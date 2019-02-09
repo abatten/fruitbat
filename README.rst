@@ -1,3 +1,4 @@
+|Travis|
 ====
 FRBz
 ====
@@ -26,3 +27,6 @@ The main function you want to use is `dm_to_redshift()`::
     >>> frbs.dm_to_redshift(9, dm_err=4)
     2.0, 1.0
 
+
+.. |Travis| image:: https://travis-ci.com/abatten/frbz.svg?token=cSfgUVgVHZsxUNLefqMs&branch=master
+    :target: https://travis-ci.com/abatten/frbz
