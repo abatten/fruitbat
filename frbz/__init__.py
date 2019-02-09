@@ -1,4 +1,4 @@
-#from . import frbz
+from . import redshift_estimation
 #from .frbz import *
 
 #__all__ = ['frbz']
