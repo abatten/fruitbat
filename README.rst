@@ -1,5 +1,5 @@
 |Travis|
-====
+
 FRBz
 ====
 
@@ -11,7 +11,6 @@ Installation
 
 Run the following to install::
 
-::
     pip install frbz
 
 Usage
@@ -19,7 +18,6 @@ Usage
 
 The main function you want to use is `dm_to_redshift()`::
 
-::
     >>> import frbz
     >>> frbz.dm_to_redshift(9)
     2.0, 0.0
