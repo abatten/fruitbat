@@ -32,8 +32,8 @@ def calc_redshift(dm, dm_err=None, method='batten2019'):
     valid_methods = ['batten2019', 'inoue2004', 'ioka2003']
 
     if method not in valid_methods:
-        raise ValueError("""Method '{0}' is not a valid method for calc_redshift. 
-                            Valid methods are: 'batten2019'""".format(method))
+        raise ValueError("""Method '{m}' is not a valid method. 
+            Valid methods are: {valid}""".format(m=method, valid=valid_methods))
 
     if method == 'batten2019':
         z, z_err = _dm_to_z_batten2019(dm, dm_err)
