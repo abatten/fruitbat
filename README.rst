@@ -30,5 +30,5 @@ The main function you want to use is `dm_to_redshift()`::
     :target: https://travis-ci.com/abatten/frbz
 
 .. |Docs| image:: https://readthedocs.org/projects/frbz/badge/?version=latest
-:target: https://frbz.readthedocs.io/en/latest/?badge=latest
-:alt: Documentation Status
+    :target: https://frbz.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
