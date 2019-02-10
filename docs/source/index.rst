@@ -7,7 +7,7 @@ Documentation
 *************
 .. toctree::
    :maxdepth: 3
-   
+
    introduction
    guidelines
 

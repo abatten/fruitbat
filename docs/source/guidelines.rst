@@ -10,5 +10,5 @@ If you use FRBz please cite our paper....
 
 License
 -------
-.. literalinclude:: ../LICENSE
+.. literalinclude:: ../../LICENSE
     :language: none
