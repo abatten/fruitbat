@@ -1,4 +1,4 @@
-|Travis|
+|Travis| |Docs|
 
 FRBz
 ====
@@ -28,3 +28,7 @@ The main function you want to use is `dm_to_redshift()`::
 
 .. |Travis| image:: https://travis-ci.com/abatten/frbz.svg?token=cSfgUVgVHZsxUNLefqMs&branch=master
     :target: https://travis-ci.com/abatten/frbz
+
+.. |Docs| image:: https://readthedocs.org/projects/frbz/badge/?version=latest
+:target: https://frbz.readthedocs.io/en/latest/?badge=latest
+:alt: Documentation Status
