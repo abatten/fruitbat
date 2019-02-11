@@ -1,4 +1,4 @@
-from frbz import Frb
+from ready import Frb
 
 
 def test_frb_get_redshift_batten2019():

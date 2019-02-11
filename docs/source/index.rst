@@ -1,7 +1,7 @@
-Welcome to FRBz's documentation!
-================================
+Welcome to Ready's documentation!
+=================================
 
-This is the documentation for FRBz
+This is the documentation for Ready
 
 Documentation
 *************

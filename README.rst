@@ -1,9 +1,9 @@
 |Travis| |Docs|
 
-FRBz
+Ready
 ====
 
-FRBz is a package estimate the redshift of a Fast Radio Burst (FRB) from its
+Ready is a package estimate the redshift of a Fast Radio Burst (FRB) from its
 dispersion measure. 
 
 Installation
@@ -11,18 +11,18 @@ Installation
 
 Run the following to install::
 
-    pip install frbz
+    pip install ready
 
 Usage
 -----
 
 The main function you want to use is `dm_to_redshift()`::
 
-    >>> import frbz
-    >>> frbz.dm_to_redshift(9)
+    >>> import ready
+    >>> ready.dm_to_redshift(9)
     2.0, 0.0
 
-    >>> frbs.dm_to_redshift(9, dm_err=4)
+    >>> ready.dm_to_redshift(9, dm_err=4)
     2.0, 1.0
 
 
