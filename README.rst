@@ -13,6 +13,10 @@ Run the following to install::
 
     pip install ready
 
+Or you can clone this repository::
+    
+    git clone https://github.com/abatten/ready
+
 Usage
 -----
 
