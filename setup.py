@@ -1,10 +1,12 @@
 from setuptools import setup
+from codecs import open
 
 with open("README.rst", "r") as f:
     long_description = f.read()
 
-#with open('requirements.txt', 'r') as f:
-#    requirements = f.read().splitlines()
+with open("requirements.txt", "r") as f:
+    requirements = f.read().splitlines()
+
 
 setup(
     name='ready',
@@ -13,7 +15,7 @@ setup(
     py_modules=["ready"],
     package_dir={"ready": "ready"},
     long_description=long_description,
-#    install_requires=requirements,
+    install_requires=requirements,
 
     classifiers=[
         "Programming Language :: Python :: 3",
