@@ -8,7 +8,7 @@ with open("README.rst", "r") as f:
 
 setup(
     name='ready',
-    version='0.0.1-dev',
+    version='0.0.1',
     description='Calculate the redshift of a FRB from its dispersion measure',
     py_modules=["ready"],
     package_dir={"ready": "ready"},
@@ -19,7 +19,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
-        "License :: OSI Approved :: GNU General Public License v3.0 (GPLv3)",
+        "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
     ],
 )

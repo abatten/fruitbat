@@ -7,11 +7,6 @@ python:
 
 install:
     - pip install tox
-    - pip install codecov
 
 script:
-    - coverage run tests/test_frbz.py
     - tox -v -e py
-
-after_success:
-    - codecov
