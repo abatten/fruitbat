@@ -9,11 +9,11 @@ with open("requirements.txt", "r") as f:
 
 
 setup(
-    name='ready',
+    name='fruitbat',
     version='0.0.1',
     description='Calculate the redshift of a FRB from its dispersion measure',
-    py_modules=["ready"],
-    package_dir={"ready": "ready"},
+    py_modules=["fruitbat"],
+    package_dir={"fruitbat": "fruitbat"},
     long_description=long_description,
     install_requires=requirements,
 

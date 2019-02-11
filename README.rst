@@ -1,9 +1,9 @@
 |Travis| |Docs|
 
-Ready
-====
+Fruitbat
+========
 
-**Ready** is an open source python package used to estimate the redshift of 
+**Fruitbat** is an open source python package used to estimate the redshift of 
 Fast Radio Burst (FRB) from its dispersion measure. 
 
 Installation
@@ -11,22 +11,22 @@ Installation
 
 Run the following to install::
 
-    pip install ready
+    pip install fruitbat
 
 Or you can clone this repository::
     
-    git clone https://github.com/abatten/ready
+    git clone https://github.com/abatten/fruitbat
 
 Usage
 -----
 
 The main function you want to use is `dm_to_redshift()`::
 
-    >>> import ready
-    >>> ready.dm_to_redshift(9)
+    >>> import fruitbat
+    >>> fruitbat.dm_to_redshift(9)
     2.0, 0.0
 
-    >>> ready.dm_to_redshift(9, dm_err=4)
+    >>> fruitbat.dm_to_redshift(9, dm_err=4)
     2.0, 1.0
 
 

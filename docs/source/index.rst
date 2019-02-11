@@ -1,7 +1,7 @@
-Welcome to Ready's documentation!
-=================================
+Welcome to Fruitbat's documentation!
+====================================
 
-This is the documentation for Ready
+This is the documentation for Fruitbat
 
 Documentation
 *************
