@@ -3,8 +3,8 @@
 Ready
 ====
 
-Ready is a package estimate the redshift of a Fast Radio Burst (FRB) from its
-dispersion measure. 
+**Ready** is an open source python package used to estimate the redshift of 
+Fast Radio Burst (FRB) from its dispersion measure. 
 
 Installation
 ------------
