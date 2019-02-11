@@ -30,9 +30,9 @@ The main function you want to use is `dm_to_redshift()`::
     2.0, 1.0
 
 
-.. |Travis| image:: https://travis-ci.com/abatten/ready.svg?branch=master
-    :target: https://travis-ci.com/abatten/ready
+.. |Travis| image:: https://travis-ci.com/abatten/fruitbat.svg?branch=master
+    :target: https://travis-ci.com/abatten/fruitbat
 
-.. |Docs| image:: https://readthedocs.org/projects/frbready/badge/?version=latest
-    :target: https://frbready.readthedocs.io/en/latest/?badge=latest
+.. |Docs| image:: https://readthedocs.org/projects/fruitbat/badge/?version=latest
+    :target: https://fruitbat.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
