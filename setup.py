@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 from codecs import open
 
 with open("README.rst", "r") as f:
@@ -10,9 +10,11 @@ with open("requirements.txt", "r") as f:
 
 setup(
     name='fruitbat',
-    version='0.0.1',
+    author='Adam Batten',
+    author_email='adamjbatten@gmail.com',
+    url='https://github.com/abatten/fruitbat',
+    version='0.0.1rc1',
     description='Calculate the redshift of a FRB from its dispersion measure',
-    py_modules=["fruitbat"],
     package_dir={"fruitbat": "fruitbat"},
     long_description=long_description,
     install_requires=requirements,
@@ -21,8 +23,9 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7"
+        "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
     ],
+    packages=find_packages()
 )

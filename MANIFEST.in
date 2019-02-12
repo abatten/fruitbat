@@ -1,3 +1,6 @@
 include LICENSE
 include requirements.txt
-recursive-include ready *.py
+include tox.ini
+include README.rst
+exclude docs
+recursive-exclude docs *

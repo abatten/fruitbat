@@ -1,5 +1,5 @@
 from . import estimation
-from .Frb import *
+from .frb import *
 
 __name__ = "fruitbat"
 __author__ = "Adam Batten (@abatten)"
