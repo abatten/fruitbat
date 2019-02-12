@@ -1,4 +1,4 @@
-|Travis| |Docs|
+|PyPI| |Python| |Travis| |Docs|
 
 Fruitbat
 ========
