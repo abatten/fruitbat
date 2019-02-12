@@ -129,22 +129,13 @@ class Frb(object):
         ----------
         method : str, optional
             The approximation to use when calculating the redshift. 
-            Avaliable methods: ``'batten2019'``, ``'inoue2004'``, 
-            ``'ioka2003'``
+            Avaliable methods: ``'batten2019'``, ``zhang2018``,
+            ``'inoue2004'``, ``'ioka2003'``
 
         cosmology : str, optional
             The method `inoue2004` has the option to choose which cosmology 
             to assume when performing the redshift estimation.
             Avaliable cosmologies:
-
-            ``'wmap2012'`` :math:`H_0 = 70, \Omega_b = 0.0463, \Omega_m = 0.2793, \Omega_\Lambda = 0.721`
-
-            ``'planck2015'`` :math:`H_0 = 67.3, \Omega_b = 0.049, \Omega_m = 0.315, \Omega_\Lambda = 0.685`
-
-            ``'planck2018'`` :math:`H_0 = 67.36, \Omega_b = 0.04930, \Omega_m = 0.3153, \Omega_\Lambda = 0.6847`
-
-            ``'planck2018+bao'`` :math:`H_0 = 67.66, \Omega_b = 0.04897, \Omega_m = 0.3111, \Omega_\Lambda = 0.6889`
-
 
         Returns
         -------
