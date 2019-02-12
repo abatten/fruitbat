@@ -30,6 +30,13 @@ The main function you want to use is `dm_to_redshift()`::
     2.0, 1.0
 
 
+.. |PyPI| image:: https://img.shields.io/pypi/v/fruitbat.svg?label=PyPI
+    :target: https://pypi.python.org/pypi/fruitbat
+    :alt: PyPI - Latest Release
+.. |Python| image:: https://img.shields.io/pypi/pyversions/fruitbat.svg?logo=python&logoColor=white&label=Python
+    :target: https://pypi.python.org/pypi/fruitbat
+    :alt: PyPI - Python Versions
+
 .. |Travis| image:: https://travis-ci.com/abatten/fruitbat.svg?branch=master
     :target: https://travis-ci.com/abatten/fruitbat
 

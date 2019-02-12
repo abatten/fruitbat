@@ -1,7 +1,9 @@
 Welcome to Fruitbat's documentation!
 ====================================
 
-This is the documentation for Fruitbat
+This is the documentation for the **fruitbat** package, an easy and convenient
+way to estimate the redshift of Fast Radio Bursts. **Fruitbat** was created
+by *Adam Batten*
 
 Documentation
 *************
@@ -9,7 +11,9 @@ Documentation
    :maxdepth: 3
 
    introduction
+   getting_started
    guidelines
+   cosmology
 
 
 Fruitbat
