@@ -12,6 +12,15 @@ Documentation
    guidelines
 
 
+Fruitbat
+********
+.. toctree::
+    :maxdepth: 4
+    :caption: Fruitbat Documentation
+
+    docstrings/fruitbat.Frb
+    docstrings/fruitbat.estimation
+
 
 Indices and tables
 ==================

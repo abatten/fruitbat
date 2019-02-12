@@ -12,5 +12,6 @@ def test_frb_get_redshift_ioka2003():
 
 
 def test_frb_get_redshift_inoue2004():
-    f = Frb('Utmost1', 300, 1)
-    assert f.calc_redshift(method='inoue2004') == (50.0, 2.0)
+    f = Frb('Utmost1', 1000, 0)
+    assert f.calc_redshift(method='inoue2004', 
+        cosmology='planck2018+bao') == (1.1961043734381342, (0.0, 0.0))
