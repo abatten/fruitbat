@@ -33,7 +33,7 @@ The main function you want to use is `dm_to_redshift()`::
 .. |PyPI| image:: https://img.shields.io/pypi/v/fruitbat.svg?label=PyPI
     :target: https://pypi.python.org/pypi/fruitbat
     :alt: PyPI - Latest Release
-.. |Python| image:: https://img.shields.io/pypi/pyversions/fruitbat.svg?logo=python&logoColor=white&label=Python
+.. |Python| image:: https://img.shields.io/pypi/pyversions/fruitbat.svg?label=Python
     :target: https://pypi.python.org/pypi/fruitbat
     :alt: PyPI - Python Versions
 
