@@ -10,22 +10,28 @@ with open("requirements.txt", "r") as f:
 
 setup(
     name='fruitbat',
+    version='0.0.1rc1',
     author='Adam Batten',
     author_email='adamjbatten@gmail.com',
     url='https://github.com/abatten/fruitbat',
-    version='0.0.1rc1',
+    download_url="https://pypi.org/project/fruitbat",
+    project_urls={
+        'Documentation': "https://fruitbat.readthedocs.io",
+        'Source Code': "https://github.com/abatten/fruitbat"
+        },
     description='Calculate the redshift of a FRB from its dispersion measure',
-    package_dir={"fruitbat": "fruitbat"},
     long_description=long_description,
     install_requires=requirements,
-
     classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: BSD License",
-        "Operating System :: OS Independent",
-    ],
+        "Operating System :: MacOS",
+        "Operating System :: Unix",
+        ],
+    package_dir={"fruitbat": "fruitbat"},
     packages=find_packages()
+    keywords=("FRB redshift astronomy astrophysics fast radio burst"),
 )
