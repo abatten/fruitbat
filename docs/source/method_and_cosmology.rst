@@ -1,5 +1,14 @@
+Methods and Cosmology
+=====================
+
+When calculation the redshift of an FRB there are varius methods that you can choose from.
+
+Methods
+*******
+There are various methods
+
 Cosmology
-=========
+*********
 
 
 .. table::

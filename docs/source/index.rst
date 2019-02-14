@@ -5,25 +5,26 @@ This is the documentation for the **fruitbat** package, an easy and convenient
 way to estimate the redshift of Fast Radio Bursts. **Fruitbat** was created
 by *Adam Batten*
 
-Documentation
-*************
+User Guide
+**********
 .. toctree::
    :maxdepth: 3
+   :caption: User Guide
 
    introduction
    getting_started
+   method_and_cosmology
    guidelines
-   cosmology
 
-
-Fruitbat
-********
+API Documentation
+*****************
 .. toctree::
     :maxdepth: 4
-    :caption: Fruitbat Documentation
+    :caption: API Documentation
 
     docstrings/fruitbat.Frb
-    docstrings/fruitbat.estimation
+    docstrings/fruitbat.Estimate
+    docstrings/fruitbat.Utils
 
 
 Indices and tables

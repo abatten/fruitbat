@@ -1,18 +1,11 @@
-"""
-Estimation
-==========
-
-The estimation module
-"""
-
-import numpy as np
-import os
+from . import utils
 
 # __all__ = ['dm_to_redshift']
+from ._fruitbatstrings import (docstr_sub, cosmo_doc,
+                               methods_doc, dm_units_doc)
 
-
-def calc_redshift(dm, dm_uncert=None, method='batten2019', 
-                  cosmology='planck2018+bao'):
+@docstr_sub(dmunits=dm_units_doc, methods=methods_doc, cosmo=cosmo_doc)
+def redshift(dm, dm_uncert=0.0, method='inoue2004', cosmology='planck2018+bao'):
     """
     Returns the redshift of a given dispersion measure using a
     specified DM-z relation.
@@ -20,18 +13,17 @@ def calc_redshift(dm, dm_uncert=None, method='batten2019',
     Parameters
     ----------
     dm : float
-        Dispersion Measure.
+        Dispersion Measure. Units: %(dmunits)s
 
     dm_uncert : float or None
-        The uncertianty in the dispersion measure. If ``dm_err`` is `None`,
+        The uncertainty in the dispersion measure. Units: %(dmunits)s
 
     method : string, optional
         The z-DM relation to use to calculate the redshift.
-        Avaliable methods are:
-        ``'batten2019'``, ``'inoue2004'``, ``'ioka2003'``
-    
+        Avaliable methods are: %(methods)s. Default: `'inoue2004'`
+
     cosmology : string, optional
-        Avaliable cosmologies:
+        Avaliable cosmologies: %(cosmo)s. Default: `'planck2018+bao'`
 
     Returns
     -------
@@ -41,6 +33,14 @@ def calc_redshift(dm, dm_uncert=None, method='batten2019',
     z_err : float
         The uncertianty in the redshift estimation. If `dm_uncert` is `None`
         then `z_err` = 0.
+
+    Notes
+    -----
+
+    Cosmology_ has a list of the cosmological parameters used in each
+    cosmology method.
+
+    .. _Cosmology: https://fruitbat.readthedocs.io/en/latest/cosmology.html
     """
 
     valid_methods = ['batten2019', 'zhang2018', 'inoue2004', 'ioka2003']
@@ -50,18 +50,18 @@ def calc_redshift(dm, dm_uncert=None, method='batten2019',
             Valid methods are: {valid}""".format(m=method, valid=valid_methods))
 
     if method == 'batten2019':
-        z, z_uncert = _dm_to_z_batten2019(dm, dm_uncert)
+        z, z_uncert = _redshift_batten2019(dm, dm_uncert)
 
     elif method == 'inoue2004':
-        z, z_uncert = _dm_to_z_inoue2004(dm, dm_uncert, cosmology)
+        z, z_uncert = _redshift_inoue2004(dm, dm_uncert, cosmology)
 
     elif method == 'ioka2003':
-        z, z_uncert = _dm_to_z_ioka2003(dm, dm_uncert)
+        z, z_uncert = _redshift_ioka2003(dm, dm_uncert)
 
     return z, z_uncert
 
 
-def _dm_to_z_batten2019(dm, dm_err=None):
+def _redshift_batten2019(dm, dm_err=0.0):
     """
     Calculates a redshft from a dispersion measure using the DM-z
     relation from Batten, A. J. 2019, ....
@@ -69,13 +69,20 @@ def _dm_to_z_batten2019(dm, dm_err=None):
     return 12.0, 4.0
 
 
-def _dm_to_z_inoue2004(dm, dm_uncert=None, cosmology="planck2018+bao"):
+def _redshift_inoue2004(dm, dm_uncert=0.0, cosmology="planck2018+bao"):
     """
     Calculates a redshift from a dispersion measure using the DM-z
-    relation from Inoue, S. 2004, MNRAS, 348(3), 999–1008.
+    relation from Inoue2004_
 
-    Pararameters
+    Parameters
     ------------
+    dm : float
+
+    dm_uncert : float, optional
+        Default: :math:`0.0`
+
+    cosmology : str, optional
+        Default: `'planck2018+bao'`
 
     Returns
     -------
@@ -83,6 +90,18 @@ def _dm_to_z_inoue2004(dm, dm_uncert=None, cosmology="planck2018+bao"):
         The redshift of the FRB.
     z_uncert : tuple of floats
         The uncertainty in the redshift of the FRB.
+
+    Notes
+    -----
+    Inoue2004_ presents the following dispersion measure and redshift relation.
+   
+    .. math ::
+        \\mathrm{DM}(z) =0.92\\times 10^{-5} \\Omega_b h^2 c \int_0^z
+        \\frac{1 + z'}{H_0\\left(\\Omega_m (1 + z)^3 +
+        \\Omega_\\Lambda\\right)^{1/2}} dz'
+
+
+    .. _Inoue2004: http://adsabs.harvard.edu/abs/2004MNRAS.348..999I
     """
 
     cosmo_dict = {
@@ -92,14 +111,14 @@ def _dm_to_z_inoue2004(dm, dm_uncert=None, cosmology="planck2018+bao"):
         "planck2018+bao": "inoue2004_planck2018_bao.npy",
     }
 
-    lookup_table = load_lookup_table(cosmo_dict[cosmology])
+    lookup_table = utils.load_lookup_table(cosmo_dict[cosmology])
 
     z, dz_low, dz_high = _get_redshift_from_table(lookup_table, dm, dm_uncert) 
 
     return z, (dz_low, dz_high)
 
 
-def _dm_to_z_ioka2003(dm, dm_err=None):
+def _redshift_ioka2003(dm, dm_uncert=0.0):
     """
     Calculates a redshift from a dispersion measure using the DM-z
     relation from Ioka, K. 2003, ApJL, 598, L79
@@ -107,22 +126,10 @@ def _dm_to_z_ioka2003(dm, dm_err=None):
     return 100.0, 5.0
 
 
-def load_lookup_table(filename, data_dir=''):
-    """
-    Parameters
-    ----------
-    """
-    if data_dir == '':
-        data_dir = os.path.join(os.path.dirname(__file__), 'data')
-    interp_file = os.path.join(data_dir, filename) 
-    return np.load(interp_file)[()]
-
-
-def _get_redshift_from_table(table, dm, d_dm):
+def _get_redshift_from_table(table, dm, dm_uncert):
 
     z = table(dm)[()]
-
-    dz_low = abs(z - table(dm - d_dm)[()])
-    dz_high = abs(z - table(dm + d_dm)[()])
+    dz_low = abs(z - table(dm - dm_uncert)[()])
+    dz_high = abs(z - table(dm + dm_uncert)[()])
 
     return z, dz_low, dz_high

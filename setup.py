@@ -32,6 +32,6 @@ setup(
         "Operating System :: Unix",
         ],
     package_dir={"fruitbat": "fruitbat"},
-    packages=find_packages()
+    packages=find_packages(),
     keywords=("FRB redshift astronomy astrophysics fast radio burst"),
 )

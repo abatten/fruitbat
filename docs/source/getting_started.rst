@@ -25,7 +25,7 @@ Examples
     import fruitbat
 
     # Create Frb Object
-    FRB121110 = fruitbat.Frb("FRB121110", dm=534, dm_uncert, dm_galaxy=30)
+    FRB121110 = fruitbat.Frb("FRB121110", dm=534, dm_galaxy=30)
 
     # Calculate the redshift using Inoue 2004 with Planck 2018 cosmology
     FRB121110.calc_redshift(method='inoue2004', cosmology='planck2018+bao')
