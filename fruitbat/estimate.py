@@ -75,7 +75,7 @@ def _redshift_inoue2004(dm, dm_uncert=0.0, cosmology="planck2018+bao"):
     relation from Inoue2004_
 
     Parameters
-    ------------
+    ----------
     dm : float
 
     dm_uncert : float, optional
@@ -96,7 +96,7 @@ def _redshift_inoue2004(dm, dm_uncert=0.0, cosmology="planck2018+bao"):
     Inoue2004_ presents the following dispersion measure and redshift relation.
    
     .. math ::
-        \\mathrm{DM}(z) =0.92\\times 10^{-5} \\Omega_b h^2 c \int_0^z
+        \\mathrm{DM}(z) =0.92\\times 10^{-5} \\Omega_b h^2 c \\int_0^z
         \\frac{1 + z'}{H_0\\left(\\Omega_m (1 + z)^3 +
         \\Omega_\\Lambda\\right)^{1/2}} dz'
 
