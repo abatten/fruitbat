@@ -19,15 +19,25 @@ Or you can clone this repository::
 
 Usage
 -----
-
-The main function you want to use is `dm_to_redshift()`::
+To calculate the redshift from a dispersion measure the main function to use
+is estimate.redshift_::
 
     >>> import fruitbat
-    >>> fruitbat.dm_to_redshift(9)
-    2.0, 0.0
+    >>> fruitbat.estimate.redshift(845)
+    2.0
 
-    >>> fruitbat.dm_to_redshift(9, dm_err=4)
-    2.0, 1.0
+Using estimate.redshift_ you can provide a method and/or a cosmology that you
+want to assume.
+
+::
+
+    >>> fruitbat.estimate.redshift(845, method="inoue2004", cosmology="planck2018")
+    1.0131760185322125
+
+    >>> fruitbat.estimate.redshift(845, method="zhang2018", cosmology="planck2018+bao")
+    1.0131760185322125
+
+.. _estimate.redshift: https://fruitbat.readthedocs.io/en/latest/docstrings/fruitbat.Estimate.html#fruitbat.estimate.redshift
 
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/fruitbat.svg?label=PyPI
