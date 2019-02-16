@@ -14,7 +14,7 @@ or by installing it directly from `PyPI`_ with::
 
     $ pip install fruitbat
 
-You can import **fruitbat** as a package using :python:``import fruitbat``.
+You can import **fruitbat** as a package using ``import fruitbat``.
 
 
 Examples
