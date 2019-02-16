@@ -17,8 +17,8 @@ def docstr_sub(*args, **kwargs):
     return(do_sub)
 
 
-methods_doc = "``'batten2019'``, ``'zhang2018'``, ``'inoue2004'``, ``'ioka2003'``"
+_methods_doc = "``'batten2019'``, ``'zhang2018'``, ``'inoue2004'``, ``'ioka2003'``"
 
-cosmo_doc = "``'wmap2012'``, ``'planck2015'``, ``planck2018``, ``planck2018+bao``"
+_cosmo_doc = "``'wmap2012'``, ``'planck2015'``, ``planck2018``, ``planck2018+bao``"
 
-dm_units_doc = ":math:`\\rm{pc\\ cm^{-3}}`"
+_dm_units_doc = ":math:`\\rm{pc\\ cm^{-3}}`"

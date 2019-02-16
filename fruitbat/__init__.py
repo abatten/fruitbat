@@ -1,5 +1,6 @@
 from . import estimate
 from . import utils
+from . import cosmology
 from . import _fruitbatstrings
 from .frb import *
 
