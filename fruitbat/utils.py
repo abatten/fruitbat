@@ -7,7 +7,7 @@ import os
 import numpy as np
 import scipy.integrate as integrate
 import scipy.interpolate as interpolate
-#from astropy import constants as CONST
+from astropy import constants as CONST
 
 def load_lookup_table(filename, data_dir='data'):
     """
@@ -35,7 +35,7 @@ def load_lookup_table(filename, data_dir='data'):
 
 
 def create_lookup_table(filename, method, cosmology, zmin=0, zmax=30,
-                        num_samples=1e5):
+                        num_samples=1e5, *args, **kwargs):
     """
     Creates a lookup table
 
@@ -109,11 +109,29 @@ def _create_lookup_table_inoue2004(filename, cosmo, zmin=0, zmax=30,
 
     return None
 
-def _create_lookup_table_zhang2018(filename, cosmo,
-                                   zmin=0, zmax=3, num_samples=1e5):
+def _create_lookup_table_zhang2018(filename, cosmo, zmin=0, zmax=3, 
+                                   num_samples=1e5, f_igm=0.83, 
+                                   free_elec=0.875, exact=True):
     """
     Creates an interpolated 1D DM-z look up table using the Zhang (2018)
     relation and a given cosmology.
+
+    Paramaters
+    ----------
+    filename: str
+
+    cosmo: dict
+
+    zmin: int or float, optional
+
+    zmax: int or float, optional
+
+    num_samples: float, optional
+
+    f_igm: float, optional
+        Default: 0.83
+
+    free_eled
     """
 
     def _integrand(z, cosmo):
@@ -123,24 +141,27 @@ def _create_lookup_table_zhang2018(filename, cosmo,
         f = top / np.sqrt(bot)
         return f
 
-    def _calc_dm(z, cosmo):
-        C_CGS = CONST.c.cgs.value  # Speed of Light c
-        G_CGS = CONST.G.cgs.value  # Gravitational Constant G
-        MP_CGS = CONST.m_p.cgs.value  # Mass of Proton m_p
+    def _calc_dm(z, cosmo, exact):
 
-        coeff_top = 3 * C_CGS * cosmo["HO"] * cosmo["Omega_b"]
-        coeff_bot = 8 * np.pi * C_CGS * MP_CGS
-        coeff = coeff_top / coeff_bot
+        if exact:
+            # Check that the user has provided all the required values
+            cosmo_required_keys = ["HO", "Omega_m", "Omega_b", "Omega_L"]
+            _check_keys_in_dict(cosmo, cosmo_required_keys)
 
-        print(coeff)
+            coeff_top = 3 * CONST.c * cosmo["HO"] * cosmo["Omega_b"]
+            coeff_bot = 8 * np.pi * CONST.G * CONST.m_p
+            coeff = coeff_top / coeff_bot
 
-        dm = coeff * f_igm * free_elec * integrate.quad(_integrand, 0, z,
-                                                       args=(cosmo))[0] 
+            coeff = coeff.to("pc cm**-3")
+            dm = coeff * f_igm * free_elec * integrate.quad(_integrand, 0, z,
+                                                           args=(cosmo))[0]
+        else:
+            dm = 855 * z * free_elec * f_igm
+
         return dm
 
-
     z_vals = np.linspace(zmin, zmax, num_samples)
-    dm_vals = np.array([_calc_dm(zi, cosmo) for zi in zvals])
+    dm_vals = np.array([_calc_dm(zi, cosmo).value for zi in z_vals])
     interp = interpolate.interp1d(dm_vals, z_vals)
 
     _save_lookup_table(interp, filename)
@@ -148,7 +169,31 @@ def _create_lookup_table_zhang2018(filename, cosmo,
     return None
 
 
+def _check_keys_in_dict(dictionary, keys):
+    """
+    Checks that a list of keys exist in a dictionary.
+
+    Parameters
+    ----------
+    dictionary: dict
+
+    keys: list of strings
+        
+
+    Returns
+    -------
+    bool:
+        True
+    """
+    if not all(key in dictionary for key in keys):
+        raise KeyError("Dictionary missing key values." 
+                       "Requires: {}".format(keys))
+    return True
+
 
 def _save_lookup_table(table, filename):
+    """
+    Saves the lookup table to a .npy file
+    """
     np.save(filename, table)
     return None
