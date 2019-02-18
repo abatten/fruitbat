@@ -126,7 +126,7 @@ class Frb(object):
         return 'Frb({0})'.format(vars(self))
 
     @docstr_sub(methods=_methods_doc, cosmo=_cosmo_doc)
-    def calc_redshift(self, method='inoue2004', cosmology="planck2018+bao"):
+    def calc_redshift(self, method='inoue2004', cosmology="planck2018"):
         """
         Calculate the redshift of the FRB from its dm or dm_excess
 

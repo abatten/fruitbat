@@ -34,7 +34,7 @@ want to assume.
     >>> fruitbat.estimate.redshift(845, method="inoue2004", cosmology="planck2018")
     1.0131760185322125
 
-    >>> fruitbat.estimate.redshift(845, method="zhang2018", cosmology="planck2018+bao")
+    >>> fruitbat.estimate.redshift(845, method="inoue2004", cosmology="planck2015")
     1.0131760185322125
 
 .. _estimate.redshift: https://fruitbat.readthedocs.io/en/latest/docstrings/fruitbat.Estimate.html#fruitbat.estimate.redshift
