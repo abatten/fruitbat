@@ -6,6 +6,8 @@ Fruitbat
 **Fruitbat** is an open source python package used to estimate the redshift of 
 Fast Radio Burst (FRB) from its dispersion measure. 
 
+**NOTE: FRUITBAT IS CURRENTLY IN EARLY DEVELOPMENT AND IS NOT READY FOR SCIENCE YET**
+
 Installation
 ------------
 
