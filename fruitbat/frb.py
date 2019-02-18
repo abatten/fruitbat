@@ -33,7 +33,6 @@ class Frb(object):
         The dispersion measure of the FRB host galaxy.
         Units: %(dm_units)s Default: 0.0
 
-
     dm_excess : float or None, optional
         The DM excess of the FRB over the estimated Galactic DM. If
         `dm_excess` is *None*, then `dm_excess` is calculated by
