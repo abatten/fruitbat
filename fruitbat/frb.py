@@ -6,10 +6,10 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 
 from . import estimate
-from ._fruitbatstrings import (docstr_sub, _methods_doc, 
+from ._fruitbatstrings import (_docstr_sub, _methods_doc, 
                                _cosmo_doc, _dm_units_doc)
 
-@docstr_sub(dm_units=_dm_units_doc)
+@_docstr_sub(dm_units=_dm_units_doc)
 class Frb(object):
     """
     Defines the :class:`~Frb` class in the **fruitbat** package.
@@ -152,7 +152,7 @@ class Frb(object):
     def __repr__(self):
         return 'Frb({0})'.format(vars(self))
 
-    @docstr_sub(methods=_methods_doc, cosmo=_cosmo_doc)
+    @_docstr_sub(methods=_methods_doc, cosmo=_cosmo_doc)
     def calc_redshift(self, method='inoue2004', cosmology="planck2018"):
         """
         Calculate the redshift of the FRB from its dm or dm_excess

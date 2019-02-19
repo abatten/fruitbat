@@ -1,10 +1,10 @@
 from . import utils
 
 # __all__ = ['dm_to_redshift']
-from ._fruitbatstrings import (docstr_sub, _cosmo_doc,
+from ._fruitbatstrings import (_docstr_sub, _cosmo_doc,
                                _methods_doc, _dm_units_doc)
 
-@docstr_sub(dmunits=_dm_units_doc, methods=_methods_doc, cosmo=_cosmo_doc)
+@_docstr_sub(dmunits=_dm_units_doc, methods=_methods_doc, cosmo=_cosmo_doc)
 def redshift(dm, dm_uncert=0.0, method='inoue2004', cosmology='planck2018'):
     """
     Returns the redshift of a given dispersion measure using a
@@ -71,7 +71,7 @@ def _redshift_batten2019(dm, dm_uncert=0.0):
     """
     return 12.0
 
-@docstr_sub(dm_units=_dm_units_doc)
+@_docstr_sub(dm_units=_dm_units_doc)
 def _redshift_inoue2004(dm, dm_uncert=0.0, cosmology="planck2018"):
     """
     Calculates a redshift from a dispersion measure using the DM-z
