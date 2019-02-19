@@ -35,9 +35,9 @@ section of the documentation made just for you! Otherwise the tl;dr is the
 following:
 
 Most of the calculations will be centred around the `Frb class`_. You can
-can define an instance of the :class:`~Frb` with a name and a dispersion 
+can define an instance of the `~Frb` with a name and a dispersion 
 measure. To calculate the redshift of the FRB use the method 
-:method:`calc_redshift()` ::
+`calc_redshift_` ::
 
     >>> import fruitbat
     >>> frb = fruitbat.Frb("FRB121102", dm=557, dm_excess=369)
@@ -52,9 +52,16 @@ You can provide a method and/or a cosmology that you want to assume.
     0.42190276949033323
 
 
-.. _Frb class: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Frb
-.. _estimate.redshift: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.estimate.html#fruitbat.estimate.redshift
+.. _Frb class: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Frb.html
+.. _calc_redshift: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Frb.html#fruitbat.Frb.calc_redshift
 .. _Getting Started: https://fruitbat.readthedocs.io/en/latest/user_guide/getting_started
+
+
+Referencing Fruitbat
+--------------------
+If you use ``fruitbat`` in your research, we would like it if you could
+reference us. :)
+
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/fruitbat.svg?label=PyPI
     :target: https://pypi.python.org/pypi/fruitbat
