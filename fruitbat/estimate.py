@@ -138,7 +138,12 @@ def _redshift_zhang2018(dm, dm_uncert=0.0, cosmology="planck2018"):
 
     .. _Zhang2018: https://ui.adsabs.harvard.edu/#abs/arXiv:1808.05277
     """
-    return 187.0
+
+    cosmo_dict = {"planck2018": "zhang2018_planck2018.npy"}
+    lookup_table = utils.load_lookup_table(cosmo_dict[cosmology])
+    z = _get_redshift_from_table(lookup_table, dm, dm_uncert)
+
+    return z
 
 
 def _get_redshift_from_table(table, dm, dm_uncert):
