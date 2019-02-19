@@ -5,6 +5,9 @@ from astropy import units as u
 
 def planck2018():
     """
+
+    https://ui.adsabs.harvard.edu/#abs/arXiv:1807.06209
+
     Returns
     -------
     dict

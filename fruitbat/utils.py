@@ -7,7 +7,7 @@ import os
 import numpy as np
 import scipy.integrate as integrate
 import scipy.interpolate as interpolate
-from astropy import constants as CONST
+import astropy.constants as CONST
 
 def load_lookup_table(filename, data_dir='data'):
     """
@@ -72,7 +72,7 @@ def create_lookup_table(filename, method, cosmology, zmin=0, zmax=30,
     
 
 def _create_lookup_table_inoue2004(filename, cosmo, zmin=0, zmax=30, 
-                                   num_samples=1e5):
+                                   num_samples=1e5, *args, **kwargs):
     """
     Creates an interpolated 1D DM-z look up table using the Inoue (2004)
     relation and a given cosmology.
@@ -111,12 +111,12 @@ def _create_lookup_table_inoue2004(filename, cosmo, zmin=0, zmax=30,
 
 def _create_lookup_table_zhang2018(filename, cosmo, zmin=0, zmax=3, 
                                    num_samples=1e5, f_igm=0.83, 
-                                   free_elec=0.875, exact=True):
+                                   free_elec=0.875, *args, **kwargs):
     """
     Creates an interpolated 1D DM-z look up table using the Zhang (2018)
     relation and a given cosmology.
 
-    Paramaters
+    Parameters
     ----------
     filename: str
 
@@ -141,7 +141,7 @@ def _create_lookup_table_zhang2018(filename, cosmo, zmin=0, zmax=3,
         f = top / np.sqrt(bot)
         return f
 
-    def _calc_dm(z, cosmo, exact):
+    def _calc_dm(z, cosmo, *args, **kwargs):
 
         if exact:
             # Check that the user has provided all the required values
@@ -156,12 +156,12 @@ def _create_lookup_table_zhang2018(filename, cosmo, zmin=0, zmax=3,
             dm = coeff * f_igm * free_elec * integrate.quad(_integrand, 0, z,
                                                            args=(cosmo))[0]
         else:
-            dm = 855 * z * free_elec * f_igm
+            dm = 1168 * f_igm * free_elec * z
 
         return dm
 
     z_vals = np.linspace(zmin, zmax, num_samples)
-    dm_vals = np.array([_calc_dm(zi, cosmo).value for zi in z_vals])
+    dm_vals = np.array([_calc_dm(zi, cosmo, exact=exact).value for zi in z_vals])
     interp = interpolate.interp1d(dm_vals, z_vals)
 
     _save_lookup_table(interp, filename)

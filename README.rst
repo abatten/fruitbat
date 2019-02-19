@@ -8,6 +8,13 @@ Fast Radio Burst (FRB) from its dispersion measure.
 
 **NOTE: FRUITBAT IS CURRENTLY IN EARLY DEVELOPMENT AND IS NOT READY FOR SCIENCE YET**
 
+
+Documentation
+-------------
+
+The documentation for **fruitbat** can be found at 
+https://fruitbat.readthedocs.io/en/latest/index.html.
+
 Installation
 ------------
 
@@ -18,21 +25,25 @@ Run the following to install::
 Or you can clone this repository::
     
     git clone https://github.com/abatten/fruitbat
+    cd fruitbat
+    pip install .
 
 Usage
 -----
-To get started you can read the `Getting Started`_ section of the online
-documentation.
+If you want to get started using **fruitbat** there is a `Getting Started`_ 
+section of the documentation made just for you! Otherwise the tl;dr is the
+following:
 
-::
+Most of the calculations will be centred around the `Frb class`_. You can
+can define an instance of the :class:`~Frb` with a name and a dispersion 
+measure. To calculate the redshift of the FRB use the method 
+:method:`calc_redshift()` ::
 
     >>> import fruitbat
     >>> frb = fruitbat.Frb("FRB121102", dm=557, dm_excess=369)
     >>> frb.calc_redshift()
     0.4537827606357084
     
-
-
 You can provide a method and/or a cosmology that you want to assume.
 
 ::
@@ -41,7 +52,8 @@ You can provide a method and/or a cosmology that you want to assume.
     0.42190276949033323
 
 
-.. _estimate.redshift: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Estimate.html#fruitbat.estimate.redshift
+.. _Frb class: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Frb
+.. _estimate.redshift: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.estimate.html#fruitbat.estimate.redshift
 .. _Getting Started: https://fruitbat.readthedocs.io/en/latest/user_guide/getting_started
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/fruitbat.svg?label=PyPI
