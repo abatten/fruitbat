@@ -81,13 +81,13 @@ class Frb(object):
         calculated by :math:`\\rm{W_{obs} \\times S_{peak,obs}}`
         Units: :math:`\\rm{Jy\\ ms}` Default: *None*
 
-    raj, decj : str or None, optional
+    raj and decj : str or None, optional
         The right ascension and declination in J2000 coordinates of the 
         pointing centre of the detection beam. This corresponds only to the 
         positioning of
         the beam centre. Default: *None*
 
-    gl, gb : str or None, optional
+    gl and gb : str or None, optional
         The Galactic longitude and latitude in degree of the best estimate of 
         the best estimate of the FRB position. Default: *None*
 
@@ -179,7 +179,6 @@ class Frb(object):
 
         Notes
         -----
-
         Cosmology_ has a list of the cosmological parameters used in each
         cosmology method.
 
@@ -213,8 +212,8 @@ class Frb(object):
             skycoords = SkyCoord(self.gl, self.gb, frame="galactic", 
                                 unit=u.deg)
         else:
-            raise ValueError("To calculate skycoords either (raj and decj)"
-                             "or (gl, gb) must be provided")
+            raise ValueError("To calculate skycoords either (`raj` and `decj`)"
+                             "or (`gl`, `gb`) must be provided")
 
 
         return skycoords

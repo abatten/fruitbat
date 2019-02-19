@@ -21,3 +21,4 @@ by *Adam Batten*
     api/fruitbat.Frb
     api/fruitbat.estimate
     api/fruitbat.utils
+    api/fruitbat.cosmology
