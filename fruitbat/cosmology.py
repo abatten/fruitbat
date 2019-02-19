@@ -84,3 +84,23 @@ def wmap2013():
     wmap2013["sigma8"] = 0.820 * u.Mpc
 
     return wmap2013
+
+def eagle():
+    """
+    Returns
+    -------
+    dict
+        The cosmology that is used in the EAGLE simulations
+    """
+
+    eagle = {}
+
+    eagle["HO"] = 67.77 * u.km / u.s / u.Mpc
+    eagle["Omega_m"] = 0.307
+    eagle["Omega_L"] = 0.693
+    eagle["Omega_b"] = 0.04825
+    eagle["sigma8"] = 0.8288
+    eagle["ns"] = 0.9611
+    eagle["Y"] = 0.248
+
+    return eagle

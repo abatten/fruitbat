@@ -179,10 +179,14 @@ class Frb(object):
 
         Notes
         -----
-        Cosmology_ has a list of the cosmological parameters used in each
-        cosmology method.
+        The methods_ section in the documentation has a discription of each 
+        methods and where they should apply.
 
-        .. _Cosmology: https://fruitbat.readthedocs.io/en/latest/cosmology.html
+        The cosmology_ section of the documentation has a list of the 
+        cosmological parameters used in each cosmology method.
+
+        .. _cosmology: https://fruitbat.readthedocs.io/en/latest/user_guide/method_and_cosmology.html#cosmology
+        .. _methods: https://fruitbat.readthedocs.io/en/latest/user_guide/method_and_cosmology.html#methods
         """
 
         z  = estimate.redshift(self.dm_excess, self.dm_uncert, 
