@@ -2,6 +2,9 @@
 Provides definition of the Frb class and member functions.
 """
 
+from astropy.coordinates import SkyCoord
+import astropy.units as u
+
 from . import estimate
 from ._fruitbatstrings import (docstr_sub, _methods_doc, 
                                _cosmo_doc, _dm_units_doc)
@@ -78,21 +81,26 @@ class Frb(object):
         calculated by :math:`\\rm{W_{obs} \\times S_{peak,obs}}`
         Units: :math:`\\rm{Jy\\ ms}` Default: *None*
 
-    raj : str or None, optional
-        The right ascension in J2000 coordinates of the pointing centre
-        of the detection beam. This corresponds only to the positioning of
+    raj, decj : str or None, optional
+        The right ascension and declination in J2000 coordinates of the 
+        pointing centre of the detection beam. This corresponds only to the 
+        positioning of
         the beam centre. Default: *None*
 
-    decj : str or None, optional
-        The declination in J2000 coordinates of the pointing centre of
-        the detection beam. This corresponds only to the positioning of
-        the beam centre. Default: *None*
+    gl, gb : str or None, optional
+        The Galactic longitude and latitude in degree of the best estimate of 
+        the best estimate of the FRB position. Default: *None*
+
+    skycoords : astropy.coordinates.sky_coordinate.SkyCoord or None, optional
+        The skycoords of the FRB. This is calculated from either (raj, decj) or
+        (gl, gb)
     """
 
     def __init__(self, name, dm, dm_uncert=0.0, dm_galaxy=0.0, dm_host=0.0, 
                  dm_excess=None, dm_index=None, z=None, z_uncert=0.0, 
                  scatt_index=None, snr=None, w_obs=None, s_peak_obs=None, 
-                 f_obs=None, raj=None, decj=None):
+                 f_obs=None, raj=None, decj=None, gl=None, gb=None, 
+                 skycoords=None):
 
         self.name = name
         self.dm = dm
@@ -113,14 +121,33 @@ class Frb(object):
         self.snr = snr
         self.w_obs = w_obs
         self.s_peak_obs = s_peak_obs
+        self.raj = raj
+        self.decj = decj
+        self.gl = gl
+        self.gb = gb
 
         # Calculate F_obs if s_peak_obs and w_obs are given
         if (not f_obs) and (s_peak_obs and w_obs):
             self.calc_f_obs()
         else:
             self.f_obs = f_obs
-        self.raj = raj
-        self.decj = decj
+
+        # Calculate the skycoords of the FRB from (raj, decj) or (gl, gb)
+        if skycoords:
+            self.skycoords = skycoords
+        elif (raj and decj) is not None or (gl and gb) is not None:
+            self.skycoords = self.calc_skycoords()
+
+
+
+        if skycoords is not None:
+            self.skycoords = skycoords
+        elif raj is not None and decj is not None:
+            self.skycoords = SkyCoord(raj, decj, frame="icrs", 
+                                      unit=(u.hourangle, u.deg))
+        elif gl is not None and gb is not None:
+            self.skycoords = SkyCoord(gl, gb, frame="galactic", unit=u.deg)
+
 
     def __repr__(self):
         return 'Frb({0})'.format(vars(self))
@@ -159,14 +186,39 @@ class Frb(object):
         .. _Cosmology: https://fruitbat.readthedocs.io/en/latest/cosmology.html
         """
 
-        z  = estimate.redshift(self.dm_excess,
-                                        self.dm_uncert,
-                                        method, cosmology)
+        z  = estimate.redshift(self.dm_excess, self.dm_uncert, 
+                               method, cosmology)
 
         self.z = z
         #self.z_uncert = z_uncert
 
         return z
+
+
+    def calc_skycoords(self):
+        """
+        Calculates the skycoord position of the FRB from (raj, decj) or (gl, gb)
+
+        Returns
+        -------
+        skycoords : astropy.coordinates.sky_coordinate.SkyCoord
+            The sky coordinates of the FRB.
+
+        """
+
+        if self.raj is not None and self.decj is not None:
+            skycoords = SkyCoord(self.raj, self.decj, frame="icrs", 
+                                 unit=(u.hourangle, u.deg))
+        elif self.gl is not None and self.gb is not None:
+            skycoords = SkyCoord(self.gl, self.gb, frame="galactic", 
+                                unit=u.deg)
+        else:
+            raise ValueError("To calculate skycoords either (raj and decj)"
+                             "or (gl, gb) must be provided")
+
+
+        return skycoords
+
 
     def calc_dm_excess(self):
         """
