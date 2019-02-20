@@ -11,7 +11,8 @@ def test_methods():
 
     methods = {"batten2019": 12.0,
                "ioka2003" : 100.0,
-               "inoue2004": 1.1997438393991349
+               "inoue2004": 0.9838829149238645,
+               "zhang2018": 1.1092684927893448,
             }
 
     frb = Frb("Utmost1", dm=1000, dm_uncert=0.0)
