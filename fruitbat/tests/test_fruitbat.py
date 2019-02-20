@@ -53,10 +53,10 @@ class Test_Frb_Class(object):
     def test_invalid_method(self):
         invalid_method = "jacqui1992" 
         with pytest.raises(ValueError):
-            self.frb.calc_redshift(invalid_method)
+            self.frb.calc_redshift(method=invalid_method)
             
     
     def test_invalid_cosmology(self):
         invalid_cosmology = "cosmos_1964"
         with pytest.raises(ValueError):
-            self.frb.calc_redshift(invalid_cosmology)
+            self.frb.calc_redshift(cosmology=invalid_cosmology)
