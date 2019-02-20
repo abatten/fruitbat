@@ -68,7 +68,8 @@ def create_lookup_table(filename, method, cosmology, zmin=0, zmax=30,
     """
     
     method_table_dict = {"inoue2004": _create_lookup_table_inoue2004,
-                         "zhang2018": _create_lookup_table_zhang2018
+                         "zhang2018": _create_lookup_table_zhang2018,
+                         "ioka2003": _create_lookup_table_ioka2003
                         }
 
     
@@ -80,16 +81,79 @@ def create_lookup_table(filename, method, cosmology, zmin=0, zmax=30,
 
 
     
-def _fz_integrand(z, cosmo):
+def _fz_integrand(z, cosmology):
     """
-    Calculate the integrand for a given redshift and cosmology zhang2018 and 
-    inoue2004. 
+    Calculate the integrand for a given redshift and cosmology. This integral
+    appears in zhang2018, inoue2004 and ioka2003. 
+
+    Parameters
+    ----------
+    z : float
+        The redshift to evaluate the integral
+
+    cosmology
     """
     top = 1 + z
-    bot = cosmo["Omega_m"] * (1 + z)**3 + cosmo["Omega_L"]
+    bot = cosmology["Omega_m"] * (1 + z)**3 + cosmology["Omega_L"]
 
     return top / np.sqrt(bot)
  
+
+def _create_lookup_table_ioka2003(filename, cosmo, zmin=0, zmax=30, 
+                                  num_samples=1e5):
+    """
+    Creates an interpolated 1D DM-z look up table using the Ioka (2003)
+    relation and a given cosmology.
+
+    Parameters
+    ----------
+    filename: str
+
+    cosmo: dict
+
+    zmin: int or float, optional
+        The minimum redshift for the table. The output table will
+        not be able to estimate redshifts lower than this value. Default: 0
+    
+    zmax: int or float, optional
+        The maximum redshift for the table. The output table will
+        not be able to estimate redshifts higher than this value. Default: 30
+
+    num_samples: int, optional
+        Default: 100000
+
+    Returns
+    -------
+    None
+    """
+        
+    def _calc_dm(z, cosmo):
+        """
+        Calculate the dispersion measure from a redshift given a cosmology
+        using the Ioka (2003) relation.
+        """
+        # Check that the user has provided all the required values
+        cosmo_required_keys = ["HO", "Omega_m", "Omega_b", "Omega_L"]
+        _check_keys_in_dict(cosmo, cosmo_required_keys)
+
+        coeff_top = 3 * CONST.c * cosmo["HO"] * cosmo["Omega_b"]
+        coeff_bot = 8 * np.pi * CONST.G * CONST.m_p
+        coeff = coeff_top / coeff_bot
+        coeff = coeff.to("pc cm**-3")
+
+        dm = coeff * integrate.quad(_fz_integrand, 0, z, args=(cosmo))[0]
+
+        return dm.value
+
+    interp = _perform_interpolation(dm_func=_calc_dm, cosmology=cosmo, 
+                                    zmin=zmin, zmax=zmax, 
+                                    num_samples=num_samples)    
+    
+    _save_lookup_table(interp, filename)
+
+
+
+
 
 def _create_lookup_table_inoue2004(filename, cosmo, zmin=0, zmax=30, 
                                    num_samples=1e5, *args, **kwargs):
@@ -103,20 +167,21 @@ def _create_lookup_table_inoue2004(filename, cosmo, zmin=0, zmax=30,
 
     cosmo: dict
 
-    zmin, zmax: int or float, optional
-        The minimum and maximum redshifts for the table. The output table will
-        not be able to estimate redshifts outside of this range. Defaults: 
-        zmin=0, zmax=30
+    zmin: int or float, optional
+        The minimum redshift for the table. The output table will
+        not be able to estimate redshifts lower than this value. Default: 0
+    
+    zmax: int or float, optional
+        The maximum redshift for the table. The output table will
+        not be able to estimate redshifts higher than this value. Default: 30
 
     num_samples: int, optional
         Default: 100000
-
 
     Returns
     -------
     None
     """
-
         
     def _calc_dm(z, cosmo):
         """
@@ -163,7 +228,7 @@ def _create_lookup_table_zhang2018(filename, cosmo, zmin=0, zmax=30,
     zmax: int or float, optional
         Default: 30
 
-    num_samples: float, optional
+    num_samples: int, optional
         Default: 100000
 
     f_igm: float, optional
@@ -205,6 +270,15 @@ def _create_lookup_table_zhang2018(filename, cosmo, zmin=0, zmax=30,
 def _perform_interpolation(dm_func=None, zmin=None, zmax=None, cosmology=None,
                            num_samples=None, *args, **kwargs):
     """
+    
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+
     """
 
     z_vals = np.linspace(zmin, zmax, num_samples)
