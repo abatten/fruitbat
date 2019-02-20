@@ -1,4 +1,6 @@
 from fruitbat import Frb
+from fruitbat import utils
+
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 import pytest
@@ -60,3 +62,8 @@ class Test_Frb_Class(object):
         invalid_cosmology = "cosmos_1964"
         with pytest.raises(ValueError):
             self.frb.calc_redshift(cosmology=invalid_cosmology)
+
+def test_fz_integrand():
+    cosmology = {"Omega_m": 0.3, "Omega_L": 0.7}
+    fz = utils._fz_integrand(0, cosmology)
+    assert fz == 1.0

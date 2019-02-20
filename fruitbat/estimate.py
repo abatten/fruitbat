@@ -47,12 +47,12 @@ def redshift(dm, dm_uncert=0.0, method='inoue2004', cosmology='planck2018'):
     valid_methods = ['batten2019', 'zhang2018', 'inoue2004', 'ioka2003']
 
     if method not in valid_methods:
-        raise ValueError("""Method '{m}' is not a valid method.
-            Valid methods are: %(methods_doc)s""")
+        raise ValueError("""Method '{}' is not a valid method.
+            Valid methods are: %(methods_doc)s""".format(method))
 
     if cosmology not in cosmology_keys():
-        raise ValueError("""Cosmology '{c}' is not a valid cosmology.
-            Valid cosmologies are: %(cosmo)s""")
+        raise ValueError("""Cosmology '{}' is not a valid cosmology.
+            Valid cosmologies are: %(cosmo)s""".format(cosmology))
 
     z = _get_redshift_from_table(dm, method, cosmology)
 
