@@ -1,4 +1,4 @@
-|PyPI| |Python| |Travis| |Docs|
+|PyPI| |Python| |Travis| |Docs| |CodeCov|
 
 Fruitbat
 ========
@@ -77,3 +77,6 @@ reference us. :)
 .. |Docs| image:: https://readthedocs.org/projects/fruitbat/badge/?version=latest
     :target: https://fruitbat.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
+
+.. |CodeCov| image:: https://codecov.io/gh/codecov/fruitbat/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/codecov/fruitbat
