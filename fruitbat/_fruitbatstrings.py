@@ -5,7 +5,7 @@ documentation.
 
 
 def _docstr_sub(*args, **kwargs):
-    if *args and **kwargs:
+    if args and kwargs:
         raise InputError("Only positional or keyword arguments are allowed")
     else:
         params = args or kwargs

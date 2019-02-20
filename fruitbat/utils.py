@@ -8,6 +8,7 @@ import numpy as np
 import scipy.integrate as integrate
 import scipy.interpolate as interpolate
 import astropy.constants as CONST
+import astropy.units as u
 
 def load_lookup_table(filename, data_dir='data'):
     """
@@ -63,53 +64,87 @@ def create_lookup_table(filename, method, cosmology, zmin=0, zmax=30,
 
     Returns
     -------
-    path : str
-        The path of the created lookup table
-
+    None
     """
-    pass
     
+    method_table_dict = {"inoue2004": _create_lookup_table_inoue2004,
+                         "zhang2018": _create_lookup_table_zhang2018
+                        }
+
     
+    method_table_dict[method](filename, cosmology, zmin=zmin, zmax=zmax, 
+                              num_samples=num_samples, args=args, 
+                              kwargs=kwargs)
+
+
+
+
+    
+def _fz_integrand(z, cosmo):
+    """
+    Calculate the integrand for a given redshift and cosmology zhang2018 and 
+    inoue2004. 
+    """
+    top = 1 + z
+    bot = cosmo["Omega_m"] * (1 + z)**3 + cosmo["Omega_L"]
+
+    return top / np.sqrt(bot)
+ 
 
 def _create_lookup_table_inoue2004(filename, cosmo, zmin=0, zmax=30, 
                                    num_samples=1e5, *args, **kwargs):
     """
     Creates an interpolated 1D DM-z look up table using the Inoue (2004)
     relation and a given cosmology.
+
+    Parameters
+    ----------
+    filename: str
+
+    cosmo: dict
+
+    zmin, zmax: int or float, optional
+        The minimum and maximum redshifts for the table. The output table will
+        not be able to estimate redshifts outside of this range. Defaults: 
+        zmin=0, zmax=30
+
+    num_samples: int, optional
+        Default: 100000
+
+
+    Returns
+    -------
+    None
     """
 
-    def _integrand(z, cosmo):
-        """
-        Calculate the integrand of the Inoue2004 function
-        """
-        top = 1 + z
-        bot = cosmo["HO"] * (cosmo["Omega_m"] * (1 + z)**3 + cosmo["Omega_L"])
-
-        return top / np.sqrt(bot)
         
     def _calc_dm(z, cosmo):
         """
         Calculate the dispersion measure from a redshift given a cosmology
         using the Inoue (2004) relation.
         """
-        coeff = 0.92e-5 * cosmo["Omega_b"] * (cosmo["HO"]/100)**2
+        # Check that the user has provided all the required values
+        cosmo_required_keys = ["HO", "Omega_m", "Omega_b", "Omega_L"]
+        _check_keys_in_dict(cosmo, cosmo_required_keys)
 
-        C_CGS = CONST.c.cgs.value
+        inoue_n_e_0 = 9.2e-10 * ((u.Mpc**2 * u.s**2) / (u.km**2 * u.cm**3)) 
 
-        dm = coeff * C_CGS * integrate.quad(_integrand, 0, z, args=(cosmo))[0]
+        coeff = inoue_n_e_0 * CONST.c * cosmo["Omega_b"] * cosmo["HO"]
+        coeff = coeff.to("pc cm**-3")
 
-        return dm
+        dm = coeff * integrate.quad(_fz_integrand, 0, z, args=(cosmo))[0]
 
-    z_vals = np.linspace(zmin, zmax, num_samples)
-    dm_vals = np.array([_calc_dm(zi, cosmo) for zi in z_vals])
+        return dm.value
 
-    interp = interpolate.interp1d(dm_vals, z_vals)
-
+    interp = _perform_interpolation(dm_func=_calc_dm, cosmology=cosmo, 
+                                    zmin=zmin, zmax=zmax, 
+                                    num_samples=num_samples, args=args, 
+                                    kwargs=kwargs)    
+    
     _save_lookup_table(interp, filename)
 
-    return None
 
-def _create_lookup_table_zhang2018(filename, cosmo, zmin=0, zmax=3, 
+def _create_lookup_table_zhang2018(filename, cosmo, zmin=0, zmax=30, 
                                    num_samples=1e5, f_igm=0.83, 
                                    free_elec=0.875, *args, **kwargs):
     """
@@ -123,27 +158,30 @@ def _create_lookup_table_zhang2018(filename, cosmo, zmin=0, zmax=3,
     cosmo: dict
 
     zmin: int or float, optional
+        Default: 0
 
     zmax: int or float, optional
+        Default: 30
 
     num_samples: float, optional
+        Default: 100000
 
     f_igm: float, optional
         Default: 0.83
 
-    free_eled
+    free_elec: float, optional
+        Default: 0.875
     """
 
-    def _integrand(z, cosmo):
-        top = 1 + z
-        bot = cosmo["Omega_m"] * (1 + z)**3 + cosmo["Omega_L"]
-        
-        f = top / np.sqrt(bot)
-        return f
+    def _calc_dm(z, cosmo, approx=False, *args, **kwargs):
 
-    def _calc_dm(z, cosmo, *args, **kwargs):
+        if approx:
+            # If the user wants to create an approximate table similar to
+            # Zhang 2018 without explicitly solving the integral.
+            dm = 1168 * f_igm * free_elec * z
+            return dm
 
-        if exact:
+        else:
             # Check that the user has provided all the required values
             cosmo_required_keys = ["HO", "Omega_m", "Omega_b", "Omega_L"]
             _check_keys_in_dict(cosmo, cosmo_required_keys)
@@ -153,21 +191,27 @@ def _create_lookup_table_zhang2018(filename, cosmo, zmin=0, zmax=3,
             coeff = coeff_top / coeff_bot
 
             coeff = coeff.to("pc cm**-3")
-            dm = coeff * f_igm * free_elec * integrate.quad(_integrand, 0, z,
+            dm = coeff * f_igm * free_elec * integrate.quad(_fz_integrand, 0, z,
                                                            args=(cosmo))[0]
-        else:
-            dm = 1168 * f_igm * free_elec * z
+            return dm.value
 
-        return dm
-
-    z_vals = np.linspace(zmin, zmax, num_samples)
-    dm_vals = np.array([_calc_dm(zi, cosmo, exact=exact).value for zi in z_vals])
-    interp = interpolate.interp1d(dm_vals, z_vals)
+    interp = _perform_interpolation(dm_func=_calc_dm, cosmology=cosmo, 
+                                    zmin=zmin, zmax=zmax, 
+                                    num_samples=num_samples, args=args, 
+                                    kwargs=kwargs)
 
     _save_lookup_table(interp, filename)
 
-    return None
+def _perform_interpolation(dm_func=None, zmin=None, zmax=None, cosmology=None,
+                           num_samples=None, *args, **kwargs):
+    """
+    """
 
+    z_vals = np.linspace(zmin, zmax, num_samples)
+    dm_vals = np.array([dm_func(z, cosmology) for z in z_vals])
+    interp = interpolate.interp1d(dm_vals, z_vals)
+
+    return interp
 
 def _check_keys_in_dict(dictionary, keys):
     """
@@ -176,9 +220,10 @@ def _check_keys_in_dict(dictionary, keys):
     Parameters
     ----------
     dictionary: dict
+        
 
     keys: list of strings
-        
+        The keys that the dictionary must have.
 
     Returns
     -------

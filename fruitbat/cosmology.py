@@ -3,6 +3,36 @@ Module for defining different cosmologies
 """
 from astropy import units as u
 
+
+def avaliable_cosmologies():
+    """
+    Returns
+    -------
+    dict
+        A dictionary containing the parameters for each cosmology.
+    """
+    cosmology_dict = {
+        "wmap2013": wmap2013(),
+        "planck2013": planck2013(),
+        "planck2015": planck2015(),
+        "planck2018": planck2018(),
+        "eagle": eagle()
+    }
+
+    return cosmology_dict 
+
+
+def cosmology_keys():
+    """
+    Returns
+    -------
+    list
+        A list containing the keyword for all avaliable cosmologies.
+    """
+
+    return avaliable_cosmologies().keys()
+
+
 def planck2018():
     """
 
