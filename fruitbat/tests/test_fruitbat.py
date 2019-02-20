@@ -10,8 +10,9 @@ class Test_Frb_Class(object):
 
     # Create FRB objects for testing
     frb = Frb("Utmost1", dm=1000, dm_uncert=0.0)
-    frb_raj_decj = Frb('Utmost1', dm=1000, raj="11:05:50.0", decj="-8:34:12.0")
-    frb_gl_gb = Frb('Utmost1', dm=1000, gl="30.5", gb="-60.2") 
+    frb_raj_decj = Frb('Utmost2', dm=1000, dm_excess=1000, raj="11:05:50.0", decj="-8:34:12.0")
+    frb_gl_gb = Frb('Utmost3', dm=1000, gl="30.5", gb="-60.2") 
+    frb_w_s = Frb('Utmost4', dm=1000, w_obs=30.0, s_peak_obs=20.0)
 
     # Test that methods returns the correct value for DM=1000 and planck2018
     def test_methods(self):
@@ -51,6 +52,9 @@ class Test_Frb_Class(object):
         test_gl, test_gb = test_skycoords.l.value, test_skycoords.b.value
         assert (gl, gb) == (test_gl, test_gb)
     
+    def test_frb_calc_f_obs(self):
+        f_obs = self.frb_w_s.calc_f_obs()
+        assert f_obs == 600.0
     
     def test_invalid_method(self):
         invalid_method = "jacqui1992" 
