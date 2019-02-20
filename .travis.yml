@@ -1,5 +1,5 @@
 language: python
-os: linus
+os: linux
 dist: xenial
 sudo: false
 
