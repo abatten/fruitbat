@@ -35,7 +35,7 @@ section of the documentation made just for you! Otherwise the tl;dr is the
 following:
 
 Most of the calculations will be centred around the `Frb class`_. You can
-can define an instance of the `~Frb` with a name and a dispersion 
+can define an instance of the `Frb class`_ with a name and a dispersion 
 measure. To calculate the redshift of the FRB use the method 
 `calc_redshift_` ::
 
@@ -66,6 +66,7 @@ reference us. :)
 .. |PyPI| image:: https://img.shields.io/pypi/v/fruitbat.svg?label=PyPI
     :target: https://pypi.python.org/pypi/fruitbat
     :alt: PyPI - Latest Release
+
 .. |Python| image:: https://img.shields.io/pypi/pyversions/fruitbat.svg?label=Python
     :target: https://pypi.python.org/pypi/fruitbat
     :alt: PyPI - Python Versions
