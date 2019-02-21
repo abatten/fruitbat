@@ -14,7 +14,7 @@ install:
     - pip install -r requirements.txt
 
 script:
-    - pytest --cov=/fruitbat.
+    - pytest --cov=fruitbat/.
 
 after_success:
     - codecov
