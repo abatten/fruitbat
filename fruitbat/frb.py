@@ -138,17 +138,6 @@ class Frb(object):
         elif (raj and decj) is not None or (gl and gb) is not None:
             self.skycoords = self.calc_skycoords()
 
-
-
-        if skycoords is not None:
-            self.skycoords = skycoords
-        elif raj is not None and decj is not None:
-            self.skycoords = SkyCoord(raj, decj, frame="icrs", 
-                                      unit=(u.hourangle, u.deg))
-        elif gl is not None and gb is not None:
-            self.skycoords = SkyCoord(gl, gb, frame="galactic", unit=u.deg)
-
-
     def __repr__(self):
         return 'Frb({0})'.format(vars(self))
 

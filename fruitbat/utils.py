@@ -36,7 +36,7 @@ def load_lookup_table(filename, data_dir='data'):
 
 
 def create_lookup_table(filename, method, cosmology, zmin=0, zmax=30,
-                        num_samples=1e5, *args, **kwargs):
+                        num_samples=1e5):
     """
     Creates a lookup table
 
@@ -70,15 +70,10 @@ def create_lookup_table(filename, method, cosmology, zmin=0, zmax=30,
     method_table_dict = {"inoue2004": _create_lookup_table_inoue2004,
                          "zhang2018": _create_lookup_table_zhang2018,
                          "ioka2003": _create_lookup_table_ioka2003
-                        }
+                         }
 
-    
     method_table_dict[method](filename, cosmology, zmin=zmin, zmax=zmax, 
-                              num_samples=num_samples, args=args, 
-                              kwargs=kwargs)
-
-
-
+                              num_samples=num_samples)
 
     
 def _fz_integrand(z, cosmology):
@@ -156,7 +151,7 @@ def _create_lookup_table_ioka2003(filename, cosmo, zmin=0, zmax=30,
 
 
 def _create_lookup_table_inoue2004(filename, cosmo, zmin=0, zmax=30, 
-                                   num_samples=1e5, *args, **kwargs):
+                                   num_samples=1e5):
     """
     Creates an interpolated 1D DM-z look up table using the Inoue (2004)
     relation and a given cosmology.
@@ -203,15 +198,14 @@ def _create_lookup_table_inoue2004(filename, cosmo, zmin=0, zmax=30,
 
     interp = _perform_interpolation(dm_func=_calc_dm, cosmology=cosmo, 
                                     zmin=zmin, zmax=zmax, 
-                                    num_samples=num_samples, args=args, 
-                                    kwargs=kwargs)    
+                                    num_samples=num_samples)    
     
     _save_lookup_table(interp, filename)
 
 
 def _create_lookup_table_zhang2018(filename, cosmo, zmin=0, zmax=30, 
                                    num_samples=1e5, f_igm=0.83, 
-                                   free_elec=0.875, *args, **kwargs):
+                                   free_elec=0.875):
     """
     Creates an interpolated 1D DM-z look up table using the Zhang (2018)
     relation and a given cosmology.
@@ -262,8 +256,7 @@ def _create_lookup_table_zhang2018(filename, cosmo, zmin=0, zmax=30,
 
     interp = _perform_interpolation(dm_func=_calc_dm, cosmology=cosmo, 
                                     zmin=zmin, zmax=zmax, 
-                                    num_samples=num_samples, args=args, 
-                                    kwargs=kwargs)
+                                    num_samples=num_samples)
 
     _save_lookup_table(interp, filename)
 
