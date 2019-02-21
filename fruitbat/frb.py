@@ -1,13 +1,16 @@
 """
-Provides definition of the Frb class and member functions.
+Provides the definition of the Frb class and methods.
 """
 
 from astropy.coordinates import SkyCoord
 import astropy.units as u
 
+import pyymw16 as ymw16
+
 from . import estimate
-from ._fruitbatstrings import (_docstr_sub, _methods_doc, 
+from ._fruitbatstrings import (_docstr_sub, _methods_doc,
                                _cosmo_doc, _dm_units_doc)
+
 
 @_docstr_sub(dm_units=_dm_units_doc)
 class Frb(object):
@@ -81,26 +84,37 @@ class Frb(object):
         calculated by :math:`\\rm{W_{obs} \\times S_{peak,obs}}`
         Units: :math:`\\rm{Jy\\ ms}` Default: *None*
 
-    raj and decj : str or None, optional
-        The right ascension and declination in J2000 coordinates of the 
-        pointing centre of the detection beam. This corresponds only to the 
-        positioning of
-        the beam centre. Default: *None*
+    raj : str or None, optional
+        The right ascension in J2000 coordinates of the best estimate of the
+        FRB position. This may correspond to the pointing centre of the
+        detection beam. Default: *None*
+        
+    decj : str or None, optional
+        The declination in J2000 coordinates of the best estimate of the
+        FRB position. This may correspond to the pointing centre of the
+        detection beam. Default: *None*        
 
-    gl and gb : str or None, optional
-        The Galactic longitude and latitude in degree of the best estimate of 
-        the best estimate of the FRB position. Default: *None*
+    gl : str or None, optional
+        The Galactic longitude in degrees of the best estimate of the FRB 
+        position. Default: *None*`
+    
+    gb : str or None, optional
+        The Galactic latitude in degrees of the best estimate of the FRB 
+        position. Default: *None*
 
     skycoords : astropy.coordinates.sky_coordinate.SkyCoord or None, optional
         The skycoords of the FRB. This is calculated from either (raj, decj) or
-        (gl, gb)
+        (gl, gb). Default: *None*
+
+    utc : str or None, optional
+        The UTC time of the FRB Burst. Default: None
     """
 
     def __init__(self, name, dm, dm_uncert=0.0, dm_galaxy=0.0, dm_host=0.0, 
                  dm_excess=None, dm_index=None, z=None, z_uncert=0.0, 
                  scatt_index=None, snr=None, w_obs=None, s_peak_obs=None, 
                  f_obs=None, raj=None, decj=None, gl=None, gb=None, 
-                 skycoords=None):
+                 skycoords=None, utc=None):
 
         self.name = name
         self.dm = dm
@@ -125,6 +139,7 @@ class Frb(object):
         self.decj = decj
         self.gl = gl
         self.gb = gb
+        self.utc = utc
 
         # Calculate F_obs if s_peak_obs and w_obs are given
         if (not f_obs) and (s_peak_obs and w_obs):
@@ -233,6 +248,34 @@ class Frb(object):
         dm_excess = self.dm - self.dm_galaxy
         self.dm_excess = dm_excess
         return dm_excess
+
+
+    def calc_dm_galaxy(self, model='ymw16'):
+        """
+        Calculates the dispersion measure contribution of the Milky Way from
+        either `(raj, decj)` or `(gl, gb)`
+
+        Parameters
+        ----------
+        model : str, optional
+            Default: ymw16
+        
+        """
+        max_galaxy_dist = 25000  # units: pc
+
+        if not self.skycoords and (self.raj and self.decj) or (self.gl, self.gb):
+            self.skycoords = self.calc_skycoords()
+        elif not self.skycoords and not (self.raj and self.decj) and not (self.gl, self.gb):
+            raise ValueError("""Can not calculate dm_galaxy since coordinates
+                             for FRB burst were not provided. Please provide
+                             (raj, decj) or (gl, gb) coordinates.""")
+
+        dm_galaxy, tau_sc = ymw16.dist_to_dm(self.skycoords.l, self.skycoords.b, 
+                                             max_galaxy_dist)
+
+        self.dm_galaxy = dm_galaxy.value
+        dm_excess = self.calc_dm_excess()
+        return dm_galaxy, tau_sc
 
 
     def calc_dm_igm(self):
