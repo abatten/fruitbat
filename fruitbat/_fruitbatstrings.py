@@ -6,7 +6,7 @@ documentation.
 
 def _docstr_sub(*args, **kwargs):
     if args and kwargs:
-        raise InputError("Only positional or keyword arguments are allowed")
+        raise RuntimeError("Only positional or keyword arguments are allowed")
     else:
         params = args or kwargs
 
@@ -14,7 +14,7 @@ def _docstr_sub(*args, **kwargs):
         if docstr.__doc__:
             docstr.__doc__ = docstr.__doc__ % params
         else:
-            raise InputError("Function has no docstring for substitution")
+            raise RuntimeError("Function has no docstring for substitution")
 
         return(docstr)
     return(do_sub)

@@ -1,14 +1,17 @@
 import os
 
+import numpy as np
 from glob import glob
 import pytest
 
 from astropy.coordinates import SkyCoord
 from astropy import units as u
+import pyymw16 as ymw16
 
 import fruitbat
 from fruitbat import Frb
 from fruitbat import utils
+from fruitbat._fruitbatstrings import _docstr_sub
 
 
 class TestFrbClass(object):
@@ -24,14 +27,14 @@ class TestFrbClass(object):
     # Test that methods returns the correct value for DM=1000 and planck2018
     def test_methods(self):
         methods = {
-            "ioka2003": 0.808948679473659,
-            "inoue2004": 0.9838829149238645,
-            "zhang2018": 1.1092684927893448,
+            "ioka2003": 0.8089,
+            "inoue2004": 0.9838,
+            "zhang2018": 1.1092,
         }
 
         for method in methods.keys():
             z = self.frb.calc_redshift(method=method, cosmology="planck2018")
-            assert z == methods[method], "Test failed for: {}".format(method)
+            assert np.isclose(z, methods[method], atol=1e-4), "Failed: {}".format(method)
 
     # Test that a ValueError is raised when an invalid method is given.
     def test_invalid_method(self):
@@ -73,7 +76,7 @@ class TestFrbClass(object):
     # Test f_obs is calculated correctly when given w_obs and s_peak_obs.
     def test_frb_calc_f_obs(self):
         f_obs = self.frb_w_s.calc_f_obs()
-        assert f_obs == 600.0
+        assert np.isclose(f_obs, 600.0)
 
     # Test calc_f_obs raises a ValueError if w_obs and s_peak_obs are None.
     def test_frb_calc_f_obs_raise_error(self):
@@ -83,7 +86,7 @@ class TestFrbClass(object):
     # Test calc_dm_igm calculates the dm_igm correctly for a known host.
     def test_frb_calc_dm_igm(self):
         dm_igm = self.frb_host_known.calc_dm_igm()
-        assert dm_igm == 800.0
+        assert np.isclose(dm_igm, 800.0)
 
     # Test calc_dm_igm raises ValueError when z is None.
     def test_frb_calc_dm_igm_z_none(self):
@@ -94,6 +97,20 @@ class TestFrbClass(object):
     def test_frb_calc_dm_igm_dm_host_zero(self):
         with pytest.raises(ValueError):
             self.frb_dm_host_0.calc_dm_igm()
+
+    # Test calc_dm_galaxy calculates dm_galaxy correctly for given coordinates.
+    def test_frb_calc_dm_galaxy(self):
+        dm_galaxy = self.frb_raj_decj.calc_dm_galaxy()
+        dm_pymw16, t_sc_pymw16 = ymw16.dist_to_dm(
+            self.frb_raj_decj.skycoords.galactic.l, 
+            self.frb_raj_decj.skycoords.galactic.b, 25000)
+        assert np.isclose(dm_galaxy, dm_pymw16.value)
+
+    # Test calc_dm_galaxy raises a ValueError when no coordinates are given
+    def test_frb_cal_dm_galaxy_no_coords(self):
+        with pytest.raises(ValueError):
+            self.frb.calc_dm_galaxy(model="ymw16")
+        
 
 
 def test_create_tables():
@@ -114,8 +131,43 @@ def test_create_tables():
         os.remove(file)
 
 
-# Test _fz_integrand correctly computes for z=0
-def test_fz_integrand():
+# Test _fz_integrand correctly computes for z = 0
+def test_fz_integrand_z0():
     cosmology = {"Omega_m": 0.3, "Omega_L": 0.7}
     fz = utils._fz_integrand(0, cosmology)
-    assert fz == 1.0
+    assert np.isclose(fz, 1.0)
+
+# Test _fz_integrand correctly computes for z = 2
+def test_fz_integrand_z2():
+    cosmology = {"Omega_m": 0.3, "Omega_L": 0.7}
+    fz = utils._fz_integrand(2, cosmology)
+    assert np.isclose(fz, 1.011299)
+
+
+class TestDocstrSub(object):
+
+    @_docstr_sub(kwargs="kwargs")
+    def docstr_sub_kwargs(self):
+        """%(kwargs)s"""
+        pass
+
+    @_docstr_sub("args")
+    def docstr_sub_args(self):
+        """%s"""
+        pass
+
+    def test_docstring_substitute(self):
+        assert self.docstr_sub_kwargs.__doc__ == "kwargs"
+        assert self.docstr_sub_args.__doc__ == "args"
+
+    with pytest.raises(RuntimeError):
+        @_docstr_sub(variable="testing_no_docstr")
+        def docstr_sub_no_docstr(self):
+            pass
+
+#    with pytest.raises(RuntimeError):
+#        @_docstr_sub("positional", keyword="keyword")
+#        def docstr_sub_args_and_kwargs(self):
+#            pass
+
+
