@@ -149,12 +149,10 @@ class TestDocstrSub(object):
     @_docstr_sub(kwargs="kwargs")
     def docstr_sub_kwargs(self):
         """%(kwargs)s"""
-        pass
 
     @_docstr_sub("args")
     def docstr_sub_args(self):
         """%s"""
-        pass
 
     def test_docstring_substitute(self):
         assert self.docstr_sub_kwargs.__doc__ == "kwargs"
@@ -163,7 +161,6 @@ class TestDocstrSub(object):
     with pytest.raises(RuntimeError):
         @_docstr_sub(variable="testing_no_docstr")
         def docstr_sub_no_docstr(self):
-            pass
 
 #    with pytest.raises(RuntimeError):
 #        @_docstr_sub("positional", keyword="keyword")
