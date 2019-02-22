@@ -161,10 +161,19 @@ class TestDocstrSub(object):
     with pytest.raises(RuntimeError):
         @_docstr_sub(variable="testing_no_docstr")
         def docstr_sub_no_docstr(self):
+            x = 1 + 1
+            return x
 
-#    with pytest.raises(RuntimeError):
-#        @_docstr_sub("positional", keyword="keyword")
-#        def docstr_sub_args_and_kwargs(self):
-#            pass
+    with pytest.raises(RuntimeError):
+        @_docstr_sub("positional", keyword="keyword")
+        def docstr_sub_args_and_kwargs(self):
+            """"""
+            x = 1 + 1
+            return x
 
-
+# Test _check_keys_in_dict raises a KeyError when dict is missing keys
+def test_check_keys_in_dict():
+    required_keys = ["key1", "key2"]
+    dictionary = {"key1":1, "otherkey":2}
+    with pytest.raises(KeyError):
+        utils._check_keys_in_dict(dictionary, required_keys)
