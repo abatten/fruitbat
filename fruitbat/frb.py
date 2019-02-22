@@ -11,6 +11,7 @@ from . import estimate
 from ._fruitbatstrings import (_docstr_sub, _methods_doc,
                                _cosmo_doc, _dm_units_doc)
 
+__all__ = ["Frb"]
 
 @_docstr_sub(dm_units=_dm_units_doc)
 class Frb(object):
@@ -271,7 +272,7 @@ class Frb(object):
 
         if not self.skycoords and (self.raj and self.decj) or (self.gl, self.gb):
             self.skycoords = self.calc_skycoords()
-        elif not self.skycoords and not (self.raj and self.decj) and not (self.gl, self.gb):
+        elif not self.skycoords and not (self.raj and self.decj) and not (self.gl and self.gb):
             raise ValueError("""Can not calculate dm_galaxy since coordinates
                              for FRB burst were not provided. Please provide
                              (raj, decj) or (gl, gb) coordinates.""")

@@ -10,6 +10,9 @@ import scipy.interpolate as interpolate
 import astropy.constants as CONST
 import astropy.units as u
 
+__all__ = ["create_lookup_table", "load_lookup_table"]
+
+
 def load_lookup_table(filename, data_dir='data'):
     """
     Opens a saved `.npy` file containing an interpolated 1D function.
