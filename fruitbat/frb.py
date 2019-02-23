@@ -11,6 +11,7 @@ from . import estimate
 from ._fruitbatstrings import (_docstr_sub, _methods_doc,
                                _cosmo_doc, _dm_units_doc)
 
+__all__ = ["Frb"]
 
 @_docstr_sub(dm_units=_dm_units_doc)
 class Frb(object):
@@ -152,6 +153,8 @@ class Frb(object):
             self.skycoords = skycoords
         elif (raj and decj) is not None or (gl and gb) is not None:
             self.skycoords = self.calc_skycoords()
+        else:
+            self.skycoords = None
 
     def __repr__(self):
         return 'Frb({0})'.format(vars(self))
@@ -261,21 +264,26 @@ class Frb(object):
             Default: ymw16
         
         """
+
+        # Since the YMW16 model only gives you a dispersion measure out to a 
+        # distance within the galaxy, to get the entire DM contribution of the 
+        # galaxy we need to specify the furthest distance in the YMW16 model.
         max_galaxy_dist = 25000  # units: pc
 
         if not self.skycoords and (self.raj and self.decj) or (self.gl, self.gb):
             self.skycoords = self.calc_skycoords()
-        elif not self.skycoords and not (self.raj and self.decj) and not (self.gl, self.gb):
+        elif not self.skycoords and not (self.raj and self.decj) and not (self.gl and self.gb):
             raise ValueError("""Can not calculate dm_galaxy since coordinates
                              for FRB burst were not provided. Please provide
                              (raj, decj) or (gl, gb) coordinates.""")
 
-        dm_galaxy, tau_sc = ymw16.dist_to_dm(self.skycoords.l, self.skycoords.b, 
+        dm_galaxy, tau_sc = ymw16.dist_to_dm(self.skycoords.galactic.l, 
+                                             self.skycoords.galactic.b, 
                                              max_galaxy_dist)
 
         self.dm_galaxy = dm_galaxy.value
         dm_excess = self.calc_dm_excess()
-        return dm_galaxy, tau_sc
+        return dm_galaxy.value
 
 
     def calc_dm_igm(self):

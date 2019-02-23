@@ -28,6 +28,16 @@ Or you can clone this repository::
     cd fruitbat
     pip install .
 
+Requirements
+------------
+ - numpy
+
+ - scipy
+
+ - astropy
+
+ - pyymw16
+
 Usage
 -----
 If you want to get started using **fruitbat** there is a `Getting Started`_ 
@@ -44,16 +54,30 @@ measure. To calculate the redshift of the FRB use the method
     >>> frb.calc_redshift()
     0.4537827606357084
     
-You can provide a method and/or a cosmology that you want to assume.
+You can also provide a method and/or a cosmology that you want to assume.
 
 ::
 
     >>> frb.calc_redshift(method="zhang2018", cosmology="planck2018")
     0.42190276949033323
 
+It is also possible to specify the coordinates of the burst and use the 
+`calc_dm_galaxy_` function to calculate the DM contribution from the Milky Way
+using the YMW16 model. Performing `calc_dm_galaxy_` will automatically
+calculate the excess dispersion measure for the redshift calculation.
+
+::
+    >>> FRB190222 = fruitbat.Frb("FRB190222", dm=500, raj="12:34:43.5", decj="2:34:15.2")
+    >>> frb.calc_dm_galaxy()
+    22.436967849731445
+    >>> frb.calc_redshift()
+    0.48112390552750095
+
+
 
 .. _Frb class: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Frb.html
 .. _calc_redshift: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Frb.html#fruitbat.Frb.calc_redshift
+.. _calc_dm_galaxy: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Frb.html#fruitbat.Frb.calc_dm_galaxy
 .. _Getting Started: https://fruitbat.readthedocs.io/en/latest/user_guide/getting_started
 
 
