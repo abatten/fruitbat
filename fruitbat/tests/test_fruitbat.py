@@ -14,7 +14,7 @@ from fruitbat import utils
 from fruitbat._fruitbatstrings import _docstr_sub
 
 
-class TestFrbClass(object):
+class TestFrbClass:
 
     # Create FRB objects for testing
     frb = Frb("Utmost1", dm=1000, dm_excess=1000, dm_uncert=0.0)
@@ -104,14 +104,16 @@ class TestFrbClass(object):
         dm_pymw16, t_sc_pymw16 = ymw16.dist_to_dm(
             self.frb_raj_decj.skycoords.galactic.l, 
             self.frb_raj_decj.skycoords.galactic.b, 25000)
-        assert np.isclose(dm_galaxy, dm_pymw16.value)
+        assert np.isclose(dm_galaxy, dm_pymw16.value, atol=1e-4)
 
     # Test calc_dm_galaxy raises a ValueError when no coordinates are given
     def test_frb_cal_dm_galaxy_no_coords(self):
         with pytest.raises(ValueError):
             self.frb.calc_dm_galaxy(model="ymw16")
         
-
+    # Test that the FRB __repr__ is printed
+    def test_frb__repr__(self):
+        print(self.frb)
 
 def test_create_tables():
     method_list = ["ioka2003", "inoue2004", "zhang2018"]
@@ -144,7 +146,7 @@ def test_fz_integrand_z2():
     assert np.isclose(fz, 1.011299)
 
 
-class TestDocstrSub(object):
+class TestDocstrSub:
 
     @_docstr_sub(kwargs="kwargs")
     def docstr_sub_kwargs(self):
