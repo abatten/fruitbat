@@ -27,7 +27,7 @@ this repository::
     cd fruitbat
     pip install .
 
-.. PyPi:: https://pypi.python.org/pypi/fruitbat 
+.. _PyPi: https://pypi.python.org/pypi/fruitbat 
 
 Requirements
 ------------
