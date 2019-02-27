@@ -11,6 +11,7 @@ by *Adam Batten*
 
    user_guide/introduction
    user_guide/getting_started
+   user_guide/using_fruitbat
    user_guide/method_and_cosmology
    user_guide/guidelines
 
