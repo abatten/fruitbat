@@ -1,11 +1,41 @@
+from e13tools import docstring_substitute
+
 from . import utils
 
 # __all__ = ['dm_to_redshift']
-from ._fruitbatstrings import (_docstr_sub, _cosmo_doc,
-                               _methods_doc, _dm_units_doc)
-from .cosmology import cosmology_keys
+from ._fruitbatstrings import dm_units_doc
+from .cosmology import keys as cosmo_keys
 
-@_docstr_sub(dmunits=_dm_units_doc, methods=_methods_doc, cosmo=_cosmo_doc)
+__all__ = ["redshift", "methods"]
+
+
+def methods(string=False):
+    """
+    Defines the list of avaliable method keywords.
+
+    Methods currently avaliable: ioka2003, inoue2004, zhang2018
+
+    Parameters
+    ----------
+    string: bool, optional
+        If True, return a string of keywords instead of a list.
+
+    Returns
+    -------
+    list or str:
+        A list containing the valid method keywords. If ``string=True`` it
+        returns a single string listing all the keywords.
+    """
+    methods = ["ioka2003", "inoue2004", "zhang2018"]
+
+    if string:
+        methods = ", ".join(methods)
+
+    return methods
+
+
+@docstring_substitute(dmunits=dm_units_doc, methods=methods(string=True), 
+                      cosmo=cosmo_keys(string=True))
 def redshift(dm, dm_uncert=0.0, method='inoue2004', cosmology='planck2018'):
     """
     Returns the redshift of a given dispersion measure using a
@@ -44,13 +74,13 @@ def redshift(dm, dm_uncert=0.0, method='inoue2004', cosmology='planck2018'):
     .. _Cosmology: https://fruitbat.readthedocs.io/en/latest/cosmology.html
     """
 
-    valid_methods = ['batten2019', 'zhang2018', 'inoue2004', 'ioka2003']
+    valid_methods = methods()
 
     if method not in valid_methods:
         raise ValueError("""Method '{}' is not a valid method.
-            Valid methods are: %(methods_doc)s""".format(method))
+            Valid methods are: {}""".format(method, methods(string=True)))
 
-    if cosmology not in cosmology_keys():
+    if cosmology not in cosmo_keys():
         raise ValueError("""Cosmology '{}' is not a valid cosmology.
             Valid cosmologies are: %(cosmo)s""".format(cosmology))
 
@@ -185,3 +215,6 @@ def _get_redshift_from_table(dm, method, cosmology):
     lookup_table = utils.load_lookup_table(filename)
     z = lookup_table(dm)[()]
     return z
+
+
+

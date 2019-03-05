@@ -1,6 +1,7 @@
 include LICENSE
 include requirements.txt
-include tox.ini
+exclude tox.ini
 include README.rst
 exclude docs
 recursive-exclude docs *
+exclude *.yml

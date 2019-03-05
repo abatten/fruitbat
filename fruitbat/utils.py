@@ -7,7 +7,7 @@ import os
 import numpy as np
 import scipy.integrate as integrate
 import scipy.interpolate as interpolate
-import astropy.constants as CONST
+import astropy.constants as const
 import astropy.units as u
 
 __all__ = ["create_lookup_table", "load_lookup_table"]
@@ -92,7 +92,7 @@ def _fz_integrand(z, cosmology):
     cosmology
     """
     top = 1 + z
-    bot = cosmology["Omega_m"] * (1 + z)**3 + cosmology["Omega_L"]
+    bot = cosmology.Om0 * (1 + z)**3 + cosmology.Ode0
 
     return top / np.sqrt(bot)
  
@@ -131,11 +131,11 @@ def _create_lookup_table_ioka2003(filename, cosmo, zmin=0, zmax=30,
         using the Ioka (2003) relation.
         """
         # Check that the user has provided all the required values
-        cosmo_required_keys = ["HO", "Omega_m", "Omega_b", "Omega_L"]
-        _check_keys_in_dict(cosmo, cosmo_required_keys)
+        #cosmo_required_keys = ["HO", "Omega_m", "Omega_b", "Omega_L"]
+        #_check_keys_in_dict(cosmo, cosmo_required_keys)
 
-        coeff_top = 3 * CONST.c * cosmo["HO"] * cosmo["Omega_b"]
-        coeff_bot = 8 * np.pi * CONST.G * CONST.m_p
+        coeff_top = 3 * const.c * cosmo.H0 * cosmo.Ob0
+        coeff_bot = 8 * np.pi * const.G * const.m_p
         coeff = coeff_top / coeff_bot
         coeff = coeff.to("pc cm**-3")
 
@@ -187,12 +187,12 @@ def _create_lookup_table_inoue2004(filename, cosmo, zmin=0, zmax=30,
         using the Inoue (2004) relation.
         """
         # Check that the user has provided all the required values
-        cosmo_required_keys = ["HO", "Omega_m", "Omega_b", "Omega_L"]
-        _check_keys_in_dict(cosmo, cosmo_required_keys)
+        #cosmo_required_keys = ["HO", "Omega_m", "Omega_b", "Omega_L"]
+        #_check_keys_in_dict(cosmo, cosmo_required_keys)
 
         inoue_n_e_0 = 9.2e-10 * ((u.Mpc**2 * u.s**2) / (u.km**2 * u.cm**3)) 
 
-        coeff = inoue_n_e_0 * CONST.c * cosmo["Omega_b"] * cosmo["HO"]
+        coeff = inoue_n_e_0 * const.c * cosmo.Ob0 * cosmo.H0
         coeff = coeff.to("pc cm**-3")
 
         dm = coeff * integrate.quad(_fz_integrand, 0, z, args=(cosmo))[0]
@@ -237,25 +237,18 @@ def _create_lookup_table_zhang2018(filename, cosmo, zmin=0, zmax=30,
 
     def _calc_dm(z, cosmo, approx=False, *args, **kwargs):
 
-        if approx:
-            # If the user wants to create an approximate table similar to
-            # Zhang 2018 without explicitly solving the integral.
-            dm = 1168 * f_igm * free_elec * z
-            return dm
+        # Check that the user has provided all the required values
+        #cosmo_required_keys = ["HO", "Omega_m", "Omega_b", "Omega_L"]
+        #_check_keys_in_dict(cosmo, cosmo_required_keys)
 
-        else:
-            # Check that the user has provided all the required values
-            cosmo_required_keys = ["HO", "Omega_m", "Omega_b", "Omega_L"]
-            _check_keys_in_dict(cosmo, cosmo_required_keys)
+        coeff_top = 3 * const.c * cosmo.H0 * cosmo.Ob0
+        coeff_bot = 8 * np.pi * const.G * const.m_p
+        coeff = coeff_top / coeff_bot
 
-            coeff_top = 3 * CONST.c * cosmo["HO"] * cosmo["Omega_b"]
-            coeff_bot = 8 * np.pi * CONST.G * CONST.m_p
-            coeff = coeff_top / coeff_bot
-
-            coeff = coeff.to("pc cm**-3")
-            dm = coeff * f_igm * free_elec * integrate.quad(_fz_integrand, 0, z,
-                                                           args=(cosmo))[0]
-            return dm.value
+        coeff = coeff.to("pc cm**-3")
+        dm = coeff * f_igm * free_elec * integrate.quad(_fz_integrand, 0, z,
+                                                        args=(cosmo))[0]
+        return dm.value
 
     interp = _perform_interpolation(dm_func=_calc_dm, cosmology=cosmo, 
                                     zmin=zmin, zmax=zmax, 
