@@ -116,7 +116,7 @@ class TestFrbClass:
 
 def test_create_tables():
     method_list = ["ioka2003", "inoue2004", "zhang2018"]
-    cosmology_list = fruitbat.cosmology.keys()
+    cosmology_list = fruitbat.cosmology.builtin()
 
     for method in method_list:
         for cosmology in cosmology_list:
