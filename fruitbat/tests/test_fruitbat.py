@@ -11,7 +11,6 @@ import pyymw16 as ymw16
 import fruitbat
 from fruitbat import Frb
 from fruitbat import utils
-from fruitbat._fruitbatstrings import _docstr_sub
 
 
 class TestFrbClass:
@@ -21,8 +20,8 @@ class TestFrbClass:
     frb_raj_decj = Frb('Utmost2', dm=1000, raj="11:05:50.0", decj="-8:34:12.0")
     frb_gl_gb = Frb('Utmost3', dm=1000, gl="30.5", gb="-60.2")
     frb_w_s = Frb('Utmost4', dm=1000, w_obs=30.0, s_peak_obs=20.0)
-    frb_host_known = Frb('Utmost5', dm=1000, dm_excess=900, z=1.0, dm_host=200)
-    frb_dm_host_0 = Frb('Utmost6', dm=1000, dm_excess=900, z=1.0)
+    frb_host_known = Frb('Utmost5', dm=1000, dm_excess=900, z_host=1.0, dm_host_loc=200)
+    frb_dm_host_0 = Frb('Utmost6', dm=1000, dm_excess=900, z_host=1.0)
 
     # Test that methods returns the correct value for DM=1000 and planck2018
     def test_methods(self):
@@ -33,14 +32,14 @@ class TestFrbClass:
         }
 
         for method in methods.keys():
-            z = self.frb.calc_redshift(method=method, cosmology="planck2018")
-            assert np.isclose(z, methods[method], atol=1e-4), "Failed: {}".format(method)
+            z = self.frb.calc_redshift(method=method, cosmology="Planck18")
+            assert np.isclose(z, methods[method], rtol=1e-3), "Failed: {}".format(method)
 
     # Test that a ValueError is raised when an invalid method is given.
     def test_invalid_method(self):
         invalid_method = "jacqui1992"
         with pytest.raises(ValueError):
-            self.frb.calc_redshift(method=invalid_method)
+            self.frb.calc_redshift(method=invalid_method, cosmology="Planck18")
 
     # Test that a ValueError is raised when an invalid cosmology is given.
     def test_invalid_cosmology(self):
@@ -69,9 +68,9 @@ class TestFrbClass:
         skycoords = self.frb_gl_gb.calc_skycoords()
         test_skycoords = SkyCoord(gl_str, gb_str, frame="galactic", unit=u.deg)
 
-        gl, gb = skycoords.l.value, skycoords.b.value
+        gl, gb = skycoords.galactic.l.value, skycoords.galactic.b.value
         test_gl, test_gb = test_skycoords.l.value, test_skycoords.b.value
-        assert (gl, gb) == (test_gl, test_gb)
+        assert np.isclose((gl, gb), (test_gl, test_gb)).all()
 
     # Test f_obs is calculated correctly when given w_obs and s_peak_obs.
     def test_frb_calc_f_obs(self):
@@ -117,11 +116,11 @@ class TestFrbClass:
 
 def test_create_tables():
     method_list = ["ioka2003", "inoue2004", "zhang2018"]
-    cosmology_list = fruitbat.cosmology.cosmology_keys()
+    cosmology_list = fruitbat.cosmology.keys()
 
     for method in method_list:
         for cosmology in cosmology_list:
-            cosmo = fruitbat.cosmology.avaliable_cosmologies()[cosmology]
+            cosmo = fruitbat.cosmology.builtin()[cosmology]
             outfile_name = "_".join(["pytest_output", method, cosmology])
             fruitbat.utils.create_lookup_table(outfile_name, method=method,
                                                cosmology=cosmo, zmin=0, zmax=3,
@@ -133,42 +132,21 @@ def test_create_tables():
         os.remove(file)
 
 
-# Test _fz_integrand correctly computes for z = 0
-def test_fz_integrand_z0():
-    cosmology = {"Omega_m": 0.3, "Omega_L": 0.7}
-    fz = utils._fz_integrand(0, cosmology)
-    assert np.isclose(fz, 1.0)
+class Test_fz_integrand:
 
-# Test _fz_integrand correctly computes for z = 2
-def test_fz_integrand_z2():
-    cosmology = {"Omega_m": 0.3, "Omega_L": 0.7}
-    fz = utils._fz_integrand(2, cosmology)
-    assert np.isclose(fz, 1.011299)
+    # Create default cosmology
+    cosmo = fruitbat.cosmology.create_cosmology("MockLambdaCDM", default=True)
 
+    # Test _fz_integrand correctly computes for z = 0
+    def test_fz_integrand_z0(self):
+        fz = utils._fz_integrand(0, self.cosmo)
+        assert np.isclose(fz, 1.0)
 
-class TestDocstrSub:
+    # Test _fz_integrand correctly computes for z = 2
+    def test_fz_integrand_z2(self):
+        fz = utils._fz_integrand(2, self.cosmo)
+        assert np.isclose(fz, 1.011299)
 
-    @_docstr_sub(kwargs="kwargs")
-    def docstr_sub_kwargs(self):
-        """%(kwargs)s"""
-
-    @_docstr_sub("args")
-    def docstr_sub_args(self):
-        """%s"""
-
-    def test_docstring_substitute(self):
-        assert self.docstr_sub_kwargs.__doc__ == "kwargs"
-        assert self.docstr_sub_args.__doc__ == "args"
-
-    with pytest.raises(RuntimeError):
-        @_docstr_sub(variable="testing_no_docstr")
-        def docstr_sub_no_docstr(self):
-            pass
-
-    with pytest.raises(RuntimeError):
-        @_docstr_sub("positional", keyword="keyword")
-        def docstr_sub_args_and_kwargs(self):
-            """"""
 
 # Test _check_keys_in_dict raises a KeyError when dict is missing keys
 def test_check_keys_in_dict():
