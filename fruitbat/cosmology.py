@@ -189,15 +189,12 @@ def builtin():
     return cosmologies
 
 
-def keys(string=False):
+def keys():
     """
     Returns the keywords for builtin cosmologies.
     """
     cosmologies = builtin()
-    if string:
-        keys = ", ".join(list(cosmologies.keys()))
-    else:
-        keys = list(cosmologies.keys())
+    keys = ", ".join(cosmologies.keys())
     return keys
 
 

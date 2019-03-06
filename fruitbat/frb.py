@@ -10,7 +10,7 @@ import pyymw16 as ymw16
 
 from . import estimate
 from . import cosmology
-from ._fruitbatstrings import (dm_units_doc)
+from ._fruitbatstrings import dm_units_doc
 
 __all__ = ["Frb"]
 
@@ -189,7 +189,7 @@ class Frb(object):
         return 'Frb({0})'.format(vars(self))
 
     @docstring_substitute(methods=estimate.methods(string=True), 
-                          cosmo=cosmology.keys(string=True))
+                          cosmo=cosmology.keys())
     def calc_redshift(self, method='inoue2004', cosmology="planck2018",
         subtract_host=False):
         """
@@ -417,7 +417,13 @@ class Frb(object):
         str: 
             The name of the FRB object.
         """
-        return self._name   
+        return self._name
+
+    @name.setter
+    def name(self, val):
+        if not isinstance(val, str):
+            raise ValueError
+        self._name = val
 
     @property
     def dm(self):
