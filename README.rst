@@ -31,13 +31,18 @@ this repository::
 
 Requirements
 ------------
- - numpy
+Below are the listed requirements for running ``fruitbat`` and the purpose for
+each requirement.
 
- - scipy
+ - numpy: Array manipulation
 
- - astropy
+ - scipy: Modules for integration and interpolation
 
- - pyymw16
+ - astropy: Modules for cosmology, coordinates, constants and units
+
+ - pyymw16: Python wrapper for YMW16 galactic dispersion measure model.
+
+ - e13tools: Utility tools for writing docstrings.
 
 Usage
 -----
@@ -63,8 +68,8 @@ will specify which cosmology to assume.
 
 ::
 
-    >>> FRB121102.calc_redshift(method="zhang2018", cosmology="planck2018")
-    0.42190276843453256
+    >>> FRB121102.calc_redshift(method="zhang2018", cosmology="Planck18")
+    0.421902
 
 It is also possible to specify the coordinates of the burst and use the 
 `calc_dm_galaxy`_ function to calculate the DM contribution from the Milky Way
@@ -74,10 +79,10 @@ calculate the excess dispersion measure for the redshift calculation.
 ::
 
     >>> FRB190222 = fruitbat.Frb("FRB190222", dm=500, raj="12:34:43.5", decj="2:34:15.2")
-    >>> frb.calc_dm_galaxy()
-    22.436967849731445
-    >>> frb.calc_redshift()
-    0.48112390552750095
+    >>> FRB190222.calc_dm_galaxy()
+    22.43696
+    >>> FRB190222.calc_redshift()
+    0.481123
 
 
 
@@ -104,7 +109,7 @@ Referencing Fruitbat
 --------------------
 
 If you use ``fruitbat`` in your research, we would like it if you could
-reference us. :)
+reference us in your acknowledgements. :)
 
 
 
