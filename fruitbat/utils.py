@@ -91,14 +91,16 @@ def _fz_integrand(z, cosmology):
 
     cosmology
     """
-    top = 1 + z
-    bot = cosmology.Om0 * (1 + z)**3 + cosmology.Ode0
+    
+    w0 = cosmology.w(0)
 
+    top = 1 + z
+    bot = cosmology.Om0 * (1 + z)**3 + cosmology.Ode0 * (1 + z)**(3 + 3*w0)
     return top / np.sqrt(bot)
  
 
-def _create_lookup_table_ioka2003(filename, cosmo, zmin=0, zmax=30, 
-                                  num_samples=1e5):
+def _create_lookup_table_ioka2003(filename, cosmo, zmin=0, zmax=20, 
+                                  num_samples=1e4):
     """
     Creates an interpolated 1D DM-z look up table using the Ioka (2003)
     relation and a given cosmology.
@@ -115,10 +117,10 @@ def _create_lookup_table_ioka2003(filename, cosmo, zmin=0, zmax=30,
     
     zmax: int or float, optional
         The maximum redshift for the table. The output table will
-        not be able to estimate redshifts higher than this value. Default: 30
+        not be able to estimate redshifts higher than this value. Default: 20
 
     num_samples: int, optional
-        Default: 100000
+        Default: 10000
 
     Returns
     -------
@@ -153,8 +155,8 @@ def _create_lookup_table_ioka2003(filename, cosmo, zmin=0, zmax=30,
 
 
 
-def _create_lookup_table_inoue2004(filename, cosmo, zmin=0, zmax=30, 
-                                   num_samples=1e5):
+def _create_lookup_table_inoue2004(filename, cosmo, zmin=0, zmax=20, 
+                                   num_samples=1e4):
     """
     Creates an interpolated 1D DM-z look up table using the Inoue (2004)
     relation and a given cosmology.
@@ -171,10 +173,10 @@ def _create_lookup_table_inoue2004(filename, cosmo, zmin=0, zmax=30,
     
     zmax: int or float, optional
         The maximum redshift for the table. The output table will
-        not be able to estimate redshifts higher than this value. Default: 30
+        not be able to estimate redshifts higher than this value. Default: 20
 
     num_samples: int, optional
-        Default: 100000
+        Default: 10000
 
     Returns
     -------
@@ -206,8 +208,8 @@ def _create_lookup_table_inoue2004(filename, cosmo, zmin=0, zmax=30,
     _save_lookup_table(interp, filename)
 
 
-def _create_lookup_table_zhang2018(filename, cosmo, zmin=0, zmax=30, 
-                                   num_samples=1e5, f_igm=0.83, 
+def _create_lookup_table_zhang2018(filename, cosmo, zmin=0, zmax=20, 
+                                   num_samples=1e4, f_igm=0.83, 
                                    free_elec=0.875):
     """
     Creates an interpolated 1D DM-z look up table using the Zhang (2018)

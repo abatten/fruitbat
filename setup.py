@@ -10,7 +10,7 @@ with open("requirements.txt", "r") as f:
 
 setup(
     name='fruitbat',
-    version='0.0.2',
+    version='0.1.0',
     author='Adam Batten',
     author_email='adamjbatten@gmail.com',
     url='https://github.com/abatten/fruitbat',

@@ -43,7 +43,7 @@ def Planck18():
     return cosmo
 
 
-def create_cosmology(name, parameters=None, default=False):
+def create_cosmology(parameters=None, name=None):
     """
     A wrapper to create custom astropy cosmologies. 
     
@@ -54,18 +54,33 @@ def create_cosmology(name, parameters=None, default=False):
 
     Parameters
     ----------
-    name: str
-        The name of the cosmology. 
-
     parameters: dict or None
         A dictionary containing the cosmological parameters. The names of the 
-        parameters must conform to the same format as those in 
-        astropy.cosmology. The minimum parameters needed to specify
-        a cosmology is: 'H0', 'Om0', 'Tcmb0', 'Neff', 'm_nu', 'Ob0'
+        parameters must conform to the same format as the parameters used in 
+        astropy.cosmology. If `parameters` is *None* then default values for
+        each parameter is used.
+        
+    name: str or None, optional
+    The name of the cosmology. Default: *None*
 
-    default: bool, optional
-        Create a cosmology with default values for parameters. Should only be
-        used for testing. Default: False
+    Returns
+    -------
+    cosmology
+        
+
+    Notes
+    -----
+    Default parameter values:
+
+    .. code-block:: python 
+
+        params = {'H0': 70, 'Om0': 0.3, 'Oc0': 0.26, 'Ob0': 0.04, 'Neff': 3.04, 
+                  'flat': True, 'Tcmb0': 0.0, 'm_nu': 0.0, 'w0': -1}
+
+    If ``'flat'`` is set to ``False`` then a value of ``'Ode0'`` (current dark 
+    energy density) should be specified.
+
+
 
     .. _astropy.cosmology: http://docs.astropy.org/en/latest/cosmology/index.html
 
@@ -75,76 +90,40 @@ def create_cosmology(name, parameters=None, default=False):
     # energy is parameterised by a cosmolological constant or an equation of 
     # state.
 
+    # Set the default parameters:
+    params = {'H0': 70, 'Om0': 0.3, 'Oc0': 0.26, 'Ob0': 0.04, 'w0': -1, 
+              'Neff': 3.04, 'flat': True, 'Tcmb0': 0.0, 'm_nu': 0.0}
+    
+    # Override default parameters with supplied parameters
     if parameters is not None:
-        if parameters["flat"]:
-            if 'w0' in parameters:
-                cosmo = FlatwCDM(H0=parameters['H0'],
-                                 Om0=parameters['Om0'],
-                                 w0=parameters['w0'],
-                                 Tcmb0=parameters['Tcmb0'],
-                                 Neff=parameters['Neff'],
-                                 m_nu=u.Quantity(parameters['m_nu'], u.eV),
-                                 name=name, 
-                                 Ob0=parameters['Ob0'])
-                cosmotype = "FlatwCDM"
-
-            else:
-                cosmo = FlatLambdaCDM(H0=parameters['H0'],
-                                      Om0=parameters['Om0'],
-                                      Tcmb0=parameters['Tcmb0'],
-                                      Neff=parameters['Neff'],
-                                      m_nu=u.Quantity(parameters['m_nu'], u.eV),
-                                      name=name, 
-                                      Ob0=parameters['Ob0'])
-                cosmotype = "FlatLambdaCDM"
+        params.update(parameters)
+        
+    if params["flat"]:
+        if params['w0'] is not -1:
+            cosmo = FlatwCDM(H0=params['H0'], Om0=params['Om0'],
+                             w0=params['w0'], Tcmb0=params['Tcmb0'],
+                             Neff=params['Neff'], Ob0=params['Ob0'],
+                             m_nu=u.Quantity(params['m_nu'], u.eV), name=name)
 
         else:
-            if 'w0' in parameters:
-                cosmo = wCDM(H0=parameters['H0'],
-                                  Om0=parameters['Om0'],
-                                  Ode0=parameters['Ode0'],
-                                  w0=parameters['w0'],
-                                  Tcmb0=parameters['Tcmb0'],
-                                  Neff=parameters['Neff'],
-                                  m_nu=u.Quantity(parameters['m_nu'], u.eV),
-                                  name=name, 
-                                  Ob0=parameters['Ob0'])
-                cosmotype = "wCDM"
+            cosmo = FlatLambdaCDM(H0=params['H0'], Om0=params['Om0'],
+                                  Tcmb0=params['Tcmb0'], Neff=params['Neff'],
+                                  Ob0=params['Ob0'], name=name,
+                                  m_nu=u.Quantity(params['m_nu'], u.eV))
 
-            else:
-                cosmo = LambdaCDM(H0=parameters['H0'],
-                                  Om0=parameters['Om0'],
-                                  Ode0=parameters['Ode0'],
-                                  Tcmb0=parameters['Tcmb0'],
-                                  Neff=parameters['Neff'],
-                                  m_nu=u.Quantity(parameters['m_nu'], u.eV),
-                                  name=name, 
-                                  Ob0=parameters['Ob0'])
-                cosmotype = "LambdaCDM"
-
-        if parameters["reference"]:
-            docstr =  "{} instance of {} cosmology \n\n(from {}) "
-            cosmo.__doc__ = docstr.format(name, cosmotype, 
-                                          parameters["reference"])
-
-        else:
-            docstr =  "{} instance of {} cosmology"
-            cosmo.__doc__ = docstr.format(name, cosmotype)
-
-
-    # Have the option to create a mock FlatLambdaCDM without a param dict    
-    elif default:
-            cosmo = FlatLambdaCDM(H0=70,
-                                  Om0=0.3,
-                                  Tcmb0=0,
-                                  Neff=3.04,
-                                  m_nu=u.Quantity(0.0, u.eV),
-                                  name=name, 
-                                  Ob0=0.04)
     else:
-        raise ValueError("""Either a parameter dictionary must be supplied"""
-                         """ or specify that default=True""")
+        if params['w0'] is not -1:
+            cosmo = wCDM(H0=params['H0'], Om0=params['Om0'],
+                         Ode0=params['Ode0'], w0=params['w0'],
+                         Tcmb0=params['Tcmb0'], Neff=params['Neff'],
+                         m_nu=u.Quantity(params['m_nu'], u.eV), name=name, 
+                         Ob0=params['Ob0'])
 
+        else:
+            cosmo = LambdaCDM(H0=params['H0'], Om0=params['Om0'],
+                              Ode0=params['Ode0'], Tcmb0=params['Tcmb0'],
+                              Neff=params['Neff'], Ob0=params['Ob0'],
+                              m_nu=u.Quantity(params['m_nu'], u.eV), name=name)
     return cosmo
             
 
@@ -185,19 +164,15 @@ def builtin():
         "Planck15": Planck15(),
         "Planck18": Planck18()
     }
-
     return cosmologies
 
 
-def keys(string=False):
+def keys():
     """
-    Returns the keywords for builtin cosmologies.
+    Returns a string constaining all the keywords for builtin cosmologies.
     """
     cosmologies = builtin()
-    if string:
-        keys = ", ".join(list(cosmologies.keys()))
-    else:
-        keys = list(cosmologies.keys())
+    keys = ", ".join(cosmologies.keys())
     return keys
 
 

@@ -1,10 +1,8 @@
 from e13tools import docstring_substitute
 
 from . import utils
-
-# __all__ = ['dm_to_redshift']
 from ._fruitbatstrings import dm_units_doc
-from .cosmology import keys as cosmo_keys
+from .cosmology import keys as cosmo_keys, builtin
 
 __all__ = ["redshift", "methods"]
 
@@ -35,8 +33,8 @@ def methods(string=False):
 
 
 @docstring_substitute(dmunits=dm_units_doc, methods=methods(string=True), 
-                      cosmo=cosmo_keys(string=True))
-def redshift(dm, dm_uncert=0.0, method='inoue2004', cosmology='planck2018'):
+                      cosmo=cosmo_keys())
+def redshift(dm, dm_uncert=0.0, method='inoue2004', cosmology='Planck18'):
     """
     Returns the redshift of a given dispersion measure using a
     specified DM-z relation.
@@ -80,9 +78,9 @@ def redshift(dm, dm_uncert=0.0, method='inoue2004', cosmology='planck2018'):
         raise ValueError("""Method '{}' is not a valid method.
             Valid methods are: {}""".format(method, methods(string=True)))
 
-    if cosmology not in cosmo_keys():
+    if cosmology not in builtin().keys():
         raise ValueError("""Cosmology '{}' is not a valid cosmology.
-            Valid cosmologies are: %(cosmo)s""".format(cosmology))
+            Valid cosmologies are: {}""".format(cosmology, cosmo_keys()))
 
     z = _get_redshift_from_table(dm, method, cosmology)
 
