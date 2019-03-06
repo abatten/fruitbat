@@ -1,6 +1,7 @@
 """
-Provides the definition of the Frb class and methods.
+Frb class and method functions.
 """
+import numpy as np
 from e13tools import docstring_substitute
 
 from astropy.coordinates import SkyCoord
@@ -17,13 +18,14 @@ __all__ = ["Frb"]
 @docstring_substitute(dm_units=dm_units_doc)
 class Frb(object):
     """
-    Defines the :class:`~Frb` class in the **fruitbat** package.
+    Create a :class:`~Frb` object using the observered properties of a FRB to
+    properties including 
 
-    Arguments
-    ---------
-    name : str
-        The name of the Frb object.
+    To define a :class:`~Frb` object all it requires is an observed dispersion 
+    measure. 
 
+    Parameters
+    ----------
     dm : float
         The observed dispersion measure of the FRB. This is without Milky Way
         or host galaxy subtraction.
@@ -31,6 +33,9 @@ class Frb(object):
 
     Keyword Arguments
     -----------------
+    name : str or None, optional
+        The name of the frb object. Default: *None*
+
     raj : str or None, optional
         The right ascension in J2000 coordinates of the best estimate of the
         FRB position. Default: *None*
@@ -114,9 +119,16 @@ class Frb(object):
     z_uncert : float, optional
         The uncertainty in the redshift of the FRB. Default: 0.0
 
+
+    **Example**
+
+    >>> import fruitbat
+    >>> FRB = fruitbat.Frb(879, gl="12:31:40.5", gb="3:41:10.0")
+    >>> FRB.calc_dm_galaxy()
+    >>> FRB.calc_redshift()
     """
 
-    def __init__(self, name, dm, *, raj=None, decj=None, gl=None, gb=None,
+    def __init__(self, dm, *, name=None, raj=None, decj=None, gl=None, gb=None,
                  dm_galaxy=0.0, dm_excess=None, z_host=None, dm_host_est=0.0,
                  dm_host_loc=0.0, dm_index=None, scatt_index=None, snr=None, 
                  w_obs=None, s_peak_obs=None, f_obs=None, utc=None,
@@ -129,31 +141,26 @@ class Frb(object):
 
         self._name = name
 
+
+
         self._dm = float(dm)
-        if self._dm < 0.0:
-            raise ValueError("Dispersion Measure can not be negative.")
-
         self._dm_uncert = float(dm_uncert)
-        if self._dm_uncert < 0.0:
-            raise ValueError("Dispersion Measure can not be negative.")
-
         self._dm_galaxy = float(dm_galaxy)
-        if self._dm_galaxy < 0.0:
-            raise ValueError("Dispersion Measure can not be negative.")
-
         self._dm_host_est = float(dm_host_est)
-        if self._dm_host_est < 0.0:
-            raise ValueError("Dispersion Measure can not be negative.")
-
         self._dm_host_loc = float(dm_host_loc)
-        if self._dm_host_loc < 0.0:
-            raise ValueError("Dispersion Measure can not be negative.")
 
         # Calculate dm_excess from existing parameters if it is not given.
-        if not dm_excess:
+        if dm_excess is None:
             self.calc_dm_excess()
         else:
             self._dm_excess = dm_excess
+        print(dm)
+        dm_list = [dm, dm_galaxy, dm_host_est, dm_host_loc, 
+                   dm_uncert, self.dm_excess]
+
+        for item in dm_list:
+            if item < 0.0:
+                raise ValueError("Dispersion Measure can not be negative.")
 
         self._dm_index = dm_index
         self._z_host = z_host
@@ -168,6 +175,7 @@ class Frb(object):
         self._gl = gl
         self._gb = gb
         self._z = None
+        self._dm_igm = None
 
         # Calculate F_obs if s_peak_obs and w_obs are given
         if (not f_obs) and (s_peak_obs and w_obs):
@@ -176,7 +184,7 @@ class Frb(object):
             self._f_obs = f_obs
 
         # Calculate the skycoords of the FRB from (raj, decj) or (gl, gb)
-        if (raj and decj) is not None or (gl and gb) is not None:
+        if (raj and decj) or (gl and gb):
             self._skycoords = self.calc_skycoords()
             self._raj = self.skycoords.icrs.ra
             self._decj = self.skycoords.icrs.dec
@@ -188,9 +196,10 @@ class Frb(object):
     def __repr__(self):
         return 'Frb({0})'.format(vars(self))
 
+
     @docstring_substitute(methods=estimate.methods(string=True), 
                           cosmo=cosmology.keys())
-    def calc_redshift(self, method='inoue2004', cosmology="planck2018",
+    def calc_redshift(self, method='inoue2004', cosmology="Planck18",
         subtract_host=False):
         """
         Calculate the redshift of the FRB from its :attr:`dm`, :attr:`dm_excess` 
@@ -232,12 +241,11 @@ class Frb(object):
             raise ValueError("subtract_host must be of type bool.")
 
         if subtract_host:
-            input_dm = self.dm_excess - self.dm_host_est
+            input_dm = self._dm_excess - self._dm_host_est
         else:
-            input_dm = self.dm_excess
+            input_dm = self._dm_excess
 
-        z  = estimate.redshift(dm=input_dm, method=method, 
-                               cosmology=cosmology)
+        z  = estimate.redshift(dm=input_dm, method=method, cosmology=cosmology)
         self._z = z
         return z
 
@@ -253,12 +261,12 @@ class Frb(object):
             The sky coordinates of the FRB.
         """
 
-        if self.raj is not None and self.decj is not None:
-            skycoords = SkyCoord(self.raj, self.decj, frame="icrs", 
+        if self._raj and self._decj:
+            skycoords = SkyCoord(self._raj, self._decj, frame="icrs", 
                                  unit=(u.hourangle, u.deg))
 
-        elif self.gl is not None and self.gb is not None:
-            skycoords = SkyCoord(self.gl, self.gb, frame="galactic", 
+        elif self._gl and self._gb:
+            skycoords = SkyCoord(self._gl, self._gb, frame="galactic", 
                                 unit=u.deg)
         else:
             raise ValueError("To calculate skycoords either (raj and decj)"
@@ -286,7 +294,7 @@ class Frb(object):
 
             DM_{excess} = DM - DM_{galaxy}
         """
-        dm_excess = self.dm - self.dm_galaxy
+        dm_excess = self._dm - self._dm_galaxy
         self._dm_excess = dm_excess
         return dm_excess
 
@@ -308,20 +316,23 @@ class Frb(object):
         # galaxy we need to specify the furthest distance in the YMW16 model.
         max_galaxy_dist = 25000  # units: pc
 
-        if not self.skycoords and (self.raj and self.decj) or (self.gl, self.gb):
+        if (self.skycoords is None and 
+            (self.raj is not None and self.decj is not None) or 
+            (self.gl is not None and self.gb is not None)):
             self._skycoords = self.calc_skycoords()
-        elif not self.skycoords and not (self.raj and self.decj) and not (self.gl and self.gb):
+
+        elif not all([self.skycoords, self.raj, self.decj, self.gl, self.gb]):
             raise ValueError("""Can not calculate dm_galaxy since coordinates
                              for FRB burst were not provided. Please provide
                              (raj, decj) or (gl, gb) coordinates.""")
 
-        dm_galaxy, tau_sc = ymw16.dist_to_dm(self.skycoords.galactic.l, 
-                                             self.skycoords.galactic.b, 
+        dm_galaxy, tau_sc = ymw16.dist_to_dm(self._skycoords.galactic.l, 
+                                             self._skycoords.galactic.b, 
                                              max_galaxy_dist)
 
         self._tau_sc = tau_sc
         self._dm_galaxy = dm_galaxy.value
-        dm_excess = self.calc_dm_excess()
+        self.calc_dm_excess()
         return dm_galaxy.value
 
 
@@ -419,20 +430,15 @@ class Frb(object):
         """
         return self._name
 
-    @name.setter
-    def name(self, val):
-        if not isinstance(val, str):
-            raise ValueError
-        self._name = val
-
     @property
     def dm(self):
         """
         float: 
             The observed dispersion measure of the FRB.
         """
-        return self._dm    
+        return self._dm
  
+
 #    @property
 #    def dm_uncert(self):
 #        """
@@ -538,24 +544,37 @@ class Frb(object):
     @property
     def raj(self):
         """
-        astropy.coordinates.angles.Longitude or None: The right accension in J2000 coordinates of the best
-        estimate of the FRB position.
+        astropy.coordinates.angles.Longitude or None: 
+        The right accension in J2000 coordinates of the best estimate of the 
+        FRB position.
         """
         return self._raj
 
     @property
     def decj(self):
-        """The Milky Way component of the dispersion measure."""
+        """
+        astropy.coordinates.angles.Latitude or None: 
+        The declination in J2000 coordinates of the best estimate of the FRB 
+        position.
+        """
         return self._decj
 
     @property
     def gl(self):
-        """The Milky Way component of the dispersion measure."""
+        """
+        astropy.coordinates.angles.Longitude or None: 
+        The longitude in galactic coordinates of the best estimate of the 
+        FRB position.
+        """
         return self._gl
 
     @property
     def gb(self):
-        """The Milky Way component of the dispersion measure."""
+        """
+        astropy.coordinates.angles.Latitude or None: 
+        The latitude in galactic coordinates of the best estimate of the 
+        FRB position.
+        """
         return self._gb
 
     @property
@@ -570,6 +589,6 @@ class Frb(object):
     @property
     def dm_igm(self):
         """
-
+        
         """
         return self._dm_igm
