@@ -307,34 +307,3 @@ def _save_lookup_table(table, filename):
     """
     np.save(filename, table)
     return None
-
-
-def set_value_units(value, unit=None, non_negative=False):
-    """
-    Parameters
-    ----------
-    value: 
-
-    unit: astropy.unit
-
-    non_negative: bool, optional
-        If Default: *False*
-
-    Return
-    ------
-    var : astropy.unit.Quantity or None
-        The 
-    """
-    if value is None:
-        var = None
-    elif type(value) not in [float, int]:
-        raise ValueError("Value must be of type float or int.")
-    elif non_negative and value < 0.0:
-        raise ValueError("Value must be greater than zero.")
-    elif unit is None:
-        var = value * u.dimensionless_unscaled
-    else:
-        var = value * unit
-
-    return var
-
