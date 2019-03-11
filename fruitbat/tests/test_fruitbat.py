@@ -28,14 +28,15 @@ class TestFrbClass:
     # Test that methods returns the correct value for DM=1000 and planck2018
     def test_methods(self):
         methods = {
-            "ioka2003": 0.8089,
-            "inoue2004": 0.9838,
-            "zhang2018": 1.1092,
+            "ioka2003": 0.80856155,
+            "inoue2004": 0.98344417,
+            "zhang2018": 1.10879646
         }
 
         for method in methods.keys():
             z = self.frb.calc_redshift(method=method, cosmology="Planck18")
-            assert np.isclose(z, methods[method], rtol=1e-3), "Failed: {}".format(method)
+            print(z)
+            assert np.isclose(z.value, methods[method]), "Failed: {}".format(method)
 
     # Test that a ValueError is raised when an invalid method is given.
     def test_invalid_method(self):
@@ -87,7 +88,7 @@ class TestFrbClass:
     # Test fluence is calculated correctly when given width and peak_flux.
     def test_frb_calc_fluence(self):
         fluence = self.frb_w_s.calc_fluence()
-        assert np.isclose(fluence, 600.0)
+        assert np.isclose(fluence.value, 600.0)
 
     # Test calc_fluence raises a ValueError if width and peak_flux are None.
     def test_frb_calc_fluence_raise_error(self):
@@ -97,7 +98,7 @@ class TestFrbClass:
     # Test calc_dm_igm calculates the dm_igm correctly for a known host.
     def test_frb_calc_dm_igm(self):
         dm_igm = self.frb_host_known.calc_dm_igm()
-        assert np.isclose(dm_igm, 800.0)
+        assert np.isclose(dm_igm.value, 800.0)
 
     # Test calc_dm_igm raises ValueError when z is None.
     def test_frb_calc_dm_igm_z_none(self):
@@ -126,7 +127,7 @@ class TestFrbClass:
         dm_pymw16, t_sc_pymw16 = ymw16.dist_to_dm(
             self.frb_raj_decj.skycoords.galactic.l, 
             self.frb_raj_decj.skycoords.galactic.b, 25000)
-        assert np.isclose(dm_galaxy, dm_pymw16.value, atol=1e-4)
+        assert np.isclose(dm_galaxy.value, dm_pymw16.value)
 
     # Test calc_dm_galaxy raises a ValueError when no coordinates are given
     def test_frb_cal_dm_galaxy_no_coords(self):
