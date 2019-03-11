@@ -20,7 +20,7 @@ the following::
 
     pip install fruitbat
 
-You can install the latest deveopment version of ``fruitbat`` by cloning 
+You can install the latest development version of ``fruitbat`` by cloning 
 this repository::
     
     git clone https://github.com/abatten/fruitbat

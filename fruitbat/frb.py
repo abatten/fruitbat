@@ -18,12 +18,24 @@ __all__ = ["Frb"]
 @docstring_substitute(dm_units=dm_units_doc)
 class Frb(object):
     """
-    Create a :class:`~Frb` object using the observered properties of a FRB to
-    properties including 
+    Create a :class:`~Frb` object using the observered properties of a FRB
+    including dispersion measure (DM) and its sky coordinates. This class 
+    utilises various DM-redshift relations as well as the YMW16 galactic DM
+    model in the analysis.
 
-    To define a :class:`~Frb` object all it requires is an observed dispersion 
-    measure. 
-
+    A FRB can be defined simply with a single :attr:`dm` value. This should be 
+    the observed DM prior to subtracting the Milky Way, however if you do not
+    provide any additional information, it is asssumed that this value is also
+    the :attr:`dm_excess` (DM - Galactic DM). You can get the estimated 
+    redshift by using the method :meth:`calc_redshift`.
+    
+    To get a more accurate distance estimate you can account for
+    the contribution due to the Milky Way by supplying :attr:`dm_galaxy` or by
+    giving the coordinates of the FRB in ICRS (:attr:`raj`, :attr:`decj`) or 
+    Galactic (:attr:`gl`, :attr:`gb`) coordinates and calling the method
+    :meth:`calc_dm_galaxy`.
+    
+    
     Parameters
     ----------
     dm : float
@@ -95,18 +107,18 @@ class Frb(object):
         The signal-to-noise of the burst.
         Default: *None*
 
-    w_obs : float or None, optional
+    width : float or None, optional
         The observed width of the pulse obtained by a pulse fitting algorithm.
         Units: :math:`\\rm{ms}` Default: *None*
 
-    s_peak_obs : float or None, optional
+    peak_flux : float or None, optional
         The observed peak flux density of the burst.
         Units: :math:`\\rm{Jy}` Default: *None*
 
-    f_obs : float or None, optional
-        The observed fluence of the FRB. If :attr:`f_obs` is *None* and both
-        :attr:`w_obs` and :attr:`s_peak_obs` are not *None* then :attr:`f_obs` 
-        is automatically calculated by :attr:`w_obs` x :attr:`s_peak_obs`
+    fluence : float or None, optional
+        The observed fluence of the FRB. If :attr:`fluence` is *None* and both
+        :attr:`width` and :attr:`peak_flux` are not *None* then :attr:`fluence` 
+        is automatically calculated by :attr:`width` x :attr:`peak_flux`
         Units: :math:`\\rm{Jy\\ ms}` Default: *None*
 
     utc : str or None, optional
@@ -131,7 +143,7 @@ class Frb(object):
     def __init__(self, dm, *, name=None, raj=None, decj=None, gl=None, gb=None,
                  dm_galaxy=0.0, dm_excess=None, z_host=None, dm_host_est=0.0,
                  dm_host_loc=0.0, dm_index=None, scatt_index=None, snr=None, 
-                 w_obs=None, s_peak_obs=None, f_obs=None, utc=None,
+                 width=None, peak_flux=None, fluence=None, utc=None,
                  dm_uncert=0.0, z_uncert=0.0):
 
         # TO DO:
@@ -167,8 +179,8 @@ class Frb(object):
         self._z_uncert = z_uncert
         self._scatt_index = scatt_index
         self._snr = snr
-        self._w_obs = w_obs
-        self._s_peak_obs = s_peak_obs
+        self._width = width
+        self._peak_flux = peak_flux
         self._utc = utc
         self._raj = raj
         self._decj = decj
@@ -177,11 +189,11 @@ class Frb(object):
         self._z = None
         self._dm_igm = None
 
-        # Calculate F_obs if s_peak_obs and w_obs are given
-        if (not f_obs) and (s_peak_obs and w_obs):
-            self.calc_f_obs()
+        # Calculate F_obs if peak_flux and width are given
+        if (not fluence) and (peak_flux and width):
+            self.calc_fluence()
         else:
-            self._f_obs = f_obs
+            self._fluence = fluence
 
         # Calculate the skycoords of the FRB from (raj, decj) or (gl, gb)
         if (raj and decj) or (gl and gb):
@@ -292,7 +304,7 @@ class Frb(object):
 
         .. math::
 
-            DM_{excess} = DM - DM_{galaxy}
+            \\rm{DM_{excess} = DM - DM_{galaxy}}
         """
         dm_excess = self._dm - self._dm_galaxy
         self._dm_excess = dm_excess
@@ -371,10 +383,10 @@ class Frb(object):
         return dm_igm
 
 
-    def calc_f_obs(self):
+    def calc_fluence(self):
         """
-        Calculates the observed fluence of the FRB. This requires :attr:`w_obs`
-        and :attr:`s_peak_obs` to not be *None*.
+        Calculates the observed fluence of the FRB. This requires :attr:`width`
+        and :attr:`peak_flux` to not be *None*.
 
         Returns
         -------
@@ -383,22 +395,29 @@ class Frb(object):
 
         Notes
         -----
-        :math:`\\rm{F_{obs}}` is calculated as follows:
+        The fluence (:math:`\\rm{F_{obs}}`) is calculated as follows:
 
         .. math::
 
             \\rm{F_{obs} = W_{obs} \\times S_{peak, obs}}
         """
 
-        if (not self.w_obs) or (not self.s_peak_obs):
-            err_msg = ("calc_f_obs requires both w_obs and s_peak_obs "
+        if (not self.width) or (not self.peak_flux):
+            err_msg = ("calc_fluence requires both width and peak_flux "
                        "to not be None")
             raise ValueError(err_msg)
 
-        f_obs = self.w_obs * self.s_peak_obs
-        self._f_obs = f_obs
-        return f_obs
+        fluence = self.width * self.peak_flux
+        self._fluence = fluence
+        return fluence
 
+
+    def calc_luminosity_distance(self, ):
+        
+        if self._z is None:
+            raise ValueError
+
+        DL = cosmo.luminosity_distance(self._z)
 
 #        def calc_d_comov(self, cosmology):
 
@@ -520,26 +539,26 @@ class Frb(object):
 #        return self._scatt_index
 
     @property
-    def w_obs(self):
+    def width(self):
         """
         float or None: 
         The observed width of the pulse obtained by a pulse fitting algorithm.
         Units: :math:`\\rm{ms}`
         """
-        return self._w_obs
+        return self._width
 
     @property
-    def s_peak_obs(self):
+    def peak_flux(self):
         """
         float or None: 
         The observed peak flux density of the burst. Units: 
         """
-        return self._s_peak_obs
+        return self._peak_flux
 
     @property
-    def f_obs(self):
+    def fluence(self):
         """The Milky Way component of the dispersion measure."""
-        return self._f_obs
+        return self._fluence
 
     @property
     def raj(self):

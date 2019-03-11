@@ -20,7 +20,7 @@ class TestFrbClass:
     frb = Frb(dm=1000, dm_excess=1000)
     frb_raj_decj = Frb(dm=1000, raj="11:05:50.0", decj="-8:34:12.0")
     frb_gl_gb = Frb(dm=1000, gl="30.5", gb="-60.2")
-    frb_w_s = Frb(dm=1000, w_obs=30.0, s_peak_obs=20.0)
+    frb_w_s = Frb(dm=1000, width=30.0, peak_flux=20.0)
     frb_host_known = Frb(dm=1000, dm_excess=900, z_host=1.0, dm_host_loc=200)
     frb_dm_host_0 = Frb(dm=1000, dm_excess=900, z_host=1.0)
     frb_dm_host_est = Frb(dm=1100, dm_host_est=100)
@@ -84,15 +84,15 @@ class TestFrbClass:
         with pytest.raises(ValueError):
             self.frb.calc_skycoords()
 
-    # Test f_obs is calculated correctly when given w_obs and s_peak_obs.
-    def test_frb_calc_f_obs(self):
-        f_obs = self.frb_w_s.calc_f_obs()
-        assert np.isclose(f_obs, 600.0)
+    # Test fluence is calculated correctly when given width and peak_flux.
+    def test_frb_calc_fluence(self):
+        fluence = self.frb_w_s.calc_fluence()
+        assert np.isclose(fluence, 600.0)
 
-    # Test calc_f_obs raises a ValueError if w_obs and s_peak_obs are None.
-    def test_frb_calc_f_obs_raise_error(self):
+    # Test calc_fluence raises a ValueError if width and peak_flux are None.
+    def test_frb_calc_fluence_raise_error(self):
         with pytest.raises(ValueError):
-            self.frb.calc_f_obs()
+            self.frb.calc_fluence()
 
     # Test calc_dm_igm calculates the dm_igm correctly for a known host.
     def test_frb_calc_dm_igm(self):
