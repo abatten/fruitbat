@@ -50,7 +50,12 @@ intersphinx_mapping = {#'python': ('https://docs.python.org/3', None),
                        #'numpy': ('https://docs.scipy.org/doc/numpy', None),
                        #'matplotlib': ('https://matplotlib.org', None),
                        #'h5py': ('https://h5py.readthedocs.io/en/stable', None),
+                       'scipy':('http://scipy.github.io/devdocs/', None),
                        'astropy':('http://docs.astropy.org/en/stable/', None)}
+
+autodoc_default_options = {'members': None,
+                           'private-members':None}
+auto_member_order = 'groupwise'
 
 napoleon_include_init_with_doc = False
 napoleon_use_admonition_for_notes = True
@@ -86,7 +91,8 @@ language = None
 exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = None
+pygments_style = 'sphinx'
+highlight_lenguage = 'default'
 
 
 # -- Options for HTML output -------------------------------------------------
