@@ -144,22 +144,6 @@ class TestFrbClass:
             attr = getattr(self.frb, d)
             print(attr)
 
-def test_create_tables():
-    method_list = ["ioka2003", "inoue2004", "zhang2018"]
-    cosmology_list = fruitbat.cosmology.builtin()
-
-    for method in method_list:
-        for key in cosmology_list:
-            cosmo = fruitbat.cosmology.builtin()[key]
-            outfile_name = "_".join(["pytest_output", method, key])
-            fruitbat.utils.create_lookup_table(outfile_name, method=method,
-                                               cosmology=cosmo, zmin=0, zmax=3,
-                                               num_samples=1000)
-
-    # Remove the files at end of test
-    test_files = glob("pytest_output_*")
-    for file in test_files:
-        os.remove(file)
 
 
 def test_create_cosmology():
@@ -198,7 +182,7 @@ class Test_fz_integrand:
         fz = utils._fz_integrand(2, self.cosmo)
         assert np.isclose(fz, 1.011299)
 
-    def test_fz_integrand_w09_z1(self):
+    def test_fz_integrand_w1_z1(self):
         fz = utils._fz_integrand(1, self.cosmo_w0)
         assert np.isclose(fz, 0.291111)
 
@@ -210,8 +194,43 @@ def test_check_keys_in_dict_missing():
     with pytest.raises(KeyError):
         utils._check_keys_in_dict(dictionary, required_keys)
 
+
 def test_check_keys_in_dict_all():
     required_keys = ["key1", "key2"]
     dictionary = {"key1": 1, "key2": 2}
     result = utils._check_keys_in_dict(dictionary, required_keys)
     assert result == True
+
+
+def test_create_tables():
+    method_list = ["ioka2003", "inoue2004", "zhang2018"]
+    cosmology_list = fruitbat.cosmology.builtin()
+
+    # Create a lookup table for each method and cosmology
+    for method in method_list:
+        for key in cosmology_list:
+            cosmo = fruitbat.cosmology.builtin()[key]
+            outfile_name = "_".join(["pytest_output", method, key])
+            utils.create_lookup_table(outfile_name, method=method,
+                                      cosmo=cosmo, zmin=0, zmax=20,
+                                      num_samples=10000)
+
+            # Compat_e new tables to existing tables for 4 dm values
+            pre_calc_fn = ".".join(["_".join([method, key]), "npy"])
+            new_calc_fn = ".".join([outfile_name, "npy"])
+            cwd = os.getcwd()
+
+            pre_calc = utils.load_lookup_table(pre_calc_fn)
+            new_calc = utils.load_lookup_table(new_calc_fn, cwd)
+
+            test_dm_list = [0, 100, 1000, 2000]
+
+            for dm in test_dm_list:
+                assert pre_calc(dm)[()] == new_calc(dm)[()]
+            
+
+    # Remove the files at end of test
+    test_files = glob("pytest_output_*")
+    for file in test_files:
+        os.remove(file)
+
