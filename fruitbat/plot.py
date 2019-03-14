@@ -84,8 +84,9 @@ def create_cosmology_comparison(filename="cosmology_comparison",
     """
     set_rc_params(usetex)
 
-    cosmologies = cosmology.builtin().keys()
+    cosmologies = cosmology.builtin()
     cosmologies.pop("EAGLE")
+    cosmologies = cosmologies.keys()
 
     dm_vals = np.linspace(0, 3000, 1000)
 

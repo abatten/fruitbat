@@ -283,8 +283,9 @@ class TestPlots:
             raise OSError
 
 
-# Remove the files at end of test
-test_files = glob("pytest_output_*")
-for file in test_files:
-    os.remove(file)
+def test_cleanup():
+    # Remove the files at end of test
+    test_files = glob("pytest_output_*")
+    for file in test_files:
+        os.remove(file)
 
