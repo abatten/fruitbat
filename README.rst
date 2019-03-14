@@ -20,7 +20,7 @@ the following::
 
     pip install fruitbat
 
-You can install the latest deveopment version of ``fruitbat`` by cloning 
+You can install the latest development version of ``fruitbat`` by cloning 
 this repository::
     
     git clone https://github.com/abatten/fruitbat
@@ -40,6 +40,8 @@ each requirement.
 
  - astropy: Modules for cosmology, coordinates, constants and units
 
+ - matplotlib: Modules for plotting
+
  - pyymw16: Python wrapper for YMW16 galactic dispersion measure model.
 
  - e13tools: Utility tools for writing docstrings.
@@ -51,16 +53,16 @@ section of the documentation made just for you! Otherwise the tl;dr is the
 following:
 
 Most of the calculations will be centred around the `Frb class`_. You can
-can define an instance of the `Frb class`_ with a name and a dispersion 
-measure. To calculate the redshift of the FRB use the method 
+can define an instance of the `Frb class`_ with a dispersion measure. 
+To calculate the redshift of the FRB use the method 
 `calc_redshift_`.
 
 ::
 
     >>> import fruitbat
-    >>> FRB121102 = fruitbat.Frb("FRB121102", dm=557, dm_excess=369)
+    >>> FRB121102 = fruitbat.Frb(dm=557, dm_excess=369)
     >>> FRB121102.calc_redshift()
-    0.3760410728569728
+    <Quantity 0.37581945>
     
 The `calc_redshift`_ function can also be passed a method and/or a cosmology.
 The method will specify which DM-redshift relation to assume and the cosmology
@@ -68,8 +70,8 @@ will specify which cosmology to assume.
 
 ::
 
-    >>> FRB121102.calc_redshift(method="zhang2018", cosmology="Planck18")
-    0.421902
+    >>> FRB121102.calc_redshift(method="Zhang2018", cosmology="Planck18")
+    <Quantity 0.42166019>
 
 It is also possible to specify the coordinates of the burst and use the 
 `calc_dm_galaxy`_ function to calculate the DM contribution from the Milky Way
@@ -78,11 +80,11 @@ calculate the excess dispersion measure for the redshift calculation.
 
 ::
 
-    >>> FRB190222 = fruitbat.Frb("FRB190222", dm=500, raj="12:34:43.5", decj="2:34:15.2")
+    >>> FRB190222 = fruitbat.Frb(dm=500, raj="12:34:43.5", decj="2:34:15.2")
     >>> FRB190222.calc_dm_galaxy()
-    22.43696
+    <Quantity 22.43696785 pc / cm3>
     >>> FRB190222.calc_redshift()
-    0.481123
+    <Quantity 0.4808557>
 
 
 
