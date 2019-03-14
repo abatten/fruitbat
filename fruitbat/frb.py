@@ -134,13 +134,6 @@ class Frb(object):
         The UTC time of the FRB Burst. Format should be of the form
         '1999-01-01T00:00:00.000'. Default: *None*
 
-    dm_uncert : float, optional
-        The uncertainty in the dispersion measure.
-        Units: %(dm_units)s Default: 0.0
-
-    z_uncert : float, optional
-        The uncertainty in the redshift of the FRB. Default: 0.0
-
 
     Example
     -------
@@ -154,7 +147,7 @@ class Frb(object):
                  dm_galaxy=0.0, dm_excess=None, z_host=None, dm_host_est=0.0,
                  dm_host_loc=0.0, dm_index=None, scatt_index=None, snr=None,
                  width=None, peak_flux=None, fluence=None, obs_bandwidth=None,
-                 utc=None, dm_uncert=0.0, z_uncert=0.0):
+                 utc=None):
 
         # TO DO:
         # There are a few other parameters that I should add:
@@ -163,7 +156,6 @@ class Frb(object):
         self.name = name
 
         self.dm = dm
-        self._dm_uncert = dm_uncert
         self.dm_galaxy = dm_galaxy
         self.dm_host_est = dm_host_est
         self.dm_host_loc = dm_host_loc
@@ -176,7 +168,6 @@ class Frb(object):
 
         self.dm_index = dm_index
         self.z_host = z_host
-        self.z_uncert = z_uncert
         self.scatt_index = scatt_index
         self.snr = snr
         self.width = width
@@ -187,16 +178,15 @@ class Frb(object):
         self.decj = decj
         self.gl = gl
         self.gb = gb
+        self.fluence = fluence
 
         self.z = None
         self.dm_igm = None
         self.cosmology_method = None
 
-        # Calculate F_obs if peak_flux and width are given
-        if (fluence is None) and (peak_flux is not None and width is not None):
+        # Calculate fluence if peak_flux and width are given
+        if (self.fluence is None) and (peak_flux is not None and width is not None):
             self.calc_fluence()
-        else:
-            self.fluence = fluence
 
         # Calculate the skycoords of the FRB from (raj, decj) or (gl, gb)
         if (raj and decj) or (gl and gb):
@@ -213,7 +203,7 @@ class Frb(object):
 
     @docstring_substitute(methods=estimate.methods(string=True),
                           cosmo=cosmology.keys())
-    def calc_redshift(self, method='inoue2004', cosmology="Planck18",
+    def calc_redshift(self, method='Inoue2004', cosmology="Planck18",
                       subtract_host=False):
         """
         Calculate the redshift of the FRB from its :attr:`dm`,
@@ -223,17 +213,18 @@ class Frb(object):
         ----------
         method : str, optional
             The approximation to use when calculating the redshift.
-            Avaliable methods:  %(methods)s
+            Avaliable methods:  %(methods)s. Default: Inoue2004
 
         cosmology : str, optional
             The method `inoue2004` has the option to choose which cosmology
             to assume when performing the redshift estimation.
-            Avaliable cosmologies: %(cosmo)s
+            Avaliable cosmologies: %(cosmo)s. Default: Planck18
 
         subtract_host : bool, optional
             Subtract :attr:`dm_host_est` from the :attr:`dm_excess` before
             calculating the redshift. This is is used to account for the
-            dispersion measure that arises from the FRB host galaxy.
+            dispersion measure that arises from the FRB host galaxy. 
+            Default: False
 
         Returns
         -------
@@ -296,7 +287,7 @@ class Frb(object):
 
         Returns
         -------
-        :obj:`astropy.units.Quantity`
+        :ob:`astropy.units.Quantity`
             The dispersion measure excess.
 
         Notes
@@ -347,7 +338,6 @@ class Frb(object):
                 (self.gl is not None and self.gb is not None)):
 
             self._skycoords = self.calc_skycoords()
-
 
         dm_galaxy, tau_sc = ymw16.dist_to_dm(self._skycoords.galactic.l,
                                              self._skycoords.galactic.b,
@@ -420,7 +410,7 @@ class Frb(object):
 
         fluence = self.width * self.peak_flux
         self.fluence = fluence.value
-        return self.fluence
+        return fluence
 
     def calc_luminosity_distance(self):
         """
@@ -516,7 +506,6 @@ class Frb(object):
         """
 
         D = self.calc_luminosity_distance()
-
         if self.fluence is None:
             raise ValueError(
                 """Can not calculate energy without fluence. Provide fluence or
@@ -536,21 +525,27 @@ class Frb(object):
 
     def _set_value_units(self, value, unit=None, non_negative=False):
         """
+        Sets the units of a value.
+
         Parameters
         ----------
         value: float or int
+            The input value.
 
         unit: :obj:`astropy.unit` or None
             The unit to set for ``value``. If ``unit = None`` then ``value``
             will become a dimensionless quantity.
 
         non_negative: bool, optional
-            If Default: *False*
+            If the value is negative raise an error. This is used to check
+            that certian values that can only be positive and correctly 
+            specified. Default: *False*
 
         Return
         ------
         var : astropy.unit.Quantity or None
-            The
+            The 
+            If ``value=None`` returns Non
         """
         if value is None:
             var = None
@@ -592,12 +587,6 @@ class Frb(object):
         self._dm = self._set_value_units(value, unit=u.pc * u.cm**-3,
                                          non_negative=True)
 
-#    @property
-#    def dm_uncert(self):
-#        """
-#        float: The uncertainty in the observed dispersion measure of the FRB.
-#        """
-#        return self._dm_uncert
 
     @property
     def dm_galaxy(self):
@@ -693,11 +682,6 @@ class Frb(object):
     @z_host.setter
     def z_host(self, value):
         self._z_host = self._set_value_units(value)
-
-#    @property
-#    def z_uncert(self):
-#        """float: The uncertainty in the measurement of the FRB redshift"""
-#        return self._z_uncert
 
 #    @property
 #    def scatt_index(self):

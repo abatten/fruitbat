@@ -39,9 +39,9 @@ def load_lookup_table(filename, data_dir='data'):
 
 
 def create_lookup_table(filename, method, cosmo, zmin=0, zmax=20,
-                        num_samples=1e4, **kwargs):
+                        num_samples=10000, **kwargs):
     """
-    Creates an interpolated 1D redshift lookup table which can be read in 
+    Creates an interpolated 1D redshift lookup table which can be read in
     using :func:`load_lookup_table`.
 
     Parameters
@@ -72,12 +72,12 @@ def create_lookup_table(filename, method, cosmo, zmin=0, zmax=20,
     -----------------
     free_elec : float or int, optional
         The amount of free electrons per proton mass in the Universe.
-        This only applies when using ``'zhang2018'``. Must be between 0 and 1.
+        This only applies when using ``'Zhang2018'``. Must be between 0 and 1.
         Default: 0.875.
 
     f_igm : float or int, optional
         The fraction of baryons in the intergalactic medium. This only
-        applies when using ``'zhang2018'``. Must be between 0 and 1. 
+        applies when using ``'Zhang2018'``. Must be between 0 and 1.
         Default: 0.83
 
     Generates
@@ -87,9 +87,9 @@ def create_lookup_table(filename, method, cosmo, zmin=0, zmax=20,
     """
 
     dm_method_dict = {
-        "ioka2003": _calc_dm_ioka2003,
-        "inoue2004": _calc_dm_inoue2004,
-        "zhang2018": _calc_dm_zhang2018
+        "Ioka2003": _calc_dm_ioka2003,
+        "Inoue2004": _calc_dm_inoue2004,
+        "Zhang2018": _calc_dm_zhang2018
     }
 
     interp = _perform_interpolation(dm_func=dm_method_dict[method],
@@ -103,8 +103,8 @@ def create_lookup_table(filename, method, cosmo, zmin=0, zmax=20,
 
 def _fz_integrand(z, cosmo):
     """
-    Calculate the integrand for a given redshift and cosmology. This the 
-    integrand for integral that appears in zhang2018, inoue2004 and ioka2003.
+    Calculate the integrand for a given redshift and cosmology. This the
+    integrand for integral that appears in Zhang2018, Inoue2004 and Ioka2003.
 
     Parameters
     ----------
@@ -117,7 +117,7 @@ def _fz_integrand(z, cosmo):
     Returns
     -------
     F(z) : float
-        The evaluated integral.
+        The evaluated integrand.
     """
 
     w = cosmo.w(z)
