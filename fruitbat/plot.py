@@ -85,6 +85,8 @@ def create_cosmology_comparison(filename="cosmology_comparison",
     set_rc_params(usetex)
 
     cosmologies = cosmology.builtin().keys()
+    cosmologies.pop("EAGLE")
+
     dm_vals = np.linspace(0, 3000, 1000)
 
     fig = plt.figure(figsize=(8, 8), constrained_layout=True)
@@ -97,8 +99,7 @@ def create_cosmology_comparison(filename="cosmology_comparison",
              r"$\rm{Planck13}$", r"$\rm{Planck15}$", r"$\rm{Planck18}$"]
 
     for j, cosmo in enumerate(cosmologies):
-        if cosmo == "EAGLE":
-            continue
+
         z_vals = np.zeros(len(dm_vals))
         for i, dm in enumerate(dm_vals):
             z_vals[i] = estimate.redshift(dm, cosmology=cosmo)
