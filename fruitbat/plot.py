@@ -5,11 +5,11 @@ from . import estimate
 from . import cosmology
 
 
-def set_rc_params():
+def set_rc_params(usetex=False):
     """
     Set the rcParams that will be used in all the plots.
     """
-    plt.rcParams["text.usetex"] = True
+    plt.rcParams["text.usetex"] = usetex
     plt.rcParams["axes.labelsize"] = 20
     plt.rcParams["axes.labelpad"] = 3.0
     plt.rcParams["xtick.minor.visible"] = True
@@ -19,7 +19,8 @@ def set_rc_params():
     plt.rcParams["legend.fontsize"] = 16
 
 
-def create_method_comparison(filename="method_comparison", extension="png"):
+def create_method_comparison(filename="method_comparison", extension="png",
+                             usetex=False):
     """
     Create a plot comparing how estimated redshift changes as a function of
     dispersion measure for each DM-z relation.
@@ -38,7 +39,7 @@ def create_method_comparison(filename="method_comparison", extension="png"):
     A figure displaying how estimated redshift changes as a function of
     dispersion measure for each of the different cosmologies.
     """
-    set_rc_params()
+    set_rc_params(usetex)
 
     methods = estimate.methods()
     dm_vals = np.linspace(0, 3000, 1000)
@@ -62,7 +63,7 @@ def create_method_comparison(filename="method_comparison", extension="png"):
 
 
 def create_cosmology_comparison(filename="cosmology_comparison",
-                                extension="png"):
+                                extension="png", usetex=False):
     """
     Create a plot comparing how the estimated redshift changes as a function
     of dispersion mesure for each cosmology.
@@ -81,7 +82,7 @@ def create_cosmology_comparison(filename="cosmology_comparison",
     A figure displaying how estimated redshift changes as a function of
     dispersion measure for each of the different cosmologies.
     """
-    set_rc_params()
+    set_rc_params(use_tex)
 
     cosmologies = cosmology.builtin().keys()
     dm_vals = np.linspace(0, 3000, 1000)
