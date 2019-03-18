@@ -11,9 +11,8 @@ import astropy.units as u
 
 import pyymw16 as ymw16
 
-from . import estimate
-from . import cosmology
-from ._fruitbatstrings import dm_units_doc
+from fruitbat import estimate, cosmology
+from fruitbat._fruitbatstrings import dm_units_doc
 
 __all__ = ["Frb"]
 
@@ -149,9 +148,6 @@ class Frb(object):
                  width=None, peak_flux=None, fluence=None, obs_bandwidth=None,
                  utc=None):
 
-        # TO DO:
-        # There are a few other parameters that I should add:
-        # dm_index
 
         self.name = name
 
@@ -287,7 +283,7 @@ class Frb(object):
 
         Returns
         -------
-        :ob:`astropy.units.Quantity`
+        :obj:`astropy.units.Quantity`
             The dispersion measure excess.
 
         Notes
@@ -399,7 +395,6 @@ class Frb(object):
         .. math::
 
             \\rm{F_{obs} = W_{obs} S_{peak, obs}}
-
         """
 
 
@@ -461,6 +456,8 @@ class Frb(object):
         cosmo = cosmology.builtin()[self.cosmology_method]
         return cosmo.comoving_distance(z_sample)
 
+#    Currently peak luminosity is removed since it's unclear from literature 
+#    how to accuratly calculate this quantity
 #    def calc_peak_luminosity(self):
 #        """
 #        Returns

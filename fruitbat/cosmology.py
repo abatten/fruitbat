@@ -3,10 +3,7 @@ Module for defining different cosmologies
 """
 from astropy import units as u
 import astropy.cosmology
-from astropy.cosmology.core import FlatLambdaCDM
-from astropy.cosmology.core import FlatwCDM
-from astropy.cosmology.core import LambdaCDM
-from astropy.cosmology.core import wCDM
+from astropy.cosmology.core import (FlatLambdaCDM, FlatwCDM, LambdaCDM, wCDM)
 from e13tools import docstring_copy
 
 __all__ = ["WMAP5", "WMAP7", "WMAP9", "Planck13", "Planck15", "Planck18",
