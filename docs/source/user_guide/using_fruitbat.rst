@@ -16,7 +16,7 @@ is the observed dispersion measure (DM).
     >>> frb = fruitbat.Frb(635.1)
 
 It's also possible to 'name' the FRB using the keyword 
-:attr:`~fruitbat.Frb.name`, which can be useful when calculating redhsifts of
+:attr:`~fruitbat.Frb.name`, which can be useful when calculating redshifts of
 many FRBs at once.
 
 .. code-block:: python
@@ -27,12 +27,39 @@ many FRBs at once.
 
 Redshift Estimation
 *******************
+To estimate the redshift of the FRB, use the method 
+:meth:`~fruitbat.Frb.calc_redshift`. Unless otherwise specified this assumes
+that the entire DM contribution is due to the IGM. To see how to account for the 
+Milky Way and host galaxy contributions to the DM see the sections on 
+`Galactic Dispersion Measure`_ and `Host Galaxy Dispersion Measure`_
+respectively.
 
 .. code-block:: python
     
     >>> frb = fruitbat.Frb(635.1)
     >>> frb.calc_redshift()
     <Quantity 0.63199287>
+
+The :meth:`~fruitbat.Frb.calc_redshift` also has keywords to select alternative
+IGM models and cosmologies when estimating the redshift of the FRB (Default
+method and cosmology are ``Inoue2004`` and ``Planck2018`` respectively).
+
+.. code-block:: python
+
+    >>> frb.calc_redshift(method="Zhang2018")
+    <Quantity 0.70986024>
+
+    >>> frb.calc_redshift(method="Ioka2003", cosmology="Planck13")
+    <Quantity 0.52776778>
+
+
+Currently avaliable methods in **fruitbat** include: ``Ioka2003``, 
+``Inoue2004``, ``Zhang2018``. Currently avaliable cosmologies include: 
+``WMAP5``, ``WMAP7``, ``WMAP9``, ``Planck13``, ``Planck15``, ``Planck18``, 
+``EAGLE``. It should be of note that ``EAGLE`` uses the ``Planck13`` cosmology
+but is listed here for convenience.
+
+.. _Galactic Dispersion Measure:
 
 Galactic Dispersion Measure
 ...........................
@@ -87,7 +114,7 @@ estimate the redshift.
 Method 2: dm_galaxy
 -------------------
 The second method to account for the galactic dispersion meausre is to provide
-a value of :attr:`~fruitbat.Frb.dm_galaxy`. This 
+a value of :attr:`~fruitbat.Frb.dm_galaxy`. 
 
 .. code-block:: python
 
@@ -107,6 +134,11 @@ The third and final method is to directly specify the
     >>> frb.calc_redshift()
     <Quantity 0.52244791>
 
+
+.. _Host Galaxy Dispersion Measure:
+
+Host Galaxy Dispersion Measure
+..............................
 
 Calculating Distances
 *********************
