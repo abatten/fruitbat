@@ -1,8 +1,8 @@
 from e13tools import docstring_substitute
 
-from . import utils
-from ._fruitbatstrings import dm_units_doc
-from .cosmology import keys as cosmo_keys, builtin
+from fruitbat import utils
+from fruitbat._fruitbatstrings import dm_units_doc
+from fruitbat.cosmology import keys as cosmo_keys, builtin
 
 __all__ = ["redshift", "methods"]
 
@@ -11,7 +11,7 @@ def methods(string=False):
     """
     Defines the list of avaliable method keywords.
 
-    Methods currently avaliable: ioka2003, inoue2004, zhang2018
+    Methods currently avaliable: Ioka2003, Inoue2004, Zhang2018
 
     Parameters
     ----------

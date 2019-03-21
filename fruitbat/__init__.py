@@ -2,7 +2,8 @@ from . import estimate
 from . import utils
 from . import cosmology
 from . import plot
-from .frb import Frb
+from ._frb import Frb
+import numpy as np
 
 __name__ = "fruitbat"
 __author__ = "Adam Batten (@abatten)"
