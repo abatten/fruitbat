@@ -21,14 +21,22 @@ the repository:
 
 Requirements
 ************
-* numpy >= 1.12.0
-* astropy >= 2.0.0
-* scipy >= 1.0.0
-* pyymw16 >= 2.0.4
-* e13Tools >= 0.5.3
+Below are the listed requirements for running ``fruitbat`` and the purpose for
+each requirement.
 
+ - numpy: Array manipulation
 
-Pyymw16_ is a python wrapper for the YMW16 galactic dispersion measure model.
+ - scipy: Modules for integration and interpolation
+
+ - astropy: Modules for cosmology, coordinates, constants and units
+
+ - matplotlib: Modules for plotting
+
+ - six: Checking compatability between python 2 and python 3
+
+ - pyymw16: Python wrapper for YMW16 galactic dispersion measure model.
+
+ - e13tools: Utility tools for writing docstrings.
 
 
 Using Fruitbat
