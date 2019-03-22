@@ -1,0 +1,6 @@
+-e .
+check-manifest
+pytest>=3.8.0
+pytest-mpl
+pytest-cov
+codecov

@@ -1,3 +1,7 @@
+from __future__ import print_function, absolute_import, division
+
+from six import PY2
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -103,15 +107,21 @@ def create_cosmology_comparison(filename="", extension="png", usetex=False,
         fig = plt.figure(figsize=(8, 8), constrained_layout=True)
         ax = fig.add_subplot(111)
 
-    # Add inset plot showing the part where cosmologies diverge the most.
-    axin = ax.inset_axes([0.05, 0.52, 0.45, 0.45])
-
     # Remove EAGLE from cosmologies since it is the same as Planck13
     cosmologies = cosmology.builtin()
     cosmologies.pop("EAGLE")
     cosmologies = cosmologies.keys()
 
     dm_vals = np.linspace(0, 3000, 1000)
+
+    add_axin = True
+    try:
+        # Add inset plot showing the part where cosmologies diverge the most.
+        axin = ax.inset_axes([0.05, 0.52, 0.45, 0.45])
+    except Exception:
+        print("""Skipping inset axis in cosmology plot. Requires Python 3 and 
+              Matplotlib 3.0""")
+        add_axin = False
 
     colours = ['#a6cee3', '#1f78b4', '#b2df8a',
                '#33a02c', '#fb9a99', '#e31a1c']
@@ -123,18 +133,21 @@ def create_cosmology_comparison(filename="", extension="png", usetex=False,
         for i, dm in enumerate(dm_vals):
             z_vals[i] = estimate.redshift(dm, cosmology=cosmo)
         ax.plot(dm_vals, z_vals, colours[j], label=label[j], **kwargs)
-        axin.plot(dm_vals, z_vals, colours[j], **kwargs)
+        if add_axin:
+            axin.plot(dm_vals, z_vals, colours[j], **kwargs)
 
     ax.set_xlabel(r"$\rm{DM\ \left[pc \ cm^{-3}\right]}$")
     ax.set_ylabel(r"$\rm{Redshift}$")
     plt.legend(loc='lower right', frameon=False)
 
-    axin.set_xlim(2800, 3000)
-    axin.set_ylim(3.0, 3.25)
-    axin.xaxis.set_tick_params(labelsize=8)
-    axin.yaxis.set_tick_params(labelsize=8)
+    if add_axin:
+        axin.set_xlim(2800, 3000)
+        axin.set_ylim(3.0, 3.25)
+        axin.xaxis.set_tick_params(labelsize=8)
+        axin.yaxis.set_tick_params(labelsize=8)
 
-    ax.indicate_inset_zoom(axin)
+        ax.indicate_inset_zoom(axin)
+
 
     if filename is not "":
         plt.savefig(".".join([filename, extension]))

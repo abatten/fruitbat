@@ -1,6 +1,8 @@
 """
 Frb class and method functions.
 """
+from __future__ import print_function, absolute_import, division
+
 from e13tools import docstring_substitute
 
 import numpy as np
@@ -12,12 +14,9 @@ import astropy.units as u
 import pyymw16 as ymw16
 
 from fruitbat import estimate, cosmology
-from fruitbat._fruitbatstrings import dm_units_doc
 
 __all__ = ["Frb"]
 
-
-@docstring_substitute(dm_units=dm_units_doc)
 class Frb(object):
     """
     Create a :class:`~Frb` object using the observered properties of a FRB
@@ -43,7 +42,7 @@ class Frb(object):
     dm : float
         The observed dispersion measure of the FRB. This is without Milky Way
         or host galaxy subtraction.
-        Units: %(dm_units)s
+        Units: pc cm**-3
 
     Keyword Arguments
     -----------------
@@ -71,13 +70,13 @@ class Frb(object):
     dm_galaxy : float, optional
         The modelled contribution to the FRB DM by electrons in the Milky Way.
         This value is calculated using :meth:`calc_dm_galaxy`
-        Units: %(dm_units)s Default: 0.0
+        Units: pc cm**-3 Default: 0.0
 
     dm_excess : float or None, optional
         The DM excess of the FRB over the estimated Galactic DM. If
         :attr:`dm_excess` is *None*, then :attr:`dm_excess` is calculated
         automatically with :meth:`calc_dm_excess`.
-        Units: %(dm_units)s Default: *None*
+        Units: pc cm**-3 Default: *None*
 
     z_host : float or None, optional
         The observed redshift of the localised FRB host galaxy.
@@ -89,14 +88,14 @@ class Frb(object):
         contributes to the observed DM, *not* the DM of the host galaxy.
         Setting this to a non-zero value and setting ``subtract_host=True``
         when calling :meth:`calc_redshift` accounts for the DM contribution
-        due to the host galaxy. Units: %(dm_units)s Default: 0.0
+        due to the host galaxy. Units: pc cm**-3 Default: 0.0
 
     dm_host_loc : float, optional
         The dispersion measure of a localised FRB host galaxy. This value is
         *not* the contribution to the observed DM, but the DM at the host
         galaxy. The observed DM is :attr:`dm_host_loc` but attenuated by a
         factor of (1 + z). To use this, the redshift of the host galaxy must
-        be known. Units: %(dm_units)s Default: 0.0
+        be known. Units: pc cm**-3 Default: 0.0
 
     dm_index : float or None, optional
         The dispersion measure index of the burst :math:`\\alpha` such that
@@ -114,20 +113,20 @@ class Frb(object):
 
     width : float or None, optional
         The observed width of the pulse obtained by a pulse fitting algorithm.
-        Units: :math:`\\rm{ms}` Default: *None*
+        Units: ms Default: *None*
 
     peak_flux : float or None, optional
         The observed peak flux density of the burst.
-        Units: :math:`\\rm{Jy}` Default: *None*
+        Units: Jy Default: *None*
 
     fluence : float or None, optional
         The observed fluence of the FRB. If :attr:`fluence` is *None* and both
         :attr:`width` and :attr:`peak_flux` are not *None* then :attr:`fluence`
         is automatically calculated with :meth:`calc_fluence`
-        Units: :math:`\\rm{Jy\\ ms}` Default: *None*
+        Units: Jy ms Default: *None*
 
     obs_bandwidth : float or None, optional
-        The observing bandwidth in MHz. Default: *None*
+        The observing bandwidth. Units: MHz Default: *None*
 
     utc : str or None, optional
         The UTC time of the FRB Burst. Format should be of the form
@@ -140,17 +139,16 @@ class Frb(object):
     >>> FRB = fruitbat.Frb(879, gl="12:31:40.5", gb="3:41:10.0")
     >>> FRB.calc_dm_galaxy()
     >>> FRB.calc_redshift()
+
     """
 
-    def __init__(self, dm, *, name=None, raj=None, decj=None, gl=None, gb=None,
-                 dm_galaxy=0.0, dm_excess=None, z_host=None, dm_host_est=0.0,
+    def __init__(self, dm, name=None, raj=None, decj=None, gl=None, gb=None, 
+                 dm_galaxy=0.0, dm_excess=None, z_host=None, dm_host_est=0.0, 
                  dm_host_loc=0.0, dm_index=None, scatt_index=None, snr=None,
                  width=None, peak_flux=None, fluence=None, obs_bandwidth=None,
-                 utc=None):
-
+                 utc=None, *args, **kwargs):
 
         self.name = name
-
         self.dm = dm
         self.dm_galaxy = dm_galaxy
         self.dm_host_est = dm_host_est

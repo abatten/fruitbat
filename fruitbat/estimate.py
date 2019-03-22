@@ -1,7 +1,8 @@
+from __future__ import print_function, absolute_import, division
+
 from e13tools import docstring_substitute
 
 from fruitbat import utils
-from fruitbat._fruitbatstrings import dm_units_doc
 from fruitbat.cosmology import keys as cosmo_keys, builtin
 
 __all__ = ["redshift", "methods"]
@@ -32,8 +33,7 @@ def methods(string=False):
     return methods
 
 
-@docstring_substitute(dmunits=dm_units_doc, methods=methods(string=True), 
-                      cosmo=cosmo_keys())
+@docstring_substitute(methods=methods(string=True), cosmo=cosmo_keys())
 def redshift(dm, dm_uncert=0.0, method='Inoue2004', cosmology='Planck18'):
     """
     Returns the redshift of a given dispersion measure using a
@@ -42,10 +42,10 @@ def redshift(dm, dm_uncert=0.0, method='Inoue2004', cosmology='Planck18'):
     Parameters
     ----------
     dm : float
-        Dispersion Measure. Units: %(dmunits)s
+        Dispersion Measure. Units: pc cm**-3
 
     dm_uncert : float or None
-        The uncertainty in the dispersion measure. Units: %(dmunits)s
+        The uncertainty in the dispersion measure. Units: pc cm**-3
 
     method : string, optional
         The DM-z relation to use to calculate the redshift.
@@ -114,6 +114,5 @@ def _get_redshift_from_table(dm, method, cosmology):
     lookup_table = utils.load_lookup_table(filename)
     z = lookup_table(dm)[()]
     return z
-
 
 
