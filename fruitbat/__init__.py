@@ -9,5 +9,5 @@ import numpy as np
 
 __name__ = "fruitbat"
 __author__ = "Adam Batten (@abatten)"
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 __all__ = ['Frb', 'estimate', 'utils', 'cosmology', 'plot']

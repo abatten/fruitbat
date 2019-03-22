@@ -10,7 +10,7 @@ with open("requirements.txt", "r") as f:
 
 setup(
     name='fruitbat',
-    version='0.1.1',
+    version='0.2.0',
     author='Adam Batten',
     author_email='adamjbatten@gmail.com',
     url='https://github.com/abatten/fruitbat',
@@ -23,6 +23,8 @@ setup(
     long_description=long_description,
     install_requires=requirements,
     classifiers=[
+        "Programming Language :: Python :: 2"
+        "Programming Language :: Python :: 2.7"
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
