@@ -145,11 +145,11 @@ class Frb(object):
 
     """
 
-    def __init__(self, dm, *args, name=None, raj=None, decj=None, gl=None, 
-                 gb=None, dm_galaxy=0.0, dm_excess=None, z_host=None, 
-                 dm_host_est=0.0, dm_host_loc=0.0, dm_index=None, 
-                 scatt_index=None, snr=None, width=None, peak_flux=None, 
-                 fluence=None, obs_bandwidth=None, utc=None):
+    def __init__(self, dm, name=None, raj=None, decj=None, gl=None, gb=None, 
+                 dm_galaxy=0.0, dm_excess=None, z_host=None, dm_host_est=0.0, 
+                 dm_host_loc=0.0, dm_index=None, scatt_index=None, snr=None,
+                 width=None, peak_flux=None, fluence=None, obs_bandwidth=None,
+                 utc=None, *args, **kwargs):
 
         self.name = name
         self.dm = dm
