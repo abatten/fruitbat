@@ -3,6 +3,7 @@ import os
 import numpy as np
 from glob import glob
 import pytest
+import pytest_mpl
 
 from astropy.coordinates import SkyCoord
 from astropy import units as u
@@ -293,14 +294,16 @@ class TestCreateTables:
 class TestPlots:
     # Test that the method plot creates an output file
     def test_method_plot(self):
-        fruitbat.plot.create_method_comparison(filename="pytest_output_method")
+        with pytest_mpl.plugin.switch_backend('Agg'):
+            fruitbat.plot.create_method_comparison(filename="pytest_output_method")
         cwd = os.getcwd()
         if not os.path.exists(os.path.join(cwd, "pytest_output_method.png")):
             raise OSError
 
     # Test that the cosmology plot creates and output file
     def test_cosmology_plot(self):
-        fruitbat.plot.create_cosmology_comparison(filename="pytest_output_cosmo")
+        with pytest_mpl.plugin.switch_backend('Agg'):
+            fruitbat.plot.create_cosmology_comparison(filename="pytest_output_cosmo")
         cwd = os.getcwd()
         if not os.path.exists(os.path.join(cwd, "pytest_output_cosmo.png")):
             raise OSError
