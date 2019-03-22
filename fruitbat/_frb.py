@@ -1,6 +1,8 @@
 """
 Frb class and method functions.
 """
+from __future__ import print_function, absolute_import, division
+
 from e13tools import docstring_substitute
 
 import numpy as np
@@ -140,17 +142,16 @@ class Frb(object):
     >>> FRB = fruitbat.Frb(879, gl="12:31:40.5", gb="3:41:10.0")
     >>> FRB.calc_dm_galaxy()
     >>> FRB.calc_redshift()
+
     """
 
-    def __init__(self, dm, *, name=None, raj=None, decj=None, gl=None, gb=None,
-                 dm_galaxy=0.0, dm_excess=None, z_host=None, dm_host_est=0.0,
-                 dm_host_loc=0.0, dm_index=None, scatt_index=None, snr=None,
-                 width=None, peak_flux=None, fluence=None, obs_bandwidth=None,
-                 utc=None):
-
+    def __init__(self, dm, *args, name=None, raj=None, decj=None, gl=None, 
+                 gb=None, dm_galaxy=0.0, dm_excess=None, z_host=None, 
+                 dm_host_est=0.0, dm_host_loc=0.0, dm_index=None, 
+                 scatt_index=None, snr=None, width=None, peak_flux=None, 
+                 fluence=None, obs_bandwidth=None, utc=None):
 
         self.name = name
-
         self.dm = dm
         self.dm_galaxy = dm_galaxy
         self.dm_host_est = dm_host_est

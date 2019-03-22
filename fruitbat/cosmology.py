@@ -1,6 +1,8 @@
 """
 Module for defining different cosmologies
 """
+from __future__ import print_function, absolute_import, division
+
 from astropy import units as u
 import astropy.cosmology
 from astropy.cosmology.core import (FlatLambdaCDM, FlatwCDM, LambdaCDM, wCDM)

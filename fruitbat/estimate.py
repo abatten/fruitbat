@@ -1,3 +1,5 @@
+from __future__ import print_function, absolute_import, division
+
 from e13tools import docstring_substitute
 
 from fruitbat import utils
