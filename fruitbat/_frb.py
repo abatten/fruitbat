@@ -20,7 +20,7 @@ __all__ = ["Frb"]
 
 
 @docstring_substitute(dm_units=dm_units_doc)
-class Frb(object):
+class Frb:
     """
     Create a :class:`~Frb` object using the observered properties of a FRB
     including dispersion measure (DM) and its sky coordinates. This class
