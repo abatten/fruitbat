@@ -242,36 +242,52 @@ class TestCreateTables:
                     for dm in test_dm_list:
                         assert pre_calc(dm)[()] == new_calc(dm)[()]
         elif PY2:
-            pass
+            with pytest.raises(SystemError):
+                utils.create_lookup_table("pytest_output", "Zhang2018", 
+                                          "Planck18")
 
     def test_create_table_zhang_figm_free_elec(self):
+        cosmo = fruitbat.cosmology.builtin()["Planck18"]
+        outfile_name = "_".join(["pytest_output", "Zhang2018", 
+                                 "Planck18", "figm_free_elec"])
         if PY3:  # Only perform tests in Python 3
-            cosmo = fruitbat.cosmology.builtin()["Planck18"]
-            outfile_name = "_".join(["pytest_output", "Zhang2018", 
-                                     "Planck18", "figm_free_elec"])
-
             utils.create_lookup_table(outfile_name, method="Zhang2018", 
                                       cosmo=cosmo, f_igm=0.5, free_elec=0.4)
         elif PY2:
-            pass
+            with pytest.raises(SystemError):
+                utils.create_lookup_table(outfile_name, method="Zhang2018", 
+                                          cosmo=cosmo, f_igm=0.5, 
+                                          free_elec=0.4)
 
     def test_create_table_zhang_figm_error(self):
         cosmo = fruitbat.cosmology.builtin()["Planck18"]
         outfile_name = "_".join(["pytest_output", "Zhang2018", 
                                  "Planck18", "figm_error"])
 
-        with pytest.raises(ValueError):
-            utils.create_lookup_table(outfile_name, method="Zhang2018", 
-                                      cosmo=cosmo, f_igm=-1)
+        if PY3:
+            with pytest.raises(ValueError):
+                utils.create_lookup_table(outfile_name, method="Zhang2018", 
+                                          cosmo=cosmo, f_igm=-1)
+        elif PY2:
+            with pytest.raises(SystemError):
+                utils.create_lookup_table(outfile_name, method="Zhang2018", 
+                                          cosmo=cosmo, f_igm=-1)
+
             
     def test_create_table_zhang_free_elec_error(self):
         cosmo = fruitbat.cosmology.builtin()["Planck18"]
         outfile_name = "_".join(["pytest_output", "Zhang2018", 
                                  "Planck18", "free_elec_error"])
 
-        with pytest.raises(ValueError):
-            utils.create_lookup_table(outfile_name, method="Zhang2018", 
-                                      cosmo=cosmo, free_elec=-1)
+        if PY3:
+            with pytest.raises(ValueError):
+                utils.create_lookup_table(outfile_name, method="Zhang2018", 
+                                          cosmo=cosmo, free_elec=-1)
+        elif PY2:
+            with pytest.raises(SystemError):
+                utils.create_lookup_table(outfile_name, method="Zhang2018", 
+                                          cosmo=cosmo, free_elec=-1)
+
 
 
 class TestPlots:

@@ -1,4 +1,11 @@
 from __future__ import print_function, absolute_import, division
+
+from six import PY2
+
+if PY2:
+    import matplotlib
+    matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 import numpy as np
 
