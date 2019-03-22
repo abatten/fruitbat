@@ -116,4 +116,3 @@ def _get_redshift_from_table(dm, method, cosmology):
     return z
 
 
-

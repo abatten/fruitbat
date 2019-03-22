@@ -42,6 +42,8 @@ each requirement.
 
  - matplotlib: Modules for plotting
 
+ - six: Checking compatability between python 2 and python 3
+
  - pyymw16: Python wrapper for YMW16 galactic dispersion measure model.
 
  - e13tools: Utility tools for writing docstrings.

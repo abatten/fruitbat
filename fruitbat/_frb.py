@@ -17,7 +17,7 @@ from fruitbat import estimate, cosmology
 
 __all__ = ["Frb"]
 
-class Frb:
+class Frb(object):
     """
     Create a :class:`~Frb` object using the observered properties of a FRB
     including dispersion measure (DM) and its sky coordinates. This class

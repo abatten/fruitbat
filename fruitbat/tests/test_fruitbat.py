@@ -14,6 +14,7 @@ from fruitbat import utils
 from fruitbat import cosmology
 from fruitbat import estimate
 
+from six import PY2, PY3
 
 class TestFrbClass:
 
@@ -215,38 +216,44 @@ def test_check_keys_in_dict_all():
 class TestCreateTables:
 
     def test_create_tables_normal(self):
-        method_list = estimate.methods()
-        cosmology_list = fruitbat.cosmology.builtin()
+        if PY3:  # Only peform tests in Python 3
+            method_list = estimate.methods()
+            cosmology_list = fruitbat.cosmology.builtin()
 
-        # Create a lookup table for each method and cosmology
-        for method in method_list:
-            for key in cosmology_list:
-                cosmo = fruitbat.cosmology.builtin()[key]
-                outfile_name = "_".join(["pytest_output", method, key])
-                utils.create_lookup_table(outfile_name, method=method,
-                                          cosmo=cosmo, zmin=0, zmax=20,
-                                          num_samples=10000)
+            # Create a lookup table for each method and cosmology
+            for method in method_list:
+                for key in cosmology_list:
+                    cosmo = fruitbat.cosmology.builtin()[key]
+                    outfile_name = "_".join(["pytest_output", method, key])
+                    utils.create_lookup_table(outfile_name, method=method,
+                                              cosmo=cosmo, zmin=0, zmax=20,
+                                              num_samples=10000)
 
-                # Compare new tables to existing tables for 4 dm values
-                pre_calc_fn = ".".join(["_".join([method, key]), "npy"])
-                new_calc_fn = ".".join([outfile_name, "npy"])
-                cwd = os.getcwd()
+                    # Compare new tables to existing tables for 4 dm values
+                    pre_calc_fn = ".".join(["_".join([method, key]), "npy"])
+                    new_calc_fn = ".".join([outfile_name, "npy"])
+                    cwd = os.getcwd()
 
-                pre_calc = utils.load_lookup_table(pre_calc_fn)
-                new_calc = utils.load_lookup_table(new_calc_fn, cwd)
+                    pre_calc = utils.load_lookup_table(pre_calc_fn)
+                    new_calc = utils.load_lookup_table(new_calc_fn, cwd)
 
-                test_dm_list = [0, 100, 1000, 2000]
+                    test_dm_list = [0, 100, 1000, 2000]
 
-                for dm in test_dm_list:
-                    assert pre_calc(dm)[()] == new_calc(dm)[()]
+                    for dm in test_dm_list:
+                        assert pre_calc(dm)[()] == new_calc(dm)[()]
+        elif PY2:
+            pass
 
     def test_create_table_zhang_figm_free_elec(self):
-        cosmo = fruitbat.cosmology.builtin()["Planck18"]
-        outfile_name = "_".join(["pytest_output", "Zhang2018", 
-                                 "Planck18", "figm_free_elec"])
+        if PY3:  # Only perform tests in Python 3
+            cosmo = fruitbat.cosmology.builtin()["Planck18"]
+            outfile_name = "_".join(["pytest_output", "Zhang2018", 
+                                     "Planck18", "figm_free_elec"])
 
-        utils.create_lookup_table(outfile_name, method="Zhang2018", 
-                                  cosmo=cosmo, f_igm=0.5, free_elec=0.4)
+            utils.create_lookup_table(outfile_name, method="Zhang2018", 
+                                      cosmo=cosmo, f_igm=0.5, free_elec=0.4)
+        elif PY2:
+            pass
 
     def test_create_table_zhang_figm_error(self):
         cosmo = fruitbat.cosmology.builtin()["Planck18"]

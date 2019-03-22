@@ -3,6 +3,7 @@ Utility functions for Fruitbat
 """
 from __future__ import print_function, absolute_import, division
 import os
+from six import PY3, PY2
 
 import numpy as np
 import scipy.integrate as integrate
@@ -84,21 +85,33 @@ def create_lookup_table(filename, method, cosmo, zmin=0, zmax=20,
     ---------
     filename.npy:
 
+    Warning
+    -------
+    Generating lookup tables is only avaliable when using **fruitbat** in
+    Python 3.
+
     """
+    if PY3:
+        dm_method_dict = {
+            "Ioka2003": _calc_dm_ioka2003,
+            "Inoue2004": _calc_dm_inoue2004,
+            "Zhang2018": _calc_dm_zhang2018
+        }
 
-    dm_method_dict = {
-        "Ioka2003": _calc_dm_ioka2003,
-        "Inoue2004": _calc_dm_inoue2004,
-        "Zhang2018": _calc_dm_zhang2018
-    }
+        interp = _perform_interpolation(dm_func=dm_method_dict[method],
+                                        cosmo=cosmo,
+                                        zmin=zmin, zmax=zmax,
+                                        num_samples=num_samples,
+                                        **kwargs)
 
-    interp = _perform_interpolation(dm_func=dm_method_dict[method],
-                                    cosmo=cosmo,
-                                    zmin=zmin, zmax=zmax,
-                                    num_samples=num_samples,
-                                    **kwargs)
+        _save_lookup_table(filename, interp)
 
-    _save_lookup_table(interp, filename)
+    elif PY2:
+        raise SystemError("create_lookup_table is a python 3 only feature. 
+                          A lookup table is in reality a pickled instance 
+                          method of the scipy.interpolate.interp1D. Since
+                          pickling an instance method in Python 2 is not 
+                          supported, this is restricted to Python 3 only.")
 
 
 def _fz_integrand(z, cosmo):
@@ -275,9 +288,10 @@ def _check_keys_in_dict(dictionary, keys):
     return True
 
 
-def _save_lookup_table(table, filename):
+def _save_lookup_table(filename, table):
     """
     Saves the lookup table to a .npy file
     """
+    
     np.save(filename, table)
     return None
