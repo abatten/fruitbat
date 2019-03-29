@@ -26,7 +26,7 @@ author = 'Adam Batten'
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = '0.2.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -44,7 +44,18 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx.ext.coverage',
+    'sphinx.ext.intersphinx'
 ]
+intersphinx_mapping = {#'python': ('https://docs.python.org/3', None),
+                       #'numpy': ('https://docs.scipy.org/doc/numpy', None),
+                       #'matplotlib': ('https://matplotlib.org', None),
+                       #'h5py': ('https://h5py.readthedocs.io/en/stable', None),
+                       'scipy':('http://scipy.github.io/devdocs/', None),
+                       'astropy':('http://docs.astropy.org/en/stable/', None)}
+
+autodoc_default_options = {'members': None,
+                           'private-members':None}
+auto_member_order = 'groupwise'
 
 napoleon_include_init_with_doc = False
 napoleon_use_admonition_for_notes = True
@@ -52,6 +63,8 @@ napoleon_use_ivar = True
 napoleon_use_param = True
 napoleon_use_keyword = True
 napoleon_use_rtype = True
+
+napoleon_custom_sections = ['Generates']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -78,7 +91,8 @@ language = None
 exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = None
+pygments_style = 'sphinx'
+highlight_lenguage = 'default'
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -162,7 +176,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'Fruitbat', 'Fruitbat Documentation',
-     author, 'Fruitbat', 'One line description of project.',
+     author, 'Fruitbat', 'Estimating the redshift of Fast Radio Bursts',
      'Miscellaneous'),
 ]
 

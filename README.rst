@@ -1,71 +1,127 @@
-|PyPI| |Python| |Travis| |Docs|
+|PyPI| |Python| |Travis| |Docs| |CodeCov|
 
 Fruitbat
 ========
 
-**Fruitbat** is an open source python package used to estimate the redshift of 
-Fast Radio Burst (FRB) from its dispersion measure. 
-
-**NOTE: FRUITBAT IS CURRENTLY IN EARLY DEVELOPMENT AND IS NOT READY FOR SCIENCE YET**
-
+``Fruitbat`` is an open source python package used to estimate the redshift of 
+Fast Radio Burst (FRB) from their dispersion measure. ``Fruitbat`` combines 
+various dispersion measure (DM) and redshift relations with the YMW16 galactic 
+dispersion measure model into a single easy to use API. 
 
 Documentation
 -------------
-
-The documentation for **fruitbat** can be found at 
+The documentation for ``fruitbat`` can be found at 
 https://fruitbat.readthedocs.io/en/latest/index.html.
 
 Installation
 ------------
-
-Run the following to install::
+You can install the latest release of ``fruitbat`` from PyPi_ by running 
+the following::
 
     pip install fruitbat
 
-Or you can clone this repository::
+You can install the latest development version of ``fruitbat`` by cloning 
+this repository::
     
     git clone https://github.com/abatten/fruitbat
     cd fruitbat
     pip install .
 
+.. _PyPi: https://pypi.python.org/pypi/fruitbat 
+
+Requirements
+------------
+Below are the listed requirements for running ``fruitbat`` and the purpose for
+each requirement.
+
+ - numpy: Array manipulation
+
+ - scipy: Modules for integration and interpolation
+
+ - astropy: Modules for cosmology, coordinates, constants and units
+
+ - matplotlib: Modules for plotting
+
+ - six: Checking compatability between python 2 and python 3
+
+ - pyymw16: Python wrapper for YMW16 galactic dispersion measure model.
+
+ - e13tools: Utility tools for writing docstrings.
+
 Usage
 -----
-If you want to get started using **fruitbat** there is a `Getting Started`_ 
+If you want to get started using ``fruitbat`` there is a `Getting Started`_ 
 section of the documentation made just for you! Otherwise the tl;dr is the
 following:
 
 Most of the calculations will be centred around the `Frb class`_. You can
-can define an instance of the `~Frb` with a name and a dispersion 
-measure. To calculate the redshift of the FRB use the method 
-`calc_redshift_` ::
-
-    >>> import fruitbat
-    >>> frb = fruitbat.Frb("FRB121102", dm=557, dm_excess=369)
-    >>> frb.calc_redshift()
-    0.4537827606357084
-    
-You can provide a method and/or a cosmology that you want to assume.
+can define an instance of the `Frb class`_ with a dispersion measure. 
+To calculate the redshift of the FRB use the method 
+`calc_redshift_`.
 
 ::
 
-    >>> frb.calc_redshift(method="zhang2018", cosmology="planck2018")
-    0.42190276949033323
+    >>> import fruitbat
+    >>> FRB121102 = fruitbat.Frb(dm=557, dm_excess=369)
+    >>> FRB121102.calc_redshift()
+    <Quantity 0.37581945>
+    
+The `calc_redshift`_ function can also be passed a method and/or a cosmology.
+The method will specify which DM-redshift relation to assume and the cosmology
+will specify which cosmology to assume.
+
+::
+
+    >>> FRB121102.calc_redshift(method="Zhang2018", cosmology="Planck18")
+    <Quantity 0.42166019>
+
+It is also possible to specify the coordinates of the burst and use the 
+`calc_dm_galaxy`_ function to calculate the DM contribution from the Milky Way
+using the YMW16 model. Performing `calc_dm_galaxy`_ will automatically
+calculate the excess dispersion measure for the redshift calculation.
+
+::
+
+    >>> FRB190222 = fruitbat.Frb(dm=500, raj="12:34:43.5", decj="2:34:15.2")
+    >>> FRB190222.calc_dm_galaxy()
+    <Quantity 22.43696785 pc / cm3>
+    >>> FRB190222.calc_redshift()
+    <Quantity 0.4808557>
+
 
 
 .. _Frb class: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Frb.html
 .. _calc_redshift: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Frb.html#fruitbat.Frb.calc_redshift
+.. _calc_dm_galaxy: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Frb.html#fruitbat.Frb.calc_dm_galaxy
 .. _Getting Started: https://fruitbat.readthedocs.io/en/latest/user_guide/getting_started
+
+
+Issues and Contributing
+-----------------------
+If there is a feature of ``fruitbat`` that currently does not exist, but you
+would like it to, you can contribute by openning a `Github Issue`_ and 
+outlining the feature. Similar to contributing, if you find a problem with
+``fruitbat`` or are having difficulties using ``fruitbat`` please do not 
+hesitate to open a `Github Issue`_.
+
+
+
+.. _Github Issue: https://github.com/abatten/fruitbat/issues
 
 
 Referencing Fruitbat
 --------------------
+
 If you use ``fruitbat`` in your research, we would like it if you could
-reference us. :)
+reference us in your acknowledgements. :)
+
+
 
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/fruitbat.svg?label=PyPI
     :target: https://pypi.python.org/pypi/fruitbat
     :alt: PyPI - Latest Release
+
 .. |Python| image:: https://img.shields.io/pypi/pyversions/fruitbat.svg?label=Python
     :target: https://pypi.python.org/pypi/fruitbat
     :alt: PyPI - Python Versions
@@ -76,3 +132,6 @@ reference us. :)
 .. |Docs| image:: https://readthedocs.org/projects/fruitbat/badge/?version=latest
     :target: https://fruitbat.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
+
+.. |CodeCov| image:: https://codecov.io/gh/abatten/fruitbat/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/abatten/fruitbat
