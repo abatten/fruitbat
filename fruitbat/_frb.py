@@ -3,7 +3,6 @@ Frb class and method functions.
 """
 from __future__ import print_function, absolute_import, division
 
-from e13tools import docstring_substitute
 
 import numpy as np
 import astropy.coordinates as coord
@@ -11,11 +10,13 @@ from astropy.coordinates import SkyCoord
 from astropy.time import Time
 import astropy.units as u
 
+from e13tools import docstring_substitute
 import pyymw16 as ymw16
 
 from fruitbat import estimate, cosmology
 
 __all__ = ["Frb"]
+
 
 class Frb(object):
     """
@@ -128,6 +129,9 @@ class Frb(object):
     obs_bandwidth : float or None, optional
         The observing bandwidth. Units: MHz Default: *None*
 
+    obs_freq_central : float or None, optional
+        The central observing frequency, Units: GHz Deault: *None*
+
     utc : str or None, optional
         The UTC time of the FRB Burst. Format should be of the form
         '1999-01-01T00:00:00.000'. Default: *None*
@@ -146,7 +150,11 @@ class Frb(object):
                  dm_galaxy=0.0, dm_excess=None, z_host=None, dm_host_est=0.0, 
                  dm_host_loc=0.0, dm_index=None, scatt_index=None, snr=None,
                  width=None, peak_flux=None, fluence=None, obs_bandwidth=None,
-                 utc=None, *args, **kwargs):
+                 obs_freq_central=None, utc=None, *args, **kwargs):
+
+        if args:
+            raise TypeError("Frb() takes 1 positional argument but {} were " 
+                            "given".format(1 + len(args)))
 
         self.name = name
         self.dm = dm
@@ -167,6 +175,7 @@ class Frb(object):
         self.width = width
         self.peak_flux = peak_flux
         self.obs_bandwidth = obs_bandwidth
+        self.obs_freq_central = obs_freq_central
         self.utc = utc
         self.raj = raj
         self.decj = decj
@@ -456,35 +465,75 @@ class Frb(object):
 
 #    Currently peak luminosity is removed since it's unclear from literature 
 #    how to accuratly calculate this quantity
-#    def calc_peak_luminosity(self):
-#        """
-#        Returns
-#        -------
-#        :obj:`astropy.units.Quantity`
-#            The estimated isotropic peak luminosity of the FRB within an
-#            observed bandwidth.
-#        """
-#
-#        D = self.calc_luminosity_distance()
-#        S = self.peak_flux
-#        B = self.obs_bandwidth
-#
-#        Lum  = 4 * np.pi * D**2 * S * B
-#        return lum.to('erg s**-1')
-
-
-    def calc_energy(self):
+    def calc_luminosity(self, use_bandwidth=False):
         """
-        Calculates the isotropic energy of the FRB within an observed
-        bandwidth. This is the upper limit to the the true energy since
-        the luminosity distance required is also an upper limit to the
-        true luminosity distance.
+        Calculates the isotropic peak luminosity of the FRB. This is the upper 
+        limit to the the true peak luminosity since the luminosity distance 
+        required is also an upper limit to the true luminosity distance.
+
+        Parameters
+        ----------
+        use_bandwidth: bool, optional
+            The default method of calculating the energy of an FRB uses 
+            :attr:`obs_freq_central` as described in Zhang 2018. However some
+            estimates of the FRB energy instead use :attr:`obs_bandwidth` (see
+            Law et al. 2017). Set to ``True`` to use :attr:`obs_bandwidth`
+            instead of :attr:`obs_freq_central`. Default: False
 
         Returns
         -------
         :obj:`astropy.units.Quantity`
-            The estimated isotropic energy of the FRB within the
+            The estimated isotropic peak luminosity of the FRB within an
             observed bandwidth.
+        """
+        D = self.calc_luminosity_distance()
+
+        if self.peak_flux is None:
+            err_msg = ("Can not calculate energy without peak_flux. Provide "
+                       "peak_flux before calculating luminosity.")
+            raise ValueError(err_msg)
+        else:
+            S = self.peak_flux
+
+        if use_bandwidth:
+            if self.obs_bandwidth is None:
+                err_msg = ("Can not calculate energy without observing "
+                           "bandwidth. Provide obs_bandwidth before "
+                           "calculating energy.")
+                raise ValueError(err_msg)            
+            B = self.obs_bandwidth
+            lum  = 4 * np.pi * D**2 * S * B
+        else:
+            if self.obs_freq_central is None:
+                err_msg = ("Can not calculate energy without observing "
+                           "frequency. Provide obs_freq_central before "
+                           "calculating energy.")
+                raise ValueError(err_msg)
+            nu = self.obs_freq_central
+            lum = 4 * np.pi * D**2 * S * nu
+
+        return lum.to('erg s**-1')
+
+
+    def calc_energy(self, use_bandwidth=False):
+        """
+        Calculates the isotropic energy of the FRB. This is the upper limit 
+        to the the true energy since the luminosity distance required is also
+        an upper limit to the true luminosity distance.
+
+        Parameters
+        ----------
+        use_bandwidth: bool, optional
+            The default method of calculating the energy of an FRB uses 
+            :attr:`obs_freq_central` as described in Zhang 2018. However some
+            estimates of the FRB energy instead use :attr:`obs_bandwidth` (see
+            Law et al. 2017). Set to ``True`` to use :attr:`obs_bandwidth`
+            instead of :attr:`obs_freq_central`. Default: False
+            
+        Returns
+        -------
+        :obj:`astropy.units.Quantity`
+            The estimated isotropic energy of the FRB.
 
         Notes
         -----
@@ -501,21 +550,38 @@ class Frb(object):
         """
 
         D = self.calc_luminosity_distance()
+
         if self.fluence is None:
-            raise ValueError(
-                """Can not calculate energy without fluence. Provide fluence or
-                peak_flux and width before calculating energy.""")
+            err_msg = ("Can not calculate energy without fluence. Provide "
+                       "fluence or peak_flux and width before calculating "
+                       "energy.")
+            raise ValueError(err_msg)
         else:
             F = self.fluence
 
-        if self.obs_bandwidth is None:
-            raise ValueError(
-                """Can not calculate energy without observing bandwidth.
-                Provide obs_bandwidth before calculating energy.""")
-        else:
-            B = self.obs_bandwidth
 
-        energy = F * B * 4 * np.pi * D**2 * (1 + self.z)**-1
+        if use_bandwidth:
+            if self.obs_bandwidth is None:
+                err_msg = ("Can not calculate energy without observing "
+                           "bandwidth. Provide obs_bandwidth before "
+                           "calculating energy.")
+                raise ValueError(err_msg)
+            else:
+                B = self.obs_bandwidth
+            energy = F * B * 4 * np.pi * D**2 * (1 + self.z)**-1
+
+        else:
+            if self.obs_freq_central is None:
+                err_msg = ("Can not calculate energy without observing "
+                           "frequency. Provide obs_freq_central before "
+                           "calculating energy.")
+                raise ValueError(err_msg)
+            else:
+                nu = self.obs_freq_central
+            energy = F * nu * 4 * np.pi * D**2 * (1 + self.z)**-1
+
+
+
         return energy.to("erg")
 
     def _set_value_units(self, value, unit=None, non_negative=False):
@@ -542,14 +608,31 @@ class Frb(object):
             The 
             If ``value=None`` returns Non
         """
-        if value is None:
-            var = None
-        elif non_negative and value < 0.0:
-            raise ValueError("Value must be greater than zero.")
-        elif unit is None:
-            var = value * u.dimensionless_unscaled
+        # Check if the value already has units
+        if not isinstance(value, u.Quantity):
+            if value is None:
+                var = None
+
+            elif non_negative and value < 0.0:
+                raise ValueError("Value must be greater than zero.")
+
+            elif unit is None:
+                var = value * u.dimensionless_unscaled
+
+            else:
+                var = value * unit
         else:
-            var = value * unit
+            # If passed units check that they are the correct units by checking
+            # that they are equivalent
+
+            if value.unit.is_equivalent(unit):
+                var = value
+
+            else:
+                err_msg = ("Quantity expected to have units of {} instead was "
+                           "passed units {} which is not convertable".format(
+                            unit, value.unit))
+                raise ValueError(err_msg)
 
         return var
 
@@ -733,6 +816,19 @@ class Frb(object):
     def obs_bandwidth(self, value):
         self._obs_bandwidth = self._set_value_units(value, u.MHz,
                                                     non_negative=True)
+
+    @property
+    def obs_freq_central(self):
+        """
+        :obj:`astropy.units.Quantity` or None:
+            The central observing frequency of the FRB.
+        """
+        return self._obs_freq_central
+
+    @obs_freq_central.setter
+    def obs_freq_central(self, value):
+        self._obs_freq_central = self._set_value_units(value, u.GHz,
+                                                       non_negative=True)
 
     @property
     def raj(self):

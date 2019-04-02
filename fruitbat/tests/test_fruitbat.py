@@ -28,6 +28,10 @@ class TestFrbClass:
     frb_dm_host_0 = Frb(dm=1000, dm_excess=900, z_host=1.0)
     frb_dm_host_est = Frb(dm=1100, dm_host_est=100)
     frb_energy = Frb(dm=1000, obs_bandwidth=400, width=1, peak_flux=2)
+    frb_energy_freq = Frb(dm=1000, obs_freq_central=0.4, width=1, peak_flux=2)
+    frb_utc = Frb(dm=1000, utc="1999-01-01T00:00:00.000")
+    frb_with_units = Frb(dm=1000, obs_bandwidth=400*u.MHz)
+    frb_fluence = Frb(dm=1000, fluence=2)
 
     # Test that methods returns the correct value for DM=1000 and planck2018
     def test_methods(self):
@@ -56,7 +60,7 @@ class TestFrbClass:
     # Test raises error on dispersion measure less than zero
     def test_frb_negative_dm(self):
         with pytest.raises(ValueError):
-            neg_dm = Frb(dm=-1000)
+            Frb(dm=-1000)
 
     # Test that the skycoords are calculated correctly when given raj and decj
     def test_frb_calc_skycoords_raj_decj(self):
@@ -118,17 +122,17 @@ class TestFrbClass:
         dm_1 = self.frb_dm_host_est.calc_redshift(subtract_host=True)
         dm_2 = self.frb.calc_redshift()
         assert np.isclose(dm_1, dm_2)
-        
+
     # Test that calc_redshift will raise error if subtract_host is not a bool
     def test_frb_subtract_host_not_bool(self):
         with pytest.raises(ValueError):
-            self.frb_dm_host_est.calc_redshift(subtract_host="yes") 
+            self.frb_dm_host_est.calc_redshift(subtract_host="yes")
 
     # Test calc_dm_galaxy calculates dm_galaxy correctly for given coordinates.
     def test_frb_calc_dm_galaxy(self):
         dm_galaxy = self.frb_raj_decj.calc_dm_galaxy()
         dm_pymw16, t_sc_pymw16 = ymw16.dist_to_dm(
-            self.frb_raj_decj.skycoords.galactic.l, 
+            self.frb_raj_decj.skycoords.galactic.l,
             self.frb_raj_decj.skycoords.galactic.b, 25000)
         assert np.isclose(dm_galaxy.value, dm_pymw16.value)
 
@@ -136,47 +140,85 @@ class TestFrbClass:
     def test_frb_cal_dm_galaxy_no_coords(self):
         with pytest.raises(ValueError):
             self.frb.calc_dm_galaxy(model="ymw16")
-       
+
+    def test_frb_calc_lum_dist_without_z(self):
+        with pytest.raises(ValueError):
+            self.frb.z = None
+            self.frb.calc_luminosity_distance()
+
     # Test calc_energy calculates the energy of an FRB
-    def test_frc_calc_energy(self):
+    def test_frb_calc_energy_bandwidth(self):
         self.frb_energy.calc_redshift()
-        assert np.isclose(self.frb_energy.calc_energy().value, 2.1325718e40)
-        
-#    def test_frb_calc_energy_no_fluence(self):
+        energy = self.frb_energy.calc_energy(use_bandwidth=True)
+        assert np.isclose(energy.value, 2.1325718e40)
 
-#    def test_frb_calc_energy_no_bandwidth(self):
+    def test_frb_calc_energy_frequency(self):
+        self.frb_energy_freq.calc_redshift()
+        energy = self.frb_energy_freq.calc_energy()
+        assert np.isclose(energy.value, 2.1325718e40)
 
+    def test_frb_calc_energy_no_fluence(self):
+        with pytest.raises(ValueError):
+            self.frb.calc_redshift()
+            self.frb.calc_energy(use_bandwidth=True)
+
+    def test_frb_calc_energy_no_bandwidth(self):
+        with pytest.raises(ValueError):
+            self.frb_fluence.calc_redshift()
+            self.frb_fluence.calc_energy(use_bandwidth=True)
+
+    def test_frb_calc_energy_no_frequency(self):
+        with pytest.raises(ValueError):
+            self.frb_energy.calc_redshift()
+            self.frb_energy.calc_energy()
+
+    def test_frb_calc_luminosity_bandwidth(self):
+        self.frb_energy.calc_redshift()
+        lum = self.frb_energy.calc_luminosity(use_bandwidth=True)
+        assert np.isclose(lum.value, 4.229828665e+43)
+
+    def test_frb_calc_luminosity_frequency(self):
+        self.frb_energy_freq.calc_redshift()
+        lum = self.frb_energy_freq.calc_luminosity()
+        assert np.isclose(lum.value, 4.2298286655e+43)
+
+    def test_frb_calc_luminosity_no_frequency(self):
+        with pytest.raises(ValueError):
+            self.frb_energy.calc_redshift()
+            self.frb_energy.calc_luminosity()
+
+    def test_frb_pass_wrong_units(self):
+        with pytest.raises(ValueError):
+            Frb(dm=1000, obs_bandwidth=400*u.m)
 
     # Test that the FRB __repr__ is printed
     def test_frb__repr__(self):
         print(self.frb)
 
-    # Test all methods and properties get values and print correctly
+    # Test all methods and properties get values and print
     def test_frb_attrs(self):
         for d in dir(self.frb):
             attr = getattr(self.frb, d)
             print(attr)
 
 
-
 def test_create_cosmology():
 
     # Test FlatLambdaCDM
     FlatLambdaCDM_params = {'H0': 67, 'Om0': 0.3, 'flat': True}
-    FlatLambdaCDM = cosmology.create_cosmology(FlatLambdaCDM_params)
+    cosmology.create_cosmology(FlatLambdaCDM_params)
 
     # Test FlatwCDM
     FlatwCDM_params = {'H0': 67, 'Om0': 0.3, 'flat': True, 'w0': 0.9}
-    FlatwCDM = cosmology.create_cosmology(FlatwCDM_params)
+    cosmology.create_cosmology(FlatwCDM_params)
 
     # Test LambdaCDM
     LambdaCDM_params = {'H0': 67, 'Om0': 0.3, 'Ode0': 0.8, 'flat': False}
-    LambdaCDM = cosmology.create_cosmology(LambdaCDM_params)
+    cosmology.create_cosmology(LambdaCDM_params)
 
     # Test wCDM
     wCDM_params = {'H0': 67, 'Om0': 0.3, 'Ode0': 0.8, 'flat': False, 'w0': 0.9}
-    wCDM = cosmology.create_cosmology(wCDM_params)
-
+    cosmology.create_cosmology(wCDM_params)
 
 
 class Test_fz_integrand:
@@ -212,7 +254,7 @@ def test_check_keys_in_dict_all():
     required_keys = ["key1", "key2"]
     dictionary = {"key1": 1, "key2": 2}
     result = utils._check_keys_in_dict(dictionary, required_keys)
-    assert result == True
+    assert result
 
 class TestCreateTables:
 
@@ -244,49 +286,49 @@ class TestCreateTables:
                         assert pre_calc(dm)[()] == new_calc(dm)[()]
         elif PY2:
             with pytest.raises(SystemError):
-                utils.create_lookup_table("pytest_output", "Zhang2018", 
+                utils.create_lookup_table("pytest_output", "Zhang2018",
                                           "Planck18")
 
     def test_create_table_zhang_figm_free_elec(self):
         cosmo = fruitbat.cosmology.builtin()["Planck18"]
-        outfile_name = "_".join(["pytest_output", "Zhang2018", 
+        outfile_name = "_".join(["pytest_output", "Zhang2018",
                                  "Planck18", "figm_free_elec"])
         if PY3:  # Only perform tests in Python 3
-            utils.create_lookup_table(outfile_name, method="Zhang2018", 
+            utils.create_lookup_table(outfile_name, method="Zhang2018",
                                       cosmo=cosmo, f_igm=0.5, free_elec=0.4)
         elif PY2:
             with pytest.raises(SystemError):
-                utils.create_lookup_table(outfile_name, method="Zhang2018", 
-                                          cosmo=cosmo, f_igm=0.5, 
+                utils.create_lookup_table(outfile_name, method="Zhang2018",
+                                          cosmo=cosmo, f_igm=0.5,
                                           free_elec=0.4)
 
     def test_create_table_zhang_figm_error(self):
         cosmo = fruitbat.cosmology.builtin()["Planck18"]
-        outfile_name = "_".join(["pytest_output", "Zhang2018", 
+        outfile_name = "_".join(["pytest_output", "Zhang2018",
                                  "Planck18", "figm_error"])
 
         if PY3:
             with pytest.raises(ValueError):
-                utils.create_lookup_table(outfile_name, method="Zhang2018", 
+                utils.create_lookup_table(outfile_name, method="Zhang2018",
                                           cosmo=cosmo, f_igm=-1)
         elif PY2:
             with pytest.raises(SystemError):
-                utils.create_lookup_table(outfile_name, method="Zhang2018", 
+                utils.create_lookup_table(outfile_name, method="Zhang2018",
                                           cosmo=cosmo, f_igm=-1)
 
-            
+
     def test_create_table_zhang_free_elec_error(self):
         cosmo = fruitbat.cosmology.builtin()["Planck18"]
-        outfile_name = "_".join(["pytest_output", "Zhang2018", 
+        outfile_name = "_".join(["pytest_output", "Zhang2018",
                                  "Planck18", "free_elec_error"])
 
         if PY3:
             with pytest.raises(ValueError):
-                utils.create_lookup_table(outfile_name, method="Zhang2018", 
+                utils.create_lookup_table(outfile_name, method="Zhang2018",
                                           cosmo=cosmo, free_elec=-1)
         elif PY2:
             with pytest.raises(SystemError):
-                utils.create_lookup_table(outfile_name, method="Zhang2018", 
+                utils.create_lookup_table(outfile_name, method="Zhang2018",
                                           cosmo=cosmo, free_elec=-1)
 
 
