@@ -35,5 +35,7 @@ setup(
         ],
     package_dir={"fruitbat": "fruitbat"},
     packages=find_packages(),
+    package_data={'fruitbat': ['*.npy']},
+    include_package_data=True,
     keywords=("FRB redshift astronomy astrophysics fast radio burst"),
 )
