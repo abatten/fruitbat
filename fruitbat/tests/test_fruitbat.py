@@ -299,8 +299,7 @@ class TestCreateTables:
                         assert pre_calc(dm)[()] == new_calc(dm)[()]
         elif PY2:
             with pytest.raises(SystemError):
-                utils.create_lookup_table("pytest_output", "Zhang2018",
-                                          "Planck18")
+                table.create("pytest_output", "Zhang2018", "Planck18")
 
     def test_create_table_zhang_figm_free_elec(self):
         cosmo = cosmologies.builtin_cosmology_functions()["Planck18"]
