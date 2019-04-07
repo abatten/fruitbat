@@ -21,6 +21,8 @@ by *Adam Batten*
     :caption: API Documentation
 
     api/fruitbat.Frb
-    api/fruitbat.estimate
+    api/fruitbat.methods
+    api/fruitbat.cosmologies
+    api/fruitbat.table
+    api/fruitbat.plot
     api/fruitbat.utils
-    api/fruitbat.cosmology

@@ -43,7 +43,6 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
-    'sphinx.ext.coverage',
     'sphinx.ext.intersphinx'
 ]
 intersphinx_mapping = {#'python': ('https://docs.python.org/3', None),
@@ -53,16 +52,12 @@ intersphinx_mapping = {#'python': ('https://docs.python.org/3', None),
                        'scipy':('http://scipy.github.io/devdocs/', None),
                        'astropy':('http://docs.astropy.org/en/stable/', None)}
 
-autodoc_default_options = {'members': None,
-                           'private-members':None}
-auto_member_order = 'groupwise'
-
 napoleon_include_init_with_doc = False
 napoleon_use_admonition_for_notes = True
 napoleon_use_ivar = True
-napoleon_use_param = True
-napoleon_use_keyword = True
-napoleon_use_rtype = True
+napoleon_use_param = False
+napoleon_use_keyword = False
+napoleon_use_rtype = False
 
 napoleon_custom_sections = ['Generates']
 
@@ -92,7 +87,7 @@ exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
-highlight_lenguage = 'default'
+highlight_language = 'default'
 
 
 # -- Options for HTML output -------------------------------------------------
