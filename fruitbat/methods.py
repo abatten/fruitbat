@@ -6,8 +6,9 @@ import astropy.units as u
 import scipy.integrate as integrate
 
 
-__all__ = ["ioka2003", "inoue2004", "zhang2018", "builtin_method_functions",
-           "add_method", "avaliable_methods"]
+__all__ = ["ioka2003", "inoue2004", "zhang2018", 
+           "builtin_method_functions", "add_method", 
+           "avaliable_methods", "reset_methods", "method_functions"]
 
 
 def _f_integrand(z, cosmo):
@@ -21,13 +22,22 @@ def _f_integrand(z, cosmo):
     z : float
         The input redshift.
 
-    cosmo : An :obj:`astropy.cosmology` object
-        The cosmology object
+    cosmo : An instance of :obj:`astropy.cosmology`
+        The cosmology to use in the integrand.
 
     Returns
     -------
-    F(z) : float
+    f : float
         The evaluated integrand.
+
+    Notes
+    -----
+    The integrand is a follows:
+
+    ..math::
+        f = \\frac{1 + z}{\\Omega_{m,0}(1 + z)^3 +
+        \\Omega_{\\Lambda,0} (1 + z)^{3(1 - w)}}
+
     """
 
     w = cosmo.w(z)
@@ -47,7 +57,13 @@ def ioka2003(z, cosmo, zmin=0):
     z: float or int
         The input redshift.
 
-    cosmo:
+    cosmo: An instance of :obj:`astropy.cosmology`
+        The cosmology to assume when when calculating the dispersion
+        measure at redshift ``z``.
+
+    zmin: float or int, optional
+        The minimum redshift to begin the integral. This should
+        typically be zero. Default: 0.
 
     Returns
     -------
@@ -73,20 +89,23 @@ def inoue2004(z, cosmo, zmin=0):
 
     Parameters
     ----------
-    z : float
+    z: float or int
         The input redshift.
 
-    cosmology :
+    cosmo: An instance of :obj:`astropy.cosmology`
+        The cosmology to assume when when calculating the dispersion
+        measure at redshift ``z``.
 
     zmin: float or int, optional
-    The minimum redshift for the table. Default: 0
+        The minimum redshift to begin the integral. This should
+        typically be zero. Default: 0.
 
     Returns
     -------
     dm : float
         The dispersion measure at the redshift ``z``.
-
     """
+
     # Coefficient from Inoue 2004
     inoue_n_e_0 = 9.2e-10 * ((u.Mpc**2 * u.s**2) / (u.km**2 * u.cm**3))
 
@@ -100,20 +119,37 @@ def inoue2004(z, cosmo, zmin=0):
 
 def zhang2018(z, cosmo, zmin=0, **kwargs):
     """
-    Calculate the dispersion measure from a redshift given a cosmology
+    Calculates the dispersion measure at a redshift given a cosmology
     using the Zhang (2018) relation.
 
     Parameters
     ----------
-    z :
-    cosmology :
+    z: float or int
+        The input redshift.
+
+    cosmo: An instance of :obj:`astropy.cosmology`
+        The cosmology to assume when when calculating the dispersion
+        measure at redshift ``z``.
+
     zmin: float or int, optional
-        The minimum redshift
+        The minimum redshift to begin the integral. This should
+        typically be zero. Default: 0.
+
+    Keyword Arguments
+    -----------------
+    f_igm : float, optional
+        The fraction of baryons in the intergalatic medium.
+        Default: 0.83
+
+    free_elec : float, optional
+        The free electron number per baryon in the intergalactic
+        medium. Default: 0.875
 
     Returns
     -------
     dm : float
-        The dispersion measure at the redshift.
+        The dispersion measure at the redshift ``z``.
+
     """
 
     if "f_igm" in kwargs:
@@ -144,7 +180,15 @@ def zhang2018(z, cosmo, zmin=0, **kwargs):
 
 def builtin_method_functions():
     """
+    Returns a dictionary of the builtin methods with keywords and
+    corresponding dispersion measure functions.
+
+    Returns
+    -------
+    methods: dict
+        Contains the keywords and function for each method.
     """
+
     methods = {
         "Ioka2003": ioka2003,
         "Inoue2004": inoue2004,
@@ -156,52 +200,59 @@ def builtin_method_functions():
 _avaliable = builtin_method_functions()
 
 
-def add_method(name, function):
+def add_method(name, func):
     """
+    Add a user defined method/DM-z relation to the list of avaliable
+    methods.
 
     Parameters
     ----------
     name : str
-        The name of the
+        The keyword for the new method.
 
-    function
+    func : function
+        The function to calculate the dispersion measure at a given
+        redshift. The first argument of ``func`` must be ``z``.
 
     Return
     ------
 
     Example
     -------
-    >>> def simple_dm(z, cosmo):
+    >>> def simple_dm(z):
         dm = 1200 * z
         return dm
 
     >>> add_method("simple_dm", simple_dm)
     """
-    method = {name: function}
+
+    method = {name: func}
     _avaliable.update(method)
-
-
-def reset_methods():
-    """
-    Resets the avaliable methods to the default builtin methods.
-    """
-
-    # Delete all keys that aren't in the list of builtin method functions
-    remove = [k for k in _avaliable.keys() if k not in builtin_method_functions()]
-    for key in remove:
-        del _avaliable[key]
 
 
 def avaliable_methods():
     """
-    Returns the list of keys that are valid method in fruitbat.
+    Returns the list containing all the keywords for valid methods.
     """
     return list(_avaliable.keys())
+
+
+def reset_methods():
+    """
+    Resets the list of avaliable methods to the default builtin methods.
+    """
+
+    # Delete all keys that aren't in the list of builtin method functions
+    remove = [k for k in avaliable_methods()
+              if k not in builtin_method_functions()]
+
+    for key in remove:
+        del _avaliable[key]
 
 
 def method_functions():
     """
     Returns a dictionary containing the valid method keys and their
-    corresponding DM function.
+    corresponding dispersion measure functions.
     """
     return _avaliable

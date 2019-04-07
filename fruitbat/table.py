@@ -8,36 +8,43 @@ import scipy.interpolate as interpolate
 from fruitbat.methods import avaliable_methods, method_functions
 
 
-def load(filename, data_dir='data'):
+def load(name, data_dir='data'):
     """
     Opens a saved `.npy` file containing an interpolated 1D function.
 
     Parameters
     ----------
-    filename : str
+    name : str
         The name of the file to load.
 
     data_dir : str, optional
-        The directory containing the data. The whole path must be specified
-        except if :attr:`data_dir` == 'data' then it will search in the
-        `data` subdirectory of the source code. Default: 'data'
+        The directory containing the data. The whole path must be
+        specified except if :attr:`data_dir` == 'data' then it will
+        search in the `data` subdirectory of the source code.
+        Default: 'data'
 
     Returns
     -------
-    :obj:`scipy.interpolate.interp1d`
-        Function
+    table: :obj:`scipy.interpolate.interp1d`
+        The lookup table containing the interpolated datset.
+
+    Example
+    -------
+    >>> table = fruitbat.table.load('Zhang2018_Planck18.npy')
+    >>> table(1100)
+    array(1.22058572)
     """
     if data_dir == 'data':
         data_dir = os.path.join(os.path.dirname(__file__), 'data')
-    file = os.path.join(data_dir, filename)
+    file = os.path.join(data_dir, name)
     return np.load(file)[()]
 
 
-def create(filename, method, cosmo, output_dir='data', zmin=0, zmax=20, 
+def create(filename, method, output_dir='data', zmin=0, zmax=20,
            num_samples=10000, **kwargs):
     """
-    Creates an interpolated 1D redshift lookup table which can be read in
-    using :func:`load_lookup_table`.
+    Creates an interpolated 1D redshift lookup table which can be read
+    in  using :func:`~fruitbat.table.load`.
 
     Parameters
     ----------
@@ -45,13 +52,14 @@ def create(filename, method, cosmo, output_dir='data', zmin=0, zmax=20,
         The name of the output file.
 
     method : str
-        The DM-z relation to assume when creating the table.
+        The DM-redshift relation to assume when creating the table.
 
-    cosmo : :obj:`astropy.cosmology` or None
-        A dictionary containing the cosmology parameters for the Hubble
-        constant, Matter density, Baryon density and Dark Energy density.
-        `cosmology` must contain values for the following keys:
-        ``'H0'``, ``'Omega_m'``, ``'Omega_b'``, ``'Omega_L'``
+    output_dir : str
+        The path of the output directory. If ``output_dir = 'data'``,
+        then created table will created in the same directory with
+        the builtin tables and will be found when using functions
+        such as `~:meth:fruitbat.Frb.calc_redshift()`.
+        Default: 'data'
 
     zmin : int or float, optional
         The minimum redshift in the table. Default: 0
@@ -65,25 +73,30 @@ def create(filename, method, cosmo, output_dir='data', zmin=0, zmax=20,
 
     Keyword Arguments
     -----------------
+    cosmo : An instance of :obj:`astropy.cosmology`, optional
+        The cosmology to assume when calculating the outputs of the
+        table. Required when creating new tables of ``'Ioka2003'``,
+        ``'Inoue2004'``, ``'Zhang2018'``.
+
     free_elec : float or int, optional
         The amount of free electrons per proton mass in the Universe.
-        This only applies when using ``'Zhang2018'``. Must be between 0 and 1.
-        Default: 0.875.
+        This applies when using ``'Zhang2018'``. Must be between 0
+        and 1. Default: 0.875.
 
     f_igm : float or int, optional
-        The fraction of baryons in the intergalactic medium. This only
+        The fraction of baryons in the intergalactic medium. This
         applies when using ``'Zhang2018'``. Must be between 0 and 1.
         Default: 0.83
 
     Generates
     ---------
-    filename.npy:
+    custom_filename: A binary file in .npy format
+        The new lookup table.
 
     Warning
     -------
-    Generating lookup tables is only avaliable when using **fruitbat** in
-    Python 3.
-
+    Generating lookup tables is only avaliable when using ``fruitbat``
+    in Python 3.
     """
     if PY3:
 
@@ -94,12 +107,10 @@ def create(filename, method, cosmo, output_dir='data', zmin=0, zmax=20,
             raise ValueError(err_msg)
 
         else:
+
             function = method_functions()[method]
             lookup_table = _perform_interpolation(function,
-                                                  cosmo=cosmo,
-                                                  zmin=zmin, zmax=zmax,
-                                                  num_samples=num_samples,
-                                                  **kwargs)
+                zmin=zmin, zmax=zmax, num_samples=num_samples, **kwargs)
 
             output_name = "custom_{}.npy".format(filename)
             if output_dir == 'data':
@@ -119,19 +130,57 @@ def create(filename, method, cosmo, output_dir='data', zmin=0, zmax=20,
                           Python 3 only.""")
 
 
-def _perform_interpolation(dm_func, cosmo=None, zmin=0, zmax=20,
+def _perform_interpolation(dm_func, zmin=0, zmax=20,
                            num_samples=10000, **kwargs):
     """
+    Calculated the dispersion meaasure - redshift relation for a given
+    number of samples and returns the interpolated relation.
+
     Parameters
     ----------
+    dm_func : function
+        A function that calculates dispersion measure from redshift.
+        The first argument of the function must be ``z``. The remaining
+        parameters should be keyword only arguments.
+
+    zmin : int or float, optional
+        The minimum redshift in the table. Default: 0
+
+    zmax : int or float, optional
+        The maximum redshift in the table. Default: 20
+
+    num_samples : int, optional
+        The number of dispersion measure samples to perform before
+        interpolation. Default: 10000
+
+    Keyword Arguments
+    -----------------
+    All additional arguments to the dispersion measure function should
+    be passed as kewword arguments. The following are example kwargs
+    used in teh buildin dispersion measure functions.
+
+    cosmo : An instance of :obj:`astropy.cosmology`, optional
+        The cosmology to assume when calculating the outputs of the
+        table. Required when creating new tables of ``'Ioka2003'``,
+        ``'Inoue2004'``, ``'Zhang2018'``.
+
+    free_elec : float or int, optional
+        The amount of free electrons per proton mass in the Universe.
+        This applies when using ``'Zhang2018'``. Must be between 0
+        and 1. Default: 0.875.
+
+    f_igm : float or int, optional
+        The fraction of baryons in the intergalactic medium. This
+        applies when using ``'Zhang2018'``. Must be between 0 and 1.
+        Default: 0.83
 
     Returns
     -------
-
-
+    interp: An instance method of :obj:`scipy.interpolate.interp1d`
+        The interpolated lookup table.
     """
     z_vals = np.linspace(zmin, zmax, num_samples)
-    dm_vals = np.array([dm_func(z, cosmo, **kwargs) for z in z_vals])
+    dm_vals = np.array([dm_func(z, **kwargs) for z in z_vals])
     interp = interpolate.interp1d(dm_vals, z_vals)
 
     return interp

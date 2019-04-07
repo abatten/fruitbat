@@ -23,8 +23,8 @@ def set_rc_params(usetex=False):
 def method_comparison(filename=None, extension="png", usetex=False,
                       passed_ax=None, **kwargs):
     """
-    Create a plot comparing how estimated redshift changes as a function of
-    dispersion measure for each DM-z relation.
+    Create a plot comparing how estimated redshift changes as a
+    function of dispersion measure for each DM-z relation.
 
     Parameters
     ----------
@@ -90,8 +90,8 @@ def method_comparison(filename=None, extension="png", usetex=False,
 def cosmology_comparison(filename="", extension="png", usetex=False,
                          passed_ax=None, **kwargs):
     """
-    Create a plot comparing how the estimated redshift changes as a function
-    of dispersion mesure for each cosmology.
+    Create a plot comparing how the estimated redshift changes as a
+    function of dispersion mesure for each cosmology.
 
     Parameters
     ----------

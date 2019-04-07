@@ -9,10 +9,10 @@ from astropy.coordinates import SkyCoord
 from astropy import units as u
 import pyymw16 as ymw16
 
-import fruitbat
-from fruitbat import Frb, utils, cosmologies, methods, table
+from fruitbat import Frb, utils, cosmologies, methods, table, plot
 
 from six import PY2, PY3
+
 
 class TestFrbClass:
 
@@ -40,7 +40,7 @@ class TestFrbClass:
 
         for method in methods.keys():
             z = self.frb.calc_redshift(method=method, cosmology="Planck18")
-            assert np.isclose(z.value, methods[method]), "Failed: {}".format(method)
+            assert np.isclose(z.value, methods[method]), "Fail: {}".format(method)
 
     # Test that a ValueError is raised when an invalid method is given.
     def test_invalid_method(self):
@@ -244,14 +244,15 @@ def test_check_keys_in_dict_missing():
     required_keys = ["key1", "key2"]
     dictionary = {"key1": 1, "otherkey": 2}
     with pytest.raises(KeyError):
-        utils._check_keys_in_dict(dictionary, required_keys)
+        utils.check_keys_in_dict(dictionary, required_keys)
 
 
 def test_check_keys_in_dict_all():
     required_keys = ["key1", "key2"]
     dictionary = {"key1": 1, "key2": 2}
-    result = utils._check_keys_in_dict(dictionary, required_keys)
+    result = utils.check_keys_in_dict(dictionary, required_keys)
     assert result
+
 
 class TestAddingMethods():
 
@@ -272,17 +273,17 @@ class TestCreateTables:
     def test_create_tables_normal(self):
         if PY3:  # Only peform tests in Python 3
             method_list = methods.builtin_method_functions()
-            cosmology_list = fruitbat.cosmologies.builtin_cosmology_functions()
+            cosmology_list = cosmologies.builtin_cosmology_functions()
 
             # Create a lookup table for each method and cosmology
             for method in method_list:
                 for key in cosmology_list:
                     here = os.getcwd()
 
-                    cosmo = fruitbat.cosmologies.builtin_cosmology_functions()[key]
+                    cosmo = cosmologies.builtin_cosmology_functions()[key]
                     outfile_name = "_".join(["pytest_output", method, key])
-                    table.create(outfile_name, method=method, cosmo=cosmo, 
-                                 output_dir=here, zmin=0, zmax=20, 
+                    table.create(outfile_name, method=method, cosmo=cosmo,
+                                 output_dir=here, zmin=0, zmax=20,
                                  num_samples=10000)
 
                     # Compare new tables to existing tables for 4 dm values
@@ -302,35 +303,34 @@ class TestCreateTables:
                                           "Planck18")
 
     def test_create_table_zhang_figm_free_elec(self):
-        cosmo = fruitbat.cosmologies.builtin_cosmology_functions()["Planck18"]
+        cosmo = cosmologies.builtin_cosmology_functions()["Planck18"]
         outfile_name = "_".join(["pytest_output", "Zhang2018",
                                  "Planck18", "figm_free_elec"])
 
         if PY3:  # Only perform tests in Python 3
-            table.create(outfile_name, method="Zhang2018", cosmo=cosmo, 
+            table.create(outfile_name, method="Zhang2018", cosmo=cosmo,
                          f_igm=0.5, free_elec=0.4)
         elif PY2:
             with pytest.raises(SystemError):
-                table.create(outfile_name, method="Zhang2018", cosmo=cosmo, 
+                table.create(outfile_name, method="Zhang2018", cosmo=cosmo,
                              f_igm=0.5, free_elec=0.4)
 
     def test_create_table_zhang_figm_error(self):
-        cosmo = fruitbat.cosmologies.builtin_cosmology_functions()["Planck18"]
+        cosmo = cosmologies.builtin_cosmology_functions()["Planck18"]
         outfile_name = "_".join(["pytest_output", "Zhang2018",
                                  "Planck18", "figm_error"])
 
         if PY3:
             with pytest.raises(ValueError):
-                table.create(outfile_name, method="Zhang2018", cosmo=cosmo, 
+                table.create(outfile_name, method="Zhang2018", cosmo=cosmo,
                              f_igm=-1)
         elif PY2:
             with pytest.raises(SystemError):
-                table.create(outfile_name, method="Zhang2018", cosmo=cosmo, 
+                table.create(outfile_name, method="Zhang2018", cosmo=cosmo,
                              f_igm=-1)
 
-
     def test_create_table_zhang_free_elec_error(self):
-        cosmo = fruitbat.cosmologies.builtin_cosmology_functions()["Planck18"]
+        cosmo = cosmologies.builtin_cosmology_functions()["Planck18"]
         outfile_name = "_".join(["pytest_output", "Zhang2018",
                                  "Planck18", "free_elec_error"])
 
@@ -344,12 +344,11 @@ class TestCreateTables:
                              free_elec=-1)
 
 
-
 class TestPlots:
     # Test that the method plot creates an output file
     def test_method_plot(self):
         with pytest_mpl.plugin.switch_backend('Agg'):
-            fruitbat.plot.method_comparison(filename="pytest_output_method")
+            plot.method_comparison(filename="pytest_output_method")
         cwd = os.getcwd()
         if not os.path.exists(os.path.join(cwd, "pytest_output_method.png")):
             raise OSError
@@ -357,11 +356,10 @@ class TestPlots:
     # Test that the cosmology plot creates and output file
     def test_cosmology_plot(self):
         with pytest_mpl.plugin.switch_backend('Agg'):
-            fruitbat.plot.cosmology_comparison(filename="pytest_output_cosmo")
+            plot.cosmology_comparison(filename="pytest_output_cosmo")
         cwd = os.getcwd()
         if not os.path.exists(os.path.join(cwd, "pytest_output_cosmo.png")):
             raise OSError
-
 
 
 def test_cleanup():

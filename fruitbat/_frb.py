@@ -54,13 +54,13 @@ class Frb(object):
         The right ascension in J2000 coordinates of the best estimate
         of the FRB position. By default should be given in the ICRS
         frame. An alternative frame can be specified by also including
-        the keyword `frame`. e.g. frame='fk5'. Default: *None*
+        the keyword ``frame``. e.g. ``frame='fk5'``. Default: *None*
 
     decj : str or None, optional
         The declination in J2000 coordinates of the best estimate of
         the FRB position. By default should be given in the ICRS frame.
         An alternative frame can be specified by also including the
-        keyword `frame`. e.g. frame='fk5'. Default: *None*
+        keyword ``frame``. e.g. ``frame='fk5'``. Default: *None*
 
     gl : str or None, optional
         The Galactic longitude in degrees of the best estimate of the
@@ -237,7 +237,7 @@ class Frb(object):
     @docstring_substitute(meth=methods.avaliable_methods(),
                           cosmo=cosmologies.avaliable_cosmologies())
     def calc_redshift(self, method='Inoue2004', cosmology="Planck18",
-                      subtract_host=False, custom_method=False):
+                      subtract_host=False):
         """
         Calculate the redshift of the FRB from its :attr:`dm`,
         :attr:`dm_excess` or :attr:`dm_excess` - :attr:`dm_host_est`.
@@ -249,20 +249,16 @@ class Frb(object):
             Avaliable methods:  %(meth)s. Default: Inoue2004
 
         cosmology : str, optional
-            The method `inoue2004` has the option to choose which cosmology
-            to assume when performing the redshift estimation.
-            Avaliable cosmologies: %(cosmo)s. Default: Planck18
+            The method `inoue2004` has the option to choose which
+            cosmology to assume when performing the redshift
+            estimation. Avaliable cosmologies: %(cosmo)s.
+            Default: 'Planck18'
 
         subtract_host : bool, optional
-            Subtract :attr:`dm_host_est` from the :attr:`dm_excess` before
-            calculating the redshift. This is is used to account for the
-            dispersion measure that arises from the FRB host galaxy.
-            Default: False
-
-        custom_method : bool, optional
-            Must be set to ``True`` using a user created method. This is
-            such that it correctly finds the name of the table in the
-            data directory. Default: False
+            Subtract :attr:`dm_host_est` from the :attr:`dm_excess`
+            before calculating the redshift. This is is used to account
+            for the dispersion measure that arises from the FRB host
+            galaxy. Default: False
 
         Returns
         -------
@@ -271,11 +267,11 @@ class Frb(object):
 
         Notes
         -----
-        The methods_ section in the documentation has a discription of each
-        methods and where they should apply.
+        The methods_ section in the documentation has a d ocription for
+        each of the builtin methods.
 
-        The cosmology_ section of the documentation has a list of the
-        cosmological parameters used in each cosmology method.
+        The cosmology_ section in the documentation has a list of the
+        cosmological parameters for each cosmology
 
         .. _cosmology: https://fruitbat.readthedocs.io/en/latest/user_guide/method_and_cosmology.html#cosmology
         .. _methods: https://fruitbat.readthedocs.io/en/latest/user_guide/method_and_cosmology.html#methods
@@ -315,16 +311,19 @@ class Frb(object):
     def calc_skycoords(self, frame=None):
         """
         Calculates the skycoord position on the sky of the FRB from
-        (:attr:`raj`, :attr:`decj`) or (:attr:`gl`, :attr:`gb`).
+        (:attr:`raj`, :attr:`decj`) or (:attr:`gl`, :attr:`gb`). If
+        both (:attr:`raj`, :attr:`decj`) and (:attr:`gl`, :attr:`gb`)
+        are given, preference is given to (:attr:`raj`, :attr:`decj`).
 
         Parameters
         ----------
         frame: str or None, optional
             The type of coordinate frame. If ``frame = None`` then
-            :meth:`calc_skycoords` will use a default frame based on the
-            coordinates given. If :attr:`raj` and :attr:`decj` are given
-            the default frame is 'icrs'. If :attr:`gl` and :attr:`gb` are
-            given the default frame is 'galactic'. Default: *None*
+            :meth:`calc_skycoords` will use a default frame based on
+            the coordinates given. If :attr:`raj` and :attr:`decj` are
+            given the default frame is 'icrs'. If :attr:`gl` and
+            :attr:`gb` are given the default frame is 'galactic'.
+            Default: *None*
 
         Returns
         -------
@@ -351,8 +350,8 @@ class Frb(object):
 
     def calc_dm_excess(self):
         """
-        Calculates the dispersion measure excess of the FRB by subtracting
-        the DM contribution from the Milky Way.
+        Calculates the dispersion measure excess of the FRB by
+        subtracting the DM contribution from the Milky Way.
 
         Returns
         -------
@@ -373,9 +372,10 @@ class Frb(object):
 
     def calc_dm_galaxy(self, model='ymw16'):
         """
-        Calculates the dispersion measure contribution of the Milky Way from
-        either (:attr:`raj`, :attr:`decj`) or (:attr:`gl`, :attr:`gb`). Uses
-        the YMW16 model of the Milky Way electron column density.
+        Calculates the dispersion measure contribution of the Milky Way
+        from either (:attr:`raj`, :attr:`decj`) or (:attr:`gl`,
+        :attr:`gb`). Uses the YMW16 model of the Milky Way free
+        electron column density.
 
         Parameters
         ----------
@@ -386,7 +386,8 @@ class Frb(object):
         Returns
         -------
         :obj:`astropy.units.Quantity`
-            The dispersion measure contribution from the Milky Way of the FRB.
+            The dispersion measure contribution from the Milky Way of
+            the FRB.
         """
 
         # Since the YMW16 model only gives you a dispersion measure out to a
@@ -418,9 +419,10 @@ class Frb(object):
 
     def calc_dm_igm(self):
         """
-        Calculates the dispersion measure of the intergalactic medium along the
-        line-of-sight of the FRB. This can only be done if the redshift and
-        dispersion measure contribution of the FRB host galaxy is known.
+        Calculates the dispersion measure of the intergalactic medium
+        along the line-of-sight of the FRB. This can only be done if
+        the redshift and dispersion measure contribution of the FRB
+        host galaxy is known.
 
         Returns
         -------
@@ -433,7 +435,8 @@ class Frb(object):
 
         .. math::
 
-           \\rm{DM_{IGM}} = \\rm{DM_{excess}} - \\frac{\\rm{DM_{host, loc}}}{1 + z}
+           \\rm{DM_{IGM}} = \\rm{DM_{excess}} -
+           \\frac{\\rm{DM_{host, loc}}}{1 + z}
         """
 
         if self.z_host is None:
@@ -452,8 +455,8 @@ class Frb(object):
 
     def calc_fluence(self):
         """
-        Calculates the observed fluence of the FRB. This requires :attr:`width`
-        and :attr:`peak_flux` to not be *None*.
+        Calculates the observed fluence of the FRB. This requires
+        :attr:`width` and :attr:`peak_flux` to not be *None*.
 
         Returns
         -------
@@ -466,8 +469,10 @@ class Frb(object):
 
         .. math::
 
-            \\rm{F_{obs} = W_{obs} S_{peak, obs}}
+            F_{obs} = W_{obs} S_{\\nu, p}
 
+        Where :math:`W_{obs}` is the with of the FRB pulse and
+        :math:`S_{\\nu, p}` is the specific peak flux.
         """
         if (self.width is None) or (self.peak_flux is None):
             err_msg = ("calc_fluence requires both width and peak_flux "
@@ -527,28 +532,45 @@ class Frb(object):
         cosmo = cosmologies.avaliable_cosmologies()[self.cosmology]
         return cosmo.comoving_distance(z_sample)
 
-#    Currently peak luminosity is removed since it's unclear from literature
-#    how to accuratly calculate this quantity
     def calc_luminosity(self, use_bandwidth=False):
         """
-        Calculates the isotropic peak luminosity of the FRB. This is the upper
-        limit to the the true peak luminosity since the luminosity distance
-        required is also an upper limit to the true luminosity distance.
+        Calculates the isotropic peak luminosity of the FRB. This is
+        the upper limit to the the true peak luminosity since the
+        luminosity distance required is also an upper limit to the true
+        luminosity distance.
 
         Parameters
         ----------
         use_bandwidth: bool, optional
-            The default method of calculating the energy of an FRB uses
-            :attr:`obs_freq_central` as described in Zhang 2018. However some
-            estimates of the FRB energy instead use :attr:`obs_bandwidth` (see
-            Law et al. 2017). Set to ``True`` to use :attr:`obs_bandwidth`
-            instead of :attr:`obs_freq_central`. Default: False
+            The default method of calculating the luminosity of a FRB
+            uses :attr:`obs_freq_central` as described in Zhang 2018.
+            However some estimates of the FRB luminosity instead use
+            :attr:`obs_bandwidth` (see Law et al. 2017). Set to
+            ``True`` to use :attr:`obs_bandwidth` instead of
+            :attr:`obs_freq_central`. Default: False
 
         Returns
         -------
         :obj:`astropy.units.Quantity`
-            The estimated isotropic peak luminosity of the FRB within an
-            observed bandwidth.
+            The estimated isotropic peak luminosity of the FRB in units
+            of ergs/s.
+
+        Notes
+        -----
+        The luminosity of a FRB is calculated following that in
+        Zhang 2018.
+
+        .. math::
+
+            L_{FRB} \\simeq 4 \\pi D_{\\rm{L}}^2 S_{\\nu, p} \\nu_c
+
+        Where :math:`S_{\\nu, p}` is the specific peak flux of the FRB,
+        :math:`\\nu_c` is the central observing frequency,
+        :math:`D_{\\rm{L}}` is the luminosity distance.
+
+        In Law et al. 2017, the bandwidth (:math:`B`) is used instead
+        of :math:`\\nu_c` to estimate luminosity.
+
         """
         D = self.calc_luminosity_distance()
 
@@ -580,36 +602,41 @@ class Frb(object):
 
     def calc_energy(self, use_bandwidth=False):
         """
-        Calculates the isotropic energy of the FRB. This is the upper limit
-        to the the true energy since the luminosity distance required is also
-        an upper limit to the true luminosity distance.
+        Calculates the isotropic energy of the FRB. This is the upper
+        limit to the the true energy since the luminosity distance
+        required is also an upper limit to the true luminosity
+        distance.
 
         Parameters
         ----------
         use_bandwidth: bool, optional
-            The default method of calculating the energy of an FRB uses
-            :attr:`obs_freq_central` as described in Zhang 2018. However some
-            estimates of the FRB energy instead use :attr:`obs_bandwidth` (see
-            Law et al. 2017). Set to ``True`` to use :attr:`obs_bandwidth`
-            instead of :attr:`obs_freq_central`. Default: False
+            The default method of calculating the energy of a FRB uses
+            :attr:`obs_freq_central` as described in Zhang 2018.
+            However some estimates of the FRB energy instead use
+            :attr:`obs_bandwidth` (see Law et al. 2017). Set to
+            ``True`` to use :attr:`obs_bandwidth` instead of
+            :attr:`obs_freq_central`. Default: False
 
         Returns
         -------
         :obj:`astropy.units.Quantity`
-            The estimated isotropic energy of the FRB.
+            The estimated isotropic energy of the FRB, in units of
+            ergs.
 
         Notes
         -----
-        The energy of a FRB is calculated following that in Law et al. 2017
-        with the redshift dependence that is included by Zhang 2018.
+        The energy of a FRB is calculated following that in Zhang 2018.
 
         .. math::
 
-            E_{FRB} \\simeq F_{obs} B \\frac{4 \\pi D_{\\rm{L}}^2}{1 + z}
+            E_{FRB} \\simeq \\frac{4 \\pi}{1 + z} D_{\\rm{L}}^2 F_{obs} \\nu_c
 
-        Where :math:`F_{obs}` is the fluence of the FRB, :math:`B` is the
-        observing bandwidth, :math:`D_{\\rm{L}}` is the luminosity distance and
-        :math:`z` is the estimated redshift.
+        Where :math:`F_{obs}` is the fluence of the FRB, :math:`\\nu_c`
+        is the central observing frequency, :math:`D_{\\rm{L}}` is the
+        luminosity distance and :math:`z` is the estimated redshift.
+
+        In Law et al. 2017, the bandwidth (:math:`B`) is used instead
+        of :math:`\\nu_c` to estimate energy.
         """
 
         D = self.calc_luminosity_distance()
@@ -646,27 +673,31 @@ class Frb(object):
 
     def _set_value_units(self, value, unit=None, non_negative=False):
         """
-        Sets the units of a value.
+        Converts ``value`` into a :obj:`~astropy.unit.Quantity` with
+        units. Also checks if ``value`` has existing units and the
+        units are convertable with ``unit``. If ``value`` is a
+        :obj:`~astropy.unit.Quantity` with convertable units then
+        ``value`` is returned unchanged.
 
         Parameters
         ----------
-        value: float or int
+        value: float, int, or :obj:`~astropy.unit.Quantity`
             The input value.
 
         unit: :obj:`astropy.unit` or None
-            The unit to set for ``value``. If ``unit = None`` then ``value``
-            will become a dimensionless quantity.
+            The unit to set for ``value``. If ``unit = None`` then
+            ``value`` will become a dimensionless quantity.
 
         non_negative: bool, optional
-            If the value is negative raise an error. This is used to check
-            that certian values that can only be positive and correctly
+            Raise an error if the value is negative. This is used to
+            verify values that can only be positive are correctly
             specified. Default: *False*
 
         Return
         ------
-        var : astropy.unit.Quantity or None
-            The
-            If ``value=None`` returns Non
+        var : :obj:`~astropy.unit.Quantity` or None
+            The output quantity with units. If ``value=None``
+            returns *None*
         """
         # Check if the value already has units
         if not isinstance(value, u.Quantity):
@@ -729,8 +760,8 @@ class Frb(object):
     def dm_galaxy(self):
         """
         :obj:`astropy.units.Quantity` or None:
-            The galactic component of the dispersion measure. This is quantity
-            is calculated using :meth:`calc_dm_galaxy`.
+            The galactic component of the dispersion measure. This is
+            quantity is calculated using :meth:`calc_dm_galaxy`.
         """
         return self._dm_galaxy
 
@@ -743,11 +774,11 @@ class Frb(object):
     def dm_excess(self):
         """
         :obj:`astropy.units.Quantity` or None:
-            The dispersion measure with the Milky Way component subtracted.
-            This value approximates the dispersion measure of the intergalatic
-            medium by assuming that the host galaxy contributes zero to the
-            observed dispersion measure. This quantity is calculated using
-            :meth:`calc_dm_excess`.
+            The dispersion measure with the Milky Way component
+            subtracted. This value approximates the dispersion measure
+            of the intergalatic medium by assuming that the host galaxy
+            contributes zero to the observed dispersion measure. This
+            quantity is calculated using :meth:`calc_dm_excess`.
         """
         return self._dm_excess
 
@@ -798,13 +829,14 @@ class Frb(object):
     def z(self):
         """
         :obj:`astropy.units.Quantity` or None:
-            The estimated redshift of the burst. By default this assumes that
-            the entire :attr:`dm_excess` arrives from the IGM and the host
-            galaxy of the FRB and any surrounding material contribute nothing
-            to the total DM. This should be taken as an upper limit to the
-            bursts true redshift. To provide an estimate of the DM contribution
-            due to he host galaxy, set :attr:`dm_host_est` to a non-zero value
-            and use ``subract_host=True`` when calling :meth:`calc_redshift()`.
+            The estimated redshift of the burst. By default this
+            assumes that the entire :attr:`dm_excess` arrives from the
+            IGM and the host galaxy of the FRB and any surrounding
+            material contribute nothing to the total DM. This should be
+            taken as an upper limit to the bursts true redshift. To
+            provide an estimate of the DM contribution due to he host
+            galaxy, set :attr:`dm_host_est` to a non-zero value and use
+            ``subract_host=True`` when calling :meth:`calc_redshift()`.
         """
         return self._z
 
@@ -816,9 +848,9 @@ class Frb(object):
     def z_host(self):
         """
         :obj:`astropy.units.Quantity` or None:
-            The redshift of the localised FRB host galaxy. Note that this an
-            observed quantity, not the estimated redshift :attr:`z` calculated
-            with :meth:`calc_redshift()`.
+            The redshift of the localised FRB host galaxy. Note that
+            this an observed quantity, not the estimated redshift
+            :attr:`z` calculated with :meth:`calc_redshift()`.
         """
         return self._z_host
 
@@ -906,8 +938,9 @@ class Frb(object):
     def raj(self):
         """
         :obj:`astropy.coordinates.Longitude` or None:
-            The right accension in J2000 coordinates of the best estimate of
-            the FRB position. This is given in the IRCS frame.
+            The right accension in J2000 coordinates of the best
+            estimate of the FRB position. This is given in the IRCS
+            frame.
         """
         return self._raj
 
@@ -922,8 +955,8 @@ class Frb(object):
     def decj(self):
         """
         :obj:`astropy.coordinates.Latitude` or None:
-            The declination in J2000 coordinates of the best estimate of the
-            FRB position. This is given in the IRCS frame.
+            The declination in J2000 coordinates of the best estimate
+            of the FRB position. This is given in the IRCS frame.
         """
         return self._decj
 
@@ -938,8 +971,8 @@ class Frb(object):
     def gl(self):
         """
         :obj:`astropy.coordinates.Longitude` or None:
-            The longitude in galactic coordinates of the best estimate of the
-            FRB position.
+            The longitude in galactic coordinates of the best estimate
+            of the FRB position.
         """
         return self._gl
 
@@ -954,8 +987,8 @@ class Frb(object):
     def gb(self):
         """
         :obj:`astropy.coordinates.Latitude` or None:
-            The latitude in galactic coordinates of the best estimate of the
-            FRB position.
+            The latitude in galactic coordinates of the best estimate
+            of the FRB position.
         """
         return self._gb
 
@@ -971,8 +1004,8 @@ class Frb(object):
         """
         :obj:`astropy.coordinates.SkyCoord` or None:
             The skycoords of the FRB. This is calculated from either
-            (:attr:`raj`, :attr:`decj`) or (:attr:`gl`, :attr:`gb`) using
-            :meth:`calc_skycoords`.
+            (:attr:`raj`, :attr:`decj`) or (:attr:`gl`, :attr:`gb`)
+            using :meth:`calc_skycoords`.
         """
         return self._skycoords
 
@@ -988,8 +1021,9 @@ class Frb(object):
         """
         :obj:`astropy.units.Quantity` or None:
             The estimated disperison measure from the IGM. This can be
-            calculated for a FRB for which the redshift of its host galaxy is
-            known. This value is determined using :meth:`calc_dm_igm`.
+            calculated for a FRB for which the redshift of its host
+            galaxy is known. This value is determined using
+            :meth:`calc_dm_igm`.
         """
         return self._dm_igm
 
