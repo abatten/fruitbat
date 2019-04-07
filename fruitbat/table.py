@@ -5,7 +5,7 @@ import numpy as np
 from six import PY3, PY2
 import scipy.interpolate as interpolate
 
-from fruitbat.methods import avaliable_methods, method_functions
+from fruitbat.methods import available_methods, method_functions
 
 
 def load(name, data_dir='data'):
@@ -95,15 +95,15 @@ def create(filename, method, output_dir='data', zmin=0, zmax=20,
 
     Warning
     -------
-    Generating lookup tables is only avaliable when using ``fruitbat``
+    Generating lookup tables is only available when using ``fruitbat``
     in Python 3.
     """
     if PY3:
 
-        if method not in avaliable_methods():
+        if method not in available_methods():
             err_msg = ("{} is not a valid method."
                        "The currently defined methods "
-                       "are: {}".format(method, avaliable_methods()))
+                       "are: {}".format(method, available_methods()))
             raise ValueError(err_msg)
 
         else:

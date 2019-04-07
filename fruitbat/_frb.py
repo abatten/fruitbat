@@ -234,8 +234,8 @@ class Frb(object):
 
         return "Frb({})".format(", ".join(map(str, frb_repr)))
 
-    @docstring_substitute(meth=methods.avaliable_methods(),
-                          cosmo=cosmologies.avaliable_cosmologies())
+    @docstring_substitute(meth=methods.available_methods(),
+                          cosmo=cosmologies.available_cosmologies())
     def calc_redshift(self, method='Inoue2004', cosmology="Planck18",
                       subtract_host=False):
         """
@@ -284,16 +284,16 @@ class Frb(object):
         else:
             input_dm = self.dm_excess
 
-        if method not in methods.avaliable_methods():
+        if method not in methods.available_methods():
             err_msg = ("Method '{}' is not a valid method. "
                        "Valid methods are: {}".format(method,
-                        methods.avaliable_methods()))
+                        methods.available_methods()))
             raise ValueError(err_msg)
 
-        if cosmology not in cosmologies.avaliable_cosmologies():
+        if cosmology not in cosmologies.available_cosmologies():
             err_msg = ("Cosmology '{}' is not a valid cosmology. Valid "
                        "cosmologies are: {}".format(cosmology,
-                        cosmologies.avaliable_cosmologies()))
+                        cosmologies.available_cosmologies()))
             raise ValueError(err_msg)
 
         if method in methods.builtin_method_functions().keys():
@@ -529,7 +529,7 @@ class Frb(object):
                 a value for z_host.
                 """)
 
-        cosmo = cosmologies.avaliable_cosmologies()[self.cosmology]
+        cosmo = cosmologies.available_cosmologies()[self.cosmology]
         return cosmo.comoving_distance(z_sample)
 
     def calc_luminosity(self, use_bandwidth=False):

@@ -261,11 +261,11 @@ class TestAddingMethods():
 
     def test_add_method(self):
         methods.add_method("new_method", self.new_method)
-        assert "new_method" in methods.avaliable_methods()
+        assert "new_method" in methods.available_methods()
 
     def test_reset_methods(self):
         methods.reset_methods()
-        assert "new_method" not in methods.avaliable_methods()
+        assert "new_method" not in methods.available_methods()
 
 
 class TestCreateTables:

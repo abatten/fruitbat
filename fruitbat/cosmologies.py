@@ -10,7 +10,7 @@ from e13tools import docstring_copy
 
 __all__ = ["WMAP5", "WMAP7", "WMAP9", "Planck13", "Planck15", "Planck18",
            "create_cosmology", "builtin_cosmology_functions",
-           "add_cosmology", "reset_cosmologies", "avaliable_cosmologies",
+           "add_cosmology", "reset_cosmologies", "available_cosmologies",
            "cosmology_functions"]
 
 
@@ -54,7 +54,7 @@ def create_cosmology(parameters=None, name=None):
     """
     A wrapper to create custom astropy cosmologies.
 
-    The only avaliable cosmology types in this method are:
+    The only available cosmology types in this method are:
     :obj:`~astropy.cosmology.FlatLambdaCDM`,
     :obj:`~astropy.cosmology.FlatwCDM`,
     :obj:`~astropy.cosmology.LambdaCDM` and
@@ -186,12 +186,12 @@ def builtin_cosmology_functions():
     return cosmologies
 
 
-_avaliable = builtin_cosmology_functions()
+_available = builtin_cosmology_functions()
 
 
 def add_cosmology(name, cosmo):
     """
-    Adds a user created cosmology to the list of avaliable cosmologies.
+    Adds a user created cosmology to the list of available cosmologies.
 
     Parameters
     ----------
@@ -199,7 +199,7 @@ def add_cosmology(name, cosmo):
         The keyword for the new cosmology.
 
     cosmo : An instance of :obj:`astropy.cosmology`
-        The cosmology to add to the list of avaliable cosmologies.
+        The cosmology to add to the list of available cosmologies.
 
     Example
     -------
@@ -207,32 +207,32 @@ def add_cosmology(name, cosmo):
     >>> new_cosmology = fruitbat.cosmology.create_cosmology(parameters=params)
     >>> fruitbat.add_cosmology("new_cosmology", new_cosmology)
     """
-    if name in avaliable_cosmologies():
+    if name in available_cosmologies():
         err_msg = ("The cosmology '{}' already exists as a builtin "
                    "cosmology. Please choose a different name for "
                    "the cosmology.".format(name))
         raise ValueError(err_msg)
 
     dict_item = {name: cosmo}
-    _avaliable.update(dict_item)
+    _available.update(dict_item)
 
 
-def avaliable_cosmologies():
+def available_cosmologies():
     """
     Returns the list constaining all the keywords for valid cosmologies.
     """
-    return list(_avaliable.keys())
+    return list(_available.keys())
 
 
 def reset_cosmologies():
     """
-    Resets the list of avaliable cosmologies to the default builtin
+    Resets the list of available cosmologies to the default builtin
     cosmologies.
     """
-    remove = [k for k in avaliable_cosmologies()
+    remove = [k for k in available_cosmologies()
               if k not in builtin_cosmology_functions()]
     for key in remove:
-        del _avaliable[key]
+        del _available[key]
 
 
 def cosmology_functions():
@@ -240,4 +240,4 @@ def cosmology_functions():
     Returns a dictionary containing the valid cosmology keys and the
     corresponding instance of that cosmology.
     """
-    return _avaliable
+    return _available

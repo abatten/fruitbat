@@ -8,7 +8,7 @@ import scipy.integrate as integrate
 
 __all__ = ["ioka2003", "inoue2004", "zhang2018", 
            "builtin_method_functions", "add_method", 
-           "avaliable_methods", "reset_methods", "method_functions"]
+           "available_methods", "reset_methods", "method_functions"]
 
 
 def _f_integrand(z, cosmo):
@@ -197,12 +197,12 @@ def builtin_method_functions():
     return methods
 
 
-_avaliable = builtin_method_functions()
+_available = builtin_method_functions()
 
 
 def add_method(name, func):
     """
-    Add a user defined method/DM-z relation to the list of avaliable
+    Add a user defined method/DM-z relation to the list of available
     methods.
 
     Parameters
@@ -227,27 +227,27 @@ def add_method(name, func):
     """
 
     method = {name: func}
-    _avaliable.update(method)
+    _available.update(method)
 
 
-def avaliable_methods():
+def available_methods():
     """
     Returns the list containing all the keywords for valid methods.
     """
-    return list(_avaliable.keys())
+    return list(_available.keys())
 
 
 def reset_methods():
     """
-    Resets the list of avaliable methods to the default builtin methods.
+    Resets the list of available methods to the default builtin methods.
     """
 
     # Delete all keys that aren't in the list of builtin method functions
-    remove = [k for k in avaliable_methods()
+    remove = [k for k in available_methods()
               if k not in builtin_method_functions()]
 
     for key in remove:
-        del _avaliable[key]
+        del _available[key]
 
 
 def method_functions():
@@ -255,4 +255,4 @@ def method_functions():
     Returns a dictionary containing the valid method keys and their
     corresponding dispersion measure functions.
     """
-    return _avaliable
+    return _available
