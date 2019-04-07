@@ -9,13 +9,10 @@ from astropy.coordinates import SkyCoord
 from astropy import units as u
 import pyymw16 as ymw16
 
-import fruitbat
-from fruitbat import Frb
-from fruitbat import utils
-from fruitbat import cosmology
-from fruitbat import estimate
+from fruitbat import Frb, utils, cosmologies, methods, table, plot
 
 from six import PY2, PY3
+
 
 class TestFrbClass:
 
@@ -43,7 +40,7 @@ class TestFrbClass:
 
         for method in methods.keys():
             z = self.frb.calc_redshift(method=method, cosmology="Planck18")
-            assert np.isclose(z.value, methods[method]), "Failed: {}".format(method)
+            assert np.isclose(z.value, methods[method]), "Fail: {}".format(method)
 
     # Test that a ValueError is raised when an invalid method is given.
     def test_invalid_method(self):
@@ -206,39 +203,39 @@ def test_create_cosmology():
 
     # Test FlatLambdaCDM
     FlatLambdaCDM_params = {'H0': 67, 'Om0': 0.3, 'flat': True}
-    cosmology.create_cosmology(FlatLambdaCDM_params)
+    cosmologies.create_cosmology(FlatLambdaCDM_params)
 
     # Test FlatwCDM
     FlatwCDM_params = {'H0': 67, 'Om0': 0.3, 'flat': True, 'w0': 0.9}
-    cosmology.create_cosmology(FlatwCDM_params)
+    cosmologies.create_cosmology(FlatwCDM_params)
 
     # Test LambdaCDM
     LambdaCDM_params = {'H0': 67, 'Om0': 0.3, 'Ode0': 0.8, 'flat': False}
-    cosmology.create_cosmology(LambdaCDM_params)
+    cosmologies.create_cosmology(LambdaCDM_params)
 
     # Test wCDM
     wCDM_params = {'H0': 67, 'Om0': 0.3, 'Ode0': 0.8, 'flat': False, 'w0': 0.9}
-    cosmology.create_cosmology(wCDM_params)
+    cosmologies.create_cosmology(wCDM_params)
 
 
 class Test_fz_integrand:
 
     # Create default cosmology
-    cosmo = fruitbat.cosmology.create_cosmology()
-    cosmo_w0 = cosmology.create_cosmology({'w0': 1})
+    cosmo = cosmologies.create_cosmology()
+    cosmo_w0 = cosmologies.create_cosmology({'w0': 1})
 
     # Test _fz_integrand correctly computes for z = 0
     def test_fz_integrand_z0(self):
-        fz = utils._fz_integrand(0, self.cosmo)
+        fz = methods._f_integrand(0, self.cosmo)
         assert np.isclose(fz, 1.0)
 
     # Test _fz_integrand correctly computes for z = 2
     def test_fz_integrand_z2(self):
-        fz = utils._fz_integrand(2, self.cosmo)
+        fz = methods._f_integrand(2, self.cosmo)
         assert np.isclose(fz, 1.011299)
 
     def test_fz_integrand_w1_z1(self):
-        fz = utils._fz_integrand(1, self.cosmo_w0)
+        fz = methods._f_integrand(1, self.cosmo_w0)
         assert np.isclose(fz, 0.291111)
 
 
@@ -247,38 +244,54 @@ def test_check_keys_in_dict_missing():
     required_keys = ["key1", "key2"]
     dictionary = {"key1": 1, "otherkey": 2}
     with pytest.raises(KeyError):
-        utils._check_keys_in_dict(dictionary, required_keys)
+        utils.check_keys_in_dict(dictionary, required_keys)
 
 
 def test_check_keys_in_dict_all():
     required_keys = ["key1", "key2"]
     dictionary = {"key1": 1, "key2": 2}
-    result = utils._check_keys_in_dict(dictionary, required_keys)
+    result = utils.check_keys_in_dict(dictionary, required_keys)
     assert result
+
+
+class TestAddingMethods():
+
+    def new_method(self, z, cosmo):
+        return 1200 * z
+
+    def test_add_method(self):
+        methods.add_method("new_method", self.new_method)
+        assert "new_method" in methods.available_methods()
+
+    def test_reset_methods(self):
+        methods.reset_methods()
+        assert "new_method" not in methods.available_methods()
+
 
 class TestCreateTables:
 
     def test_create_tables_normal(self):
         if PY3:  # Only peform tests in Python 3
-            method_list = estimate.methods()
-            cosmology_list = fruitbat.cosmology.builtin()
+            method_list = methods.builtin_method_functions()
+            cosmology_list = cosmologies.builtin_cosmology_functions()
 
             # Create a lookup table for each method and cosmology
             for method in method_list:
                 for key in cosmology_list:
-                    cosmo = fruitbat.cosmology.builtin()[key]
+                    here = os.getcwd()
+
+                    cosmo = cosmologies.builtin_cosmology_functions()[key]
                     outfile_name = "_".join(["pytest_output", method, key])
-                    utils.create_lookup_table(outfile_name, method=method,
-                                              cosmo=cosmo, zmin=0, zmax=20,
-                                              num_samples=10000)
+                    table.create(outfile_name, method=method, cosmo=cosmo,
+                                 output_dir=here, zmin=0, zmax=20,
+                                 num_samples=10000)
 
                     # Compare new tables to existing tables for 4 dm values
                     pre_calc_fn = ".".join(["_".join([method, key]), "npy"])
-                    new_calc_fn = ".".join([outfile_name, "npy"])
-                    cwd = os.getcwd()
+                    new_calc_fn = "".join(["custom_", outfile_name, ".npy"])
 
-                    pre_calc = utils.load_lookup_table(pre_calc_fn)
-                    new_calc = utils.load_lookup_table(new_calc_fn, cwd)
+                    pre_calc = table.load(pre_calc_fn)
+                    new_calc = table.load(new_calc_fn, data_dir=here)
 
                     test_dm_list = [0, 100, 1000, 2000]
 
@@ -286,58 +299,55 @@ class TestCreateTables:
                         assert pre_calc(dm)[()] == new_calc(dm)[()]
         elif PY2:
             with pytest.raises(SystemError):
-                utils.create_lookup_table("pytest_output", "Zhang2018",
-                                          "Planck18")
+                table.create("pytest_output", "Zhang2018", "Planck18")
 
     def test_create_table_zhang_figm_free_elec(self):
-        cosmo = fruitbat.cosmology.builtin()["Planck18"]
+        cosmo = cosmologies.builtin_cosmology_functions()["Planck18"]
         outfile_name = "_".join(["pytest_output", "Zhang2018",
                                  "Planck18", "figm_free_elec"])
+
         if PY3:  # Only perform tests in Python 3
-            utils.create_lookup_table(outfile_name, method="Zhang2018",
-                                      cosmo=cosmo, f_igm=0.5, free_elec=0.4)
+            table.create(outfile_name, method="Zhang2018", cosmo=cosmo,
+                         f_igm=0.5, free_elec=0.4)
         elif PY2:
             with pytest.raises(SystemError):
-                utils.create_lookup_table(outfile_name, method="Zhang2018",
-                                          cosmo=cosmo, f_igm=0.5,
-                                          free_elec=0.4)
+                table.create(outfile_name, method="Zhang2018", cosmo=cosmo,
+                             f_igm=0.5, free_elec=0.4)
 
     def test_create_table_zhang_figm_error(self):
-        cosmo = fruitbat.cosmology.builtin()["Planck18"]
+        cosmo = cosmologies.builtin_cosmology_functions()["Planck18"]
         outfile_name = "_".join(["pytest_output", "Zhang2018",
                                  "Planck18", "figm_error"])
 
         if PY3:
             with pytest.raises(ValueError):
-                utils.create_lookup_table(outfile_name, method="Zhang2018",
-                                          cosmo=cosmo, f_igm=-1)
+                table.create(outfile_name, method="Zhang2018", cosmo=cosmo,
+                             f_igm=-1)
         elif PY2:
             with pytest.raises(SystemError):
-                utils.create_lookup_table(outfile_name, method="Zhang2018",
-                                          cosmo=cosmo, f_igm=-1)
-
+                table.create(outfile_name, method="Zhang2018", cosmo=cosmo,
+                             f_igm=-1)
 
     def test_create_table_zhang_free_elec_error(self):
-        cosmo = fruitbat.cosmology.builtin()["Planck18"]
+        cosmo = cosmologies.builtin_cosmology_functions()["Planck18"]
         outfile_name = "_".join(["pytest_output", "Zhang2018",
                                  "Planck18", "free_elec_error"])
 
         if PY3:
             with pytest.raises(ValueError):
-                utils.create_lookup_table(outfile_name, method="Zhang2018",
-                                          cosmo=cosmo, free_elec=-1)
+                table.create(outfile_name, method="Zhang2018", cosmo=cosmo,
+                             free_elec=-1)
         elif PY2:
             with pytest.raises(SystemError):
-                utils.create_lookup_table(outfile_name, method="Zhang2018",
-                                          cosmo=cosmo, free_elec=-1)
-
+                table.create(outfile_name, method="Zhang2018", cosmo=cosmo,
+                             free_elec=-1)
 
 
 class TestPlots:
     # Test that the method plot creates an output file
     def test_method_plot(self):
         with pytest_mpl.plugin.switch_backend('Agg'):
-            fruitbat.plot.create_method_comparison(filename="pytest_output_method")
+            plot.method_comparison(filename="pytest_output_method")
         cwd = os.getcwd()
         if not os.path.exists(os.path.join(cwd, "pytest_output_method.png")):
             raise OSError
@@ -345,7 +355,7 @@ class TestPlots:
     # Test that the cosmology plot creates and output file
     def test_cosmology_plot(self):
         with pytest_mpl.plugin.switch_backend('Agg'):
-            fruitbat.plot.create_cosmology_comparison(filename="pytest_output_cosmo")
+            plot.cosmology_comparison(filename="pytest_output_cosmo")
         cwd = os.getcwd()
         if not os.path.exists(os.path.join(cwd, "pytest_output_cosmo.png")):
             raise OSError
@@ -353,7 +363,6 @@ class TestPlots:
 
 def test_cleanup():
     # Remove the files at end of test
-    test_files = glob("pytest_output_*")
+    test_files = glob("*pytest_output*")
     for file in test_files:
         os.remove(file)
-
