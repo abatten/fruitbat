@@ -9,7 +9,8 @@ from astropy.cosmology.core import (FlatLambdaCDM, FlatwCDM, LambdaCDM, wCDM)
 from e13tools import docstring_copy
 
 __all__ = ["WMAP5", "WMAP7", "WMAP9", "Planck13", "Planck15", "Planck18",
-           "create_cosmology", "builtin", "keys"]
+           "create_cosmology", "builtin_cosmology_functions",
+           "cosmology_functions", "avaliable_cosmologies"]
 
 
 @docstring_copy(astropy.cosmology.WMAP9)
@@ -131,6 +132,9 @@ def create_cosmology(parameters=None, name=None):
 
 
 # Planck 2018 paper VI Table 2 Final column (68% confidence interval)
+# This is the Planck 2018 cosmology that will be added to Astropy when the
+# paper is accepted. When it does fruitbat will convert to using
+# astropy.cosmology.Planck18.
 planck18 = dict(
     Oc0=0.2607,
     Ob0=0.04897,
@@ -150,7 +154,7 @@ planck18 = dict(
 )
 
 
-def builtin():
+def builtin_cosmology_functions():
     """
     Create a dictionary of the builtin cosmologies with keywords and functions.
 
@@ -171,10 +175,35 @@ def builtin():
     return cosmologies
 
 
-def keys():
+_avaliable = builtin_cosmology_functions()
+
+
+def add_cosmology(name, function):
     """
-    Returns a string constaining all the keywords for builtin cosmologies.
     """
-    cosmologies = builtin()
-    keys = ", ".join(cosmologies.keys())
-    return keys
+    cosmology = {name: function}
+    _avaliable.update(cosmology)
+
+
+def reset_cosmologies():
+    """
+    Resets the avaliable cosmologies to the default builtin cosmologies.
+    """
+    remove = [k for k in _avaliable.keys() if k not in builtin_cosmology_functions()]
+    for key in remove:
+        del _avaliable[key]
+
+
+def avaliable_cosmologies():
+    """
+    Returns the list constaining all the keywords for valid cosmologies.
+    """
+    return list(_avaliable.keys())
+
+
+def cosmology_functions():
+    """
+    Returns a dictionary containing the valid cosmology keys and their
+    corresponging function.
+    """
+    return _avaliable

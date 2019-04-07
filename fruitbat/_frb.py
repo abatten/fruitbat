@@ -12,7 +12,7 @@ import astropy.units as u
 from e13tools import docstring_substitute
 import pyymw16 as ymw16
 
-from fruitbat import estimate, cosmology
+from fruitbat import cosmologies, methods, table
 
 __all__ = ["Frb"]
 
@@ -234,10 +234,10 @@ class Frb(object):
 
         return "Frb({})".format(", ".join(map(str, frb_repr)))
 
-    @docstring_substitute(methods=estimate.methods(string=True),
-                          cosmo=cosmology.keys())
+    @docstring_substitute(meth=methods.avaliable_methods(),
+                          cosmo=cosmologies.avaliable_cosmologies())
     def calc_redshift(self, method='Inoue2004', cosmology="Planck18",
-                      subtract_host=False):
+                      subtract_host=False, custom_method=False):
         """
         Calculate the redshift of the FRB from its :attr:`dm`,
         :attr:`dm_excess` or :attr:`dm_excess` - :attr:`dm_host_est`.
@@ -246,7 +246,7 @@ class Frb(object):
         ----------
         method : str, optional
             The approximation to use when calculating the redshift.
-            Avaliable methods:  %(methods)s. Default: Inoue2004
+            Avaliable methods:  %(meth)s. Default: Inoue2004
 
         cosmology : str, optional
             The method `inoue2004` has the option to choose which cosmology
@@ -258,6 +258,11 @@ class Frb(object):
             calculating the redshift. This is is used to account for the
             dispersion measure that arises from the FRB host galaxy.
             Default: False
+
+        custom_method : bool, optional
+            Must be set to ``True`` using a user created method. This is
+            such that it correctly finds the name of the table in the
+            data directory. Default: False
 
         Returns
         -------
@@ -283,8 +288,25 @@ class Frb(object):
         else:
             input_dm = self.dm_excess
 
-        self.z = estimate.redshift(input_dm, method=method,
-                                   cosmology=cosmology)
+        if method not in methods.avaliable_methods():
+            err_msg = ("Method '{}' is not a valid method. "
+                       "Valid methods are: {}".format(method,
+                        methods.avaliable_methods()))
+            raise ValueError(err_msg)
+
+        if cosmology not in cosmologies.avaliable_cosmologies():
+            err_msg = ("Cosmology '{}' is not a valid cosmology. Valid "
+                       "cosmologies are: {}".format(cosmology,
+                        cosmologies.avaliable_cosmologies()))
+            raise ValueError(err_msg)
+
+        if method in methods.builtin_method_functions().keys():
+            table_name = "".join(["_".join([method, cosmology]), ".npy"])
+        else:
+            table_name = "".join(["custom_", method, ".npy"])
+
+        lookup_table = table.load(table_name)
+        self.z = lookup_table(input_dm)[()]
 
         self.cosmology = cosmology
         self.method = method
@@ -476,7 +498,7 @@ class Frb(object):
                 a value for z_host.
                 """)
 
-        cosmo = cosmology.builtin()[self.cosmology]
+        cosmo = cosmologies.builtin_cosmology_functions()[self.cosmology]
         return cosmo.luminosity_distance(self.z)
 
     def calc_comoving_distance(self):
@@ -502,7 +524,7 @@ class Frb(object):
                 a value for z_host.
                 """)
 
-        cosmo = cosmology.builtin()[self.cosmology]
+        cosmo = cosmologies.avaliable_cosmologies()[self.cosmology]
         return cosmo.comoving_distance(z_sample)
 
 #    Currently peak luminosity is removed since it's unclear from literature
