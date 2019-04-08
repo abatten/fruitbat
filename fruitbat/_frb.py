@@ -135,7 +135,7 @@ class Frb(object):
         The observing bandwidth. Units: MHz Default: *None*
 
     obs_freq_central : float or None, optional
-        The central observing frequency, Units: GHz Deault: *None*
+        The central observing frequency, Units: MHz Deault: *None*
 
     utc : str or None, optional
         The UTC time of the FRB Burst. Format should be of the form
@@ -155,11 +155,7 @@ class Frb(object):
                  dm_galaxy=0.0, dm_excess=None, z_host=None, dm_host_est=0.0,
                  dm_host_loc=0.0, dm_index=None, scatt_index=None, snr=None,
                  width=None, peak_flux=None, fluence=None, obs_bandwidth=None,
-                 obs_freq_central=None, utc=None, *args, **kwargs):
-
-        if args:
-            raise TypeError("Frb() takes 1 positional argument but {} were "
-                            "given".format(1 + len(args)))
+                 obs_freq_central=None, utc=None, **kwargs):
 
         self.dm = dm
 
@@ -203,8 +199,7 @@ class Frb(object):
         # Calculate the skycoords of the FRB from (raj, decj) or (gl, gb)
         if (raj and decj) or (gl and gb):
             if 'frame' in kwargs:
-                frame = kwargs.get('frame', 0)
-                self.skycoords = self.calc_skycoords(frame=frame)
+                self.skycoords = self.calc_skycoords(frame=kwargs["frame"])
             else:
                 self.skycoords = self.calc_skycoords()
 
@@ -237,7 +232,7 @@ class Frb(object):
     @docstring_substitute(meth=methods.available_methods(),
                           cosmo=cosmologies.available_cosmologies())
     def calc_redshift(self, method='Inoue2004', cosmology="Planck18",
-                      subtract_host=False):
+                      subtract_host=False, lookup_table=None):
         """
         Calculate the redshift of the FRB from its :attr:`dm`,
         :attr:`dm_excess` or :attr:`dm_excess` - :attr:`dm_host_est`.
@@ -245,20 +240,24 @@ class Frb(object):
         Parameters
         ----------
         method : str, optional
-            The approximation to use when calculating the redshift.
-            Avaliable methods:  %(meth)s. Default: Inoue2004
+            The dispersion meausre -redshift relation to use when 
+            calculating the redshift. Avaliable methods:  %(meth)s. 
+            Default: 'Inoue2004'
 
         cosmology : str, optional
-            The method `inoue2004` has the option to choose which
-            cosmology to assume when performing the redshift
-            estimation. Avaliable cosmologies: %(cosmo)s.
-            Default: 'Planck18'
+            The cosmology to assume when calculating the redshift. 
+            Avaliable cosmologies: %(cosmo)s. Default: 'Planck18'
 
         subtract_host : bool, optional
             Subtract :attr:`dm_host_est` from the :attr:`dm_excess`
             before calculating the redshift. This is is used to account
             for the dispersion measure that arises from the FRB host
             galaxy. Default: False
+
+        lookup_table : str or None, optional
+            The path to the lookup table file. If ``lookup_table=None``
+            a table will attempted to be loaded from the data directory 
+            based on the method name. Default: *None*       
 
         Returns
         -------
@@ -267,7 +266,7 @@ class Frb(object):
 
         Notes
         -----
-        The methods_ section in the documentation has a d ocription for
+        The methods_ section in the documentation has a description for
         each of the builtin methods.
 
         The cosmology_ section in the documentation has a list of the
@@ -296,13 +295,19 @@ class Frb(object):
                         cosmologies.available_cosmologies()))
             raise ValueError(err_msg)
 
-        if method in methods.builtin_method_functions().keys():
-            table_name = "".join(["_".join([method, cosmology]), ".npy"])
-        else:
-            table_name = "".join(["custom_", method, ".npy"])
+        # If the user provides a table use that table for estimation.
+        if lookup_table is not None:
+            lookup_table = table.load(lookup_table)
 
-        lookup_table = table.load(table_name)
-        self.z = lookup_table(input_dm)[()]
+        else:
+            if method in methods.builtin_method_functions().keys():
+                table_name = "".join(["_".join([method, cosmology]), ".npz"])
+            else:
+                table_name = "".join(["custom_", method, ".npz"])
+
+            lookup_table = table.load(table_name)
+
+        self.z = table.get_z_from_table(input_dm, lookup_table)
 
         self.cosmology = cosmology
         self.method = method
@@ -367,7 +372,13 @@ class Frb(object):
             \\rm{DM_{excess} = DM - DM_{galaxy}}
         """
         dm_excess = self.dm.value - self.dm_galaxy.value
-        self.dm_excess = dm_excess
+        if dm_excess < 0:
+            print("dm_excess < 0: This implies that the DM estimate "
+                  "from the Milky Way is higher than the observed DM. "
+                  "Setting dm_excess = 0")
+            self.dm_excess = 0
+        else:
+            self.dm_excess = dm_excess
         return dm_excess
 
     def calc_dm_galaxy(self, model='ymw16'):
@@ -503,7 +514,7 @@ class Frb(object):
                 a value for z_host.
                 """)
 
-        cosmo = cosmologies.builtin_cosmology_functions()[self.cosmology]
+        cosmo = cosmologies.cosmology_functions()[self.cosmology]
         return cosmo.luminosity_distance(self.z)
 
     def calc_comoving_distance(self):
@@ -529,7 +540,7 @@ class Frb(object):
                 a value for z_host.
                 """)
 
-        cosmo = cosmologies.available_cosmologies()[self.cosmology]
+        cosmo = cosmologies.cosmology_functions()[self.cosmology]
         return cosmo.comoving_distance(z_sample)
 
     def calc_luminosity(self, use_bandwidth=False):
@@ -787,6 +798,7 @@ class Frb(object):
             self._dm_excess = self._set_value_units(value, u.pc * u.cm**-3,
                                                     non_negative=True)
 
+
     @property
     def dm_host_est(self):
         """
@@ -931,7 +943,7 @@ class Frb(object):
 
     @obs_freq_central.setter
     def obs_freq_central(self, value):
-        self._obs_freq_central = self._set_value_units(value, u.GHz,
+        self._obs_freq_central = self._set_value_units(value, u.MHz,
                                                        non_negative=True)
 
     @property
