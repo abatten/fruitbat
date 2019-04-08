@@ -66,11 +66,11 @@ def method_comparison(filename=None, extension="png", usetex=False,
         else:
             cosmology = 'Planck18'
 
-        table_name = "".join(["_".join([method, cosmology]), ".npy"])
+        table_name = "".join(["_".join([method, cosmology]), ".npz"])
         lookup_table = table.load(table_name)
 
         for i, dm in enumerate(dm_vals):
-            z_vals[i] = lookup_table(dm)[()]
+            z_vals[i] = table.get_z_from_table(dm, lookup_table)
 
         ax.plot(dm_vals, z_vals, colours[j], label=label[j], **kwargs)
 
@@ -145,11 +145,10 @@ def cosmology_comparison(filename="", extension="png", usetex=False,
         else:
             method = 'Inoue2004'
 
-        table_name = "".join(["_".join([method, cosmo]), ".npy"])
+        table_name = "".join(["_".join([method, cosmo]), ".npz"])
         lookup_table = table.load(table_name)        
         for i, dm in enumerate(dm_vals):
-
-            z_vals[i] = lookup_table(dm)[()]
+            z_vals[i] = table.get_z_from_table(dm, lookup_table)
 
         ax.plot(dm_vals, z_vals, colours[j], label=label[j], **kwargs)
         if add_axin:
