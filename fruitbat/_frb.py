@@ -135,7 +135,7 @@ class Frb(object):
         The observing bandwidth. Units: MHz Default: *None*
 
     obs_freq_central : float or None, optional
-        The central observing frequency, Units: GHz Deault: *None*
+        The central observing frequency, Units: MHz Deault: *None*
 
     utc : str or None, optional
         The UTC time of the FRB Burst. Format should be of the form
@@ -245,14 +245,13 @@ class Frb(object):
         Parameters
         ----------
         method : str, optional
-            The approximation to use when calculating the redshift.
-            Avaliable methods:  %(meth)s. Default: Inoue2004
+            The dispersion meausre -redshift relation to use when 
+            calculating the redshift. Avaliable methods:  %(meth)s. 
+            Default: 'Inoue2004'
 
         cosmology : str, optional
-            The method `inoue2004` has the option to choose which
-            cosmology to assume when performing the redshift
-            estimation. Avaliable cosmologies: %(cosmo)s.
-            Default: 'Planck18'
+            The cosmology to assume when calculating the redshift. 
+            Avaliable cosmologies: %(cosmo)s. Default: 'Planck18'
 
         subtract_host : bool, optional
             Subtract :attr:`dm_host_est` from the :attr:`dm_excess`
@@ -367,7 +366,13 @@ class Frb(object):
             \\rm{DM_{excess} = DM - DM_{galaxy}}
         """
         dm_excess = self.dm.value - self.dm_galaxy.value
-        self.dm_excess = dm_excess
+        if dm_excess < 0:
+            print("dm_excess < 0: This implies that the DM estimate "
+                  "from the Milky Way is higher than the observed DM. "
+                  "Setting dm_excess = 0")
+            self.dm_excess = 0
+        else:
+            self.dm_excess = dm_excess
         return dm_excess
 
     def calc_dm_galaxy(self, model='ymw16'):
@@ -787,6 +792,7 @@ class Frb(object):
             self._dm_excess = self._set_value_units(value, u.pc * u.cm**-3,
                                                     non_negative=True)
 
+
     @property
     def dm_host_est(self):
         """
@@ -931,7 +937,7 @@ class Frb(object):
 
     @obs_freq_central.setter
     def obs_freq_central(self, value):
-        self._obs_freq_central = self._set_value_units(value, u.GHz,
+        self._obs_freq_central = self._set_value_units(value, u.MHz,
                                                        non_negative=True)
 
     @property

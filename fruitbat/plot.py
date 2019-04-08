@@ -29,13 +29,14 @@ def method_comparison(filename=None, extension="png", usetex=False,
     Parameters
     ----------
     filename: string or None, optional
-        The filename of the saved figure. Default: None
+        The filename of the saved figure. Default: *None*
 
     extension: string, optional
-        The format to save the figure. e.g "png", "pdf", "esp", etc...
+        The format to save the figure. e.g "png", "pdf", "eps", etc...
         Default: "png"
 
     usetex: bool, optional
+        Use LaTeX for for fonts. 
 
     passed_ax: or None, optional
 
@@ -60,23 +61,25 @@ def method_comparison(filename=None, extension="png", usetex=False,
 
     for j, method in enumerate(method_list):
         z_vals = np.zeros(len(dm_vals))
+        if 'cosmology' in kwargs:
+            cosmology = kwargs['cosmology']
+        else:
+            cosmology = 'Planck18'
+
+        table_name = "".join(["_".join([method, cosmology]), ".npy"])
+        lookup_table = table.load(table_name)
+
         for i, dm in enumerate(dm_vals):
-
-            if 'cosmology' in kwargs:
-                cosmology = kwargs.get('cosmology', 0)
-            else:
-                cosmology = 'Planck18'
-
-            table_name = "".join(["_".join([method, cosmology]), ".npy"])
-            lookup_table = table.load(table_name)
-
             z_vals[i] = lookup_table(dm)[()]
 
         ax.plot(dm_vals, z_vals, colours[j], label=label[j], **kwargs)
 
+    if not passed_ax:
+        ax.set_ylabel(r"$\rm{Redshift}$")
+
+
     ax.set_xlabel(r"$\rm{DM\ \left[pc \ cm^{-3}\right]}$")
-    ax.set_ylabel(r"$\rm{Redshift}$")
-    plt.legend(loc='lower right', frameon=False)
+    ax.legend(loc='lower right', frameon=False)
 
     if filename is not None:
         plt.savefig(".".join([filename, extension]))
@@ -137,15 +140,14 @@ def cosmology_comparison(filename="", extension="png", usetex=False,
 
     for j, cosmo in enumerate(cosmology_list):
         z_vals = np.zeros(len(dm_vals))
+        if 'method' in kwargs:
+            method = kwargs['method']
+        else:
+            method = 'Inoue2004'
+
+        table_name = "".join(["_".join([method, cosmo]), ".npy"])
+        lookup_table = table.load(table_name)        
         for i, dm in enumerate(dm_vals):
-
-            if 'method' in kwargs:
-                method = kwargs.get('method', 0)
-            else:
-                method = 'Ioka2003'
-
-            table_name = "".join(["_".join([method, cosmo]), ".npy"])
-            lookup_table = table.load(table_name)
 
             z_vals[i] = lookup_table(dm)[()]
 
@@ -154,8 +156,11 @@ def cosmology_comparison(filename="", extension="png", usetex=False,
             axin.plot(dm_vals, z_vals, colours[j], **kwargs)
 
     ax.set_xlabel(r"$\rm{DM\ \left[pc \ cm^{-3}\right]}$")
-    ax.set_ylabel(r"$\rm{Redshift}$")
-    plt.legend(loc='lower right', frameon=False)
+    
+    if not passed_ax:
+        ax.set_ylabel(r"$\rm{Redshift}$")
+
+    ax.legend(loc='lower right', frameon=False)
 
     if add_axin:
         axin.set_xlim(2800, 3000)
