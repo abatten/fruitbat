@@ -1,4 +1,4 @@
-|PyPI| |Python| |Licence| |Travis| |Docs| |CodeCov|
+|PyPI| |Python| |License| |Travis| |Docs| |CodeCov|
 
 Fruitbat
 ========
