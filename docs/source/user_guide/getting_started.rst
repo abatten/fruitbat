@@ -32,7 +32,7 @@ each requirement.
 
  - matplotlib: Modules for plotting
 
- - six: Checking compatability between python 2 and python 3
+ - pandas: Reading csv files from FRBCAT
 
  - pyymw16: Python wrapper for YMW16 galactic dispersion measure model.
 

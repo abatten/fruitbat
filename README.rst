@@ -1,4 +1,4 @@
-|PyPI| |Python| |Travis| |Docs| |CodeCov|
+|PyPI| |Python| |Licence| |Travis| |Docs| |CodeCov|
 
 Fruitbat
 ========
@@ -42,7 +42,7 @@ each requirement.
 
  - matplotlib: Modules for plotting
 
- - six: Checking compatability between python 2 and python 3
+ - pandas: Reading csv files from FRBCAT
 
  - pyymw16: Python wrapper for YMW16 galactic dispersion measure model.
 
@@ -57,7 +57,7 @@ following:
 Most of the calculations will be centred around the `Frb class`_. You can
 can define an instance of the `Frb class`_ with a dispersion measure. 
 To calculate the redshift of the FRB use the method 
-`calc_redshift_`.
+`calc_redshift`_.
 
 ::
 
@@ -113,7 +113,7 @@ Referencing Fruitbat
 --------------------
 
 If you use ``fruitbat`` in your research, we would like it if you could
-reference us in your acknowledgements. :)
+reference our paper.
 
 
 
@@ -135,3 +135,7 @@ reference us in your acknowledgements. :)
 
 .. |CodeCov| image:: https://codecov.io/gh/abatten/fruitbat/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/abatten/fruitbat
+
+.. |License| image:: https://img.shields.io/pypi/l/fruitbat.svg?colorB=purple&label=License
+    :target: https://github.com/abatten/fruitbat/raw/master/LICENSE
+    :alt: PyPI - License
