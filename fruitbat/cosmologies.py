@@ -9,12 +9,14 @@ from astropy.cosmology.core import (FlatLambdaCDM, FlatwCDM, LambdaCDM, wCDM)
 from e13tools import docstring_copy
 
 __all__ = ["WMAP5", "WMAP7", "WMAP9", "Planck13", "Planck15", "Planck18",
-           "create_cosmology", "builtin", "keys"]
+           "create_cosmology", "builtin_cosmology_functions",
+           "add_cosmology", "reset_cosmologies", "available_cosmologies",
+           "cosmology_functions"]
 
 
-@docstring_copy(astropy.cosmology.WMAP9)
-def WMAP9():
-    return astropy.cosmology.WMAP9
+@docstring_copy(astropy.cosmology.WMAP5)
+def WMAP5():
+    return astropy.cosmology.WMAP5
 
 
 @docstring_copy(astropy.cosmology.WMAP7)
@@ -22,9 +24,9 @@ def WMAP7():
     return astropy.cosmology.WMAP7
 
 
-@docstring_copy(astropy.cosmology.WMAP5)
-def WMAP5():
-    return astropy.cosmology.WMAP5
+@docstring_copy(astropy.cosmology.WMAP9)
+def WMAP9():
+    return astropy.cosmology.WMAP9
 
 
 @docstring_copy(astropy.cosmology.Planck13)
@@ -44,7 +46,7 @@ def Planck18():
     (from Planck 2018 results. VI. Cosmological Parameters,
     A&A, submitted, Table 2 (TT, TE, EE + lowE + lensing + BAO))
     """
-    cosmo = create_cosmology(name="Planck18", parameters=planck18)
+    cosmo = create_cosmology(name="Planck18", parameters=PLANCK18)
     return cosmo
 
 
@@ -52,26 +54,34 @@ def create_cosmology(parameters=None, name=None):
     """
     A wrapper to create custom astropy cosmologies.
 
-    The only avaliable cosmology types in this method are: FlatLambdaCDM,
-    FlatwCDM, LambdaCDM and wCDM. See `astropy.cosmology`_ for more details on
-    these types of cosmologies. To create a cosmology of a type that isn't
-    listed above, it will have to be created directly using astropy.cosmology.
+    The only available cosmology types in this method are:
+    :obj:`~astropy.cosmology.FlatLambdaCDM`,
+    :obj:`~astropy.cosmology.FlatwCDM`,
+    :obj:`~astropy.cosmology.LambdaCDM` and
+    :obj:`~astropy.cosmology.wCDM`.
+
+    See `astropy`_ for more details on these types of cosmologies.
+    To create a cosmology of a type that isn't listed above, it will
+    have to be created directly using astropy.cosmology.
 
     Parameters
     ----------
     parameters: dict or None
-        A dictionary containing the cosmological parameters. The names of the
-        parameters must conform to the same format as the parameters used in
-        astropy.cosmology. If `parameters` is *None* then default values for
-        each parameter is used.
+        A dictionary containing the cosmological parameters. The names
+        of the parameters must conform to the same format as the
+        parameters used in the astropy.cosmology module. If
+        ``parameters = None`` then default values for each parameter
+        is used.
 
     name: str or None, optional
         The name of the cosmology. Default: *None*
 
     Returns
     -------
-    cosmology
-
+    :obj:`~astropy.cosmology.FlatLambdaCDM` if ``flat = True`` \& ``w = -1``
+    :obj:`~astropy.cosmology.FlatwCDM` if ``flat = True`` \& ``w != -1``
+    :obj:`~astropy.cosmology.LambdaCDM` if ``flat = False`` \& ``w = -1``
+    :obj:`~astropy.cosmology.wCDM`  if ``flat = False`` \& ``w != -1``
 
     Notes
     -----
@@ -79,13 +89,14 @@ def create_cosmology(parameters=None, name=None):
 
     .. code-block:: python
 
-        params = {'H0': 70, 'Om0': 0.3, 'Oc0': 0.26, 'Ob0': 0.04, 'Neff': 3.04,
-                  'flat': True, 'Tcmb0': 0.0, 'm_nu': 0.0, 'w0': -1}
+        params = {'H0': 70, 'Om0': 0.3, 'Oc0': 0.26, 'Ob0': 0.04,
+                  'Neff': 3.04, 'flat': True, 'Tcmb0': 0.0,
+                  'm_nu': 0.0, 'w0': -1}
 
-    If ``'flat'`` is set to ``False`` then a value of ``'Ode0'`` (current dark
-    energy density) should be specified.
+    If ``'flat'`` is set to ``False`` then a value of ``'Ode0'``
+    (current dark energy density) should be specified.
 
-    .. _astropy.cosmology: http://docs.astropy.org/en/latest/cosmology/index.html
+    .. _astropy: http://docs.astropy.org/en/latest/cosmology/index.html
 
     """
 
@@ -131,7 +142,10 @@ def create_cosmology(parameters=None, name=None):
 
 
 # Planck 2018 paper VI Table 2 Final column (68% confidence interval)
-planck18 = dict(
+# This is the Planck 2018 cosmology that will be added to Astropy when the
+# paper is accepted. When it does fruitbat will convert to using
+# astropy.cosmology.Planck18.
+PLANCK18 = dict(
     Oc0=0.2607,
     Ob0=0.04897,
     Om0=0.3111,
@@ -150,14 +164,15 @@ planck18 = dict(
 )
 
 
-def builtin():
+def builtin_cosmology_functions():
     """
-    Create a dictionary of the builtin cosmologies with keywords and functions.
+    Returns a dictionary of the builtin cosmologies with keywords and
+    corresponding instances of those cosmologies.
 
     Returns
     -------
-    dict
-        A dictionary containing the keywords and function for each cosmology.
+    cosmologies: dict
+        Contains the keywords and instances for each cosmology.
     """
     cosmologies = {
         "WMAP5": WMAP5(),
@@ -171,10 +186,58 @@ def builtin():
     return cosmologies
 
 
-def keys():
+_available = builtin_cosmology_functions()
+
+
+def add_cosmology(name, cosmo):
     """
-    Returns a string constaining all the keywords for builtin cosmologies.
+    Adds a user created cosmology to the list of available cosmologies.
+
+    Parameters
+    ----------
+    name : str
+        The keyword for the new cosmology.
+
+    cosmo : An instance of :obj:`astropy.cosmology`
+        The cosmology to add to the list of available cosmologies.
+
+    Example
+    -------
+    >>> params = {"H0": 72.4, "Om0": 0.26}
+    >>> new_cosmology = fruitbat.cosmology.create_cosmology(parameters=params)
+    >>> fruitbat.add_cosmology("new_cosmology", new_cosmology)
     """
-    cosmologies = builtin()
-    keys = ", ".join(cosmologies.keys())
-    return keys
+    if name in available_cosmologies():
+        err_msg = ("The cosmology '{}' already exists as a builtin "
+                   "cosmology. Please choose a different name for "
+                   "the cosmology.".format(name))
+        raise ValueError(err_msg)
+
+    dict_item = {name: cosmo}
+    _available.update(dict_item)
+
+
+def available_cosmologies():
+    """
+    Returns the list constaining all the keywords for valid cosmologies.
+    """
+    return list(_available.keys())
+
+
+def reset_cosmologies():
+    """
+    Resets the list of available cosmologies to the default builtin
+    cosmologies.
+    """
+    remove = [k for k in available_cosmologies()
+              if k not in builtin_cosmology_functions()]
+    for key in remove:
+        del _available[key]
+
+
+def cosmology_functions():
+    """
+    Returns a dictionary containing the valid cosmology keys and the
+    corresponding instance of that cosmology.
+    """
+    return _available

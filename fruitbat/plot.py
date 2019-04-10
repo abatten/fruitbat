@@ -1,11 +1,9 @@
 from __future__ import print_function, absolute_import, division
 
-from six import PY2
-
 import matplotlib.pyplot as plt
 import numpy as np
 
-from fruitbat import estimate, cosmology
+from fruitbat import cosmologies, methods, table
 
 
 def set_rc_params(usetex=False):
@@ -22,22 +20,23 @@ def set_rc_params(usetex=False):
     plt.rcParams["legend.fontsize"] = 16
 
 
-def create_method_comparison(filename="", extension="png", usetex=False,
-                             passed_ax=None, **kwargs):
+def method_comparison(filename=None, extension="png", usetex=False,
+                      passed_ax=None, **kwargs):
     """
-    Create a plot comparing how estimated redshift changes as a function of
-    dispersion measure for each DM-z relation.
+    Create a plot comparing how estimated redshift changes as a
+    function of dispersion measure for each DM-z relation.
 
     Parameters
     ----------
-    filename: string, optional
-        The filename of the saved figure. Default: ""
+    filename: string or None, optional
+        The filename of the saved figure. Default: *None*
 
     extension: string, optional
-        The format to save the figure. e.g "png", "pdf", "esp", etc...
+        The format to save the figure. e.g "png", "pdf", "eps", etc...
         Default: "png"
 
     usetex: bool, optional
+        Use LaTeX for for fonts. 
 
     passed_ax: or None, optional
 
@@ -54,23 +53,35 @@ def create_method_comparison(filename="", extension="png", usetex=False,
         fig = plt.figure(figsize=(8, 8), constrained_layout=True)
         ax = fig.add_subplot(111)
 
-    methods = estimate.methods()
+    method_list = methods.available_methods()
     dm_vals = np.linspace(0, 3000, 1000)
 
     colours = ["#1b9e77", "#d95f02", "#7570b3"]
     label = [r"$\rm{Ioka 2003}$", r"$\rm{Inoue 2004}$", r"$\rm{Zhang 2018}$"]
 
-    for j, method in enumerate(methods):
+    for j, method in enumerate(method_list):
         z_vals = np.zeros(len(dm_vals))
+        if 'cosmology' in kwargs:
+            cosmology = kwargs['cosmology']
+        else:
+            cosmology = 'Planck18'
+
+        table_name = "".join(["_".join([method, cosmology]), ".npz"])
+        lookup_table = table.load(table_name)
+
         for i, dm in enumerate(dm_vals):
-            z_vals[i] = estimate.redshift(dm, method=method)
+            z_vals[i] = table.get_z_from_table(dm, lookup_table)
+
         ax.plot(dm_vals, z_vals, colours[j], label=label[j], **kwargs)
 
-    ax.set_xlabel(r"$\rm{DM\ \left[pc \ cm^{-3}\right]}$")
-    ax.set_ylabel(r"$\rm{Redshift}$")
-    plt.legend(loc='lower right', frameon=False)
+    if not passed_ax:
+        ax.set_ylabel(r"$\rm{Redshift}$")
 
-    if filename is not "":
+
+    ax.set_xlabel(r"$\rm{DM\ \left[pc \ cm^{-3}\right]}$")
+    ax.legend(loc='lower right', frameon=False)
+
+    if filename is not None:
         plt.savefig(".".join([filename, extension]))
 
     if passed_ax:
@@ -79,11 +90,11 @@ def create_method_comparison(filename="", extension="png", usetex=False,
         return fig
 
 
-def create_cosmology_comparison(filename="", extension="png", usetex=False,
-                                passed_ax=None, **kwargs):
+def cosmology_comparison(filename="", extension="png", usetex=False,
+                         passed_ax=None, **kwargs):
     """
-    Create a plot comparing how the estimated redshift changes as a function
-    of dispersion mesure for each cosmology.
+    Create a plot comparing how the estimated redshift changes as a
+    function of dispersion mesure for each cosmology.
 
     Parameters
     ----------
@@ -108,9 +119,8 @@ def create_cosmology_comparison(filename="", extension="png", usetex=False,
         ax = fig.add_subplot(111)
 
     # Remove EAGLE from cosmologies since it is the same as Planck13
-    cosmologies = cosmology.builtin()
-    cosmologies.pop("EAGLE")
-    cosmologies = cosmologies.keys()
+    cosmology_list = cosmologies.builtin_cosmology_functions()
+    cosmology_list.pop("EAGLE")
 
     dm_vals = np.linspace(0, 3000, 1000)
 
@@ -119,7 +129,7 @@ def create_cosmology_comparison(filename="", extension="png", usetex=False,
         # Add inset plot showing the part where cosmologies diverge the most.
         axin = ax.inset_axes([0.05, 0.52, 0.45, 0.45])
     except Exception:
-        print("""Skipping inset axis in cosmology plot. Requires Python 3 and 
+        print("""Skipping inset axis in cosmology plot. Requires Python 3 and
               Matplotlib 3.0""")
         add_axin = False
 
@@ -128,17 +138,28 @@ def create_cosmology_comparison(filename="", extension="png", usetex=False,
     label = [r"$\rm{WMAP5}$", r"$\rm{WMAP7}$", r"$\rm{WMAP9}$",
              r"$\rm{Planck13}$", r"$\rm{Planck15}$", r"$\rm{Planck18}$"]
 
-    for j, cosmo in enumerate(cosmologies):
+    for j, cosmo in enumerate(cosmology_list):
         z_vals = np.zeros(len(dm_vals))
+        if 'method' in kwargs:
+            method = kwargs['method']
+        else:
+            method = 'Inoue2004'
+
+        table_name = "".join(["_".join([method, cosmo]), ".npz"])
+        lookup_table = table.load(table_name)        
         for i, dm in enumerate(dm_vals):
-            z_vals[i] = estimate.redshift(dm, cosmology=cosmo)
+            z_vals[i] = table.get_z_from_table(dm, lookup_table)
+
         ax.plot(dm_vals, z_vals, colours[j], label=label[j], **kwargs)
         if add_axin:
             axin.plot(dm_vals, z_vals, colours[j], **kwargs)
 
     ax.set_xlabel(r"$\rm{DM\ \left[pc \ cm^{-3}\right]}$")
-    ax.set_ylabel(r"$\rm{Redshift}$")
-    plt.legend(loc='lower right', frameon=False)
+    
+    if not passed_ax:
+        ax.set_ylabel(r"$\rm{Redshift}$")
+
+    ax.legend(loc='lower right', frameon=False)
 
     if add_axin:
         axin.set_xlim(2800, 3000)
@@ -147,7 +168,6 @@ def create_cosmology_comparison(filename="", extension="png", usetex=False,
         axin.yaxis.set_tick_params(labelsize=8)
 
         ax.indicate_inset_zoom(axin)
-
 
     if filename is not "":
         plt.savefig(".".join([filename, extension]))

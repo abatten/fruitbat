@@ -1,13 +1,24 @@
+"""
+Fruitbat is a package designed for estimating the redshift of FRBs.
+"""
+
 from __future__ import absolute_import, print_function, division
 
-from . import estimate
 from . import utils
-from . import cosmology
+from . import methods
+from . import cosmologies
+from . import table
 from . import plot
 from ._frb import Frb
-import numpy as np
+from . import catalogue
+from .methods import add_method, reset_methods, available_methods
+from .cosmologies import (add_cosmology, reset_cosmologies,
+                          available_cosmologies)
+from .__version__ import __version__
 
 __name__ = "fruitbat"
 __author__ = "Adam Batten (@abatten)"
-__version__ = "0.2.0"
-__all__ = ['Frb', 'estimate', 'utils', 'cosmology', 'plot']
+__all__ = ['Frb', 'methods', 'cosmologies', 'plot', 'table', 'utils',
+           'catalogue', 'add_method', 'reset_methods', 
+           'available_methods', 'add_cosmology', 'reset_cosmologies',
+           'available_cosmologies']
