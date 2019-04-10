@@ -1,5 +1,5 @@
 ---
-title: 'Fruitbat: A Python Package for Estimating Redshifts for FRBs'
+title: 'Fruitbat: A Python Package for Estimating Redshifts of Fast Radio Bursts'
 tags:
   - astrophysics
   - frb
@@ -28,9 +28,9 @@ The defining feature of FRBs, and one that sets them apart from other radio tran
 
 Unfortunately most telescopes do not have high enough resolution to unambiguously localise the host galaxies of FRBs and instead an upper limit of their redshifts can be estimated using a DM-redshift relation; typically calculated via analytical means (e.g. @Ioka2003, @Inoue2004, @Zhang2018).
 
-We have constructed the tool ``fruitbat`` to assist the estimation of redshifts and galactic DM values of FRBs. ``fruitbat`` generates and utilises 'look-up tables' of existing DM - redshift relations found in the literature (@Ioka2003, @Inoue2004, @Zhang2018) in conjunction with cosmological parameters determined from both the WMAP (@WMAP5, @WMAP7, @WMAP9) and Planck missions (@Planck13, @Planck15, @Planck18). 
+We have constructed the tool ``fruitbat`` to assist the estimation of redshifts and galactic DM values of FRBs. ``fruitbat`` generates and utilises 'look-up tables' of existing DM-redshift relations found in the literature (@Ioka2003, @Inoue2004, @Zhang2018) in conjunction with cosmological parameters determined from both the WMAP (@WMAP5, @WMAP7, @WMAP9) and Planck missions (@Planck13, @Planck15, @Planck18). 
 
-``fruitbat`` allows the user to independently choose the DM-redshift relation and the cosmological parameters which was typically not an option when using the relations from the literature. Additionally, ``fruitbat`` explicitly integrates the entire DM-z relation at each redshift instead of assuming an average value across redshifts; an assumption which introduces a 6\% error (see Equation (6) in @Zhang2018). In the figure below we compare the different DM-redshift relations and cosmologies that have been built into ``fruitbat``. The left figure compares the three DM-redshift relations assuming a @Planck18 cosmology. The right figure compares how the @Inoue2004 relation changes with six different cosmologies.
+``fruitbat`` allows the user to independently choose the DM-redshift relation and the cosmological parameters which was typically not an option when using the relations from the literature. Additionally, ``fruitbat`` explicitly integrates the entire DM-redshift relation at each redshift instead of assuming an average value across redshifts; an assumption which introduces a 6\% error (see Equation (6) in @Zhang2018). In the figure below we compare the different DM-redshift relations and cosmologies that have been built into ``fruitbat``. The left figure compares the three DM-redshift relations assuming a @Planck18 cosmology. The right figure compares how the @Inoue2004 relation changes with six different cosmologies.
 
 ![Comparison of builtin methods and cosmologies](methods_cosmology_plots.png)
 
