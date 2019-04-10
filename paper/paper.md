@@ -14,7 +14,7 @@ affiliations:
   index: 1
 - name: ARC Centre of Excellence for All Sky Astrophysics in 3 Dimensions (ASTRO 3D)
   index: 2
-date: 1 April 2019
+date: 10 April 2019
 bibliography: paper.bib
 ---
 
