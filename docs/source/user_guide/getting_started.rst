@@ -39,14 +39,10 @@ each requirement.
  - e13tools: Utility tools for writing docstrings.
 
 
-Using Fruitbat
+Simple Example
 --------------
 
 A detailed explanation of this example can be viewed at `Using Fruitbat`_.
-
-
-Simple Example
-**************
 
 .. code-block:: python
 
@@ -59,7 +55,7 @@ Simple Example
     FRB180110.calc_dm_galaxy()
 
     # Calculate the Redshift of the FRB using the relation from Zhang (2018)
-    FRB180110.calc_redshift(method="zhang2018", cosmology="Planck18")
+    FRB180110.calc_redshift(method="Zhang2018", cosmology="Planck18")
 
 
 

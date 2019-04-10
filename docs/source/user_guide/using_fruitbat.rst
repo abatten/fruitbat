@@ -170,5 +170,53 @@ Comoving Distance
 Calculating Energy
 ******************
 
-Cosmology
-~~~~~~~~~
+.. code-block:: python
+
+    >>> frb.fluence = 2.0
+    >>> frb.obs_freq_central = 1600
+    >>> frb.calc_energy()
+    <Quantity 2.37921847e+40 erg>
+
+
+Custom Lookup Tables
+~~~~~~~~~~~~~~~~~~~~
+
+Custom Methods
+**************
+
+.. code-block:: python
+
+    >>> def simple_dm(z):
+        dm = 1200 * z
+        return dm
+    >>> fruitbat.add_method("simple_dm", simple_dm)
+    ['Ioka2003', 'Inoue2004', 'Zhang2018', 'simple_dm']
+
+
+
+Custom Cosmologies
+******************
+
+.. code-block:: python
+
+    >>> params = {"H0": 72.4, "Om0": 0.26}
+    >>> new_cosmology = fruitbat.cosmology.create_cosmology(parameters=params)
+    >>> fruitbat.add_cosmology("new_cosmology", new_cosmology)
+    >>> fruitbat.avaliable_cosmologies()
+    ['WMAP5', 'WMAP7', 'WMAP9', 'Planck13', 'Planck15', 'Planck18', 'EAGLE', 'new_cosmology']
+
+
+Custom Table
+************
+
+.. code-block:: python
+
+    >>> def simple_dm(z):
+        dm = 1200 * z
+        return dm
+    >>> fruitbat.add_method("simple_dm", simple_dm)
+    >>> fruitbat.table.create("simple_dm")
+    >>> frb = fruitbat.Frb(1200)
+    >>> frb.calc_redshift(method="simple_dm")
+    <Quantity 1.>
+

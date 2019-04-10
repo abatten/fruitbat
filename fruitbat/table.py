@@ -80,7 +80,7 @@ def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
         if filename is not None:
             output_name = filename
         else:
-            output_name = "custom_{}".format(filename)
+            output_name = "custom_{}".format(method)
 
         if output_dir == 'data':
             output_file = os.path.join(os.path.dirname(__file__),
