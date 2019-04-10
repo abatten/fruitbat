@@ -1,5 +1,9 @@
 """
-Fruitbat is a package designed for estimating the redshift of FRBs.
+Fruitbat
+========
+Fruitbat is a package designed to assist the estimation of redshifts, energies
+and the galactic dispersion measure of fast radio bursts.
+
 """
 
 from __future__ import absolute_import, print_function, division
