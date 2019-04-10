@@ -18,6 +18,8 @@ date: 1 April 2019
 bibliography: paper.bib
 ---
 
+![Fruitbat Logo](../logo/fruitbat_logo.png)
+
 # Summary
 
 ``fruitbat`` is a Python 2/3 package for estimating redshifts, energies and the galactic dispersion measure contributions of fast radio bursts (FRBs).
