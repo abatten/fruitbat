@@ -14,7 +14,7 @@ affiliations:
   index: 1
 - name: ARC Centre of Excellence for All Sky Astrophysics in 3 Dimensions (ASTRO 3D)
   index: 2
-date: 1 April 2019
+date: 11 April 2019
 bibliography: paper.bib
 ---
 
@@ -46,7 +46,7 @@ In addition to estimating the redshifts and the line-of-sight galactic DM, ``fru
 * Burst energy
 * Average luminosity 
 
-``fruitbat`` was developed due to a need for a tool that can utilise DM-redshift relations derived analytically and from cosmological simulations (Batten et al. in prep). ``fruitbat`` has since been used by Price et al. submitted to estimate the redshift of FRB 180301.
+``fruitbat`` was developed due to a need for a tool that can utilise DM-redshift relations derived analytically and from cosmological simulations (Batten et al. in prep). ``fruitbat`` has since been used by Price et al. (MNRAS accepted) to estimate the redshift of FRB 180301.
 
 ``fruitbat`` is released under the BSD 3-Clause licence, and is avaliable from PyPi via ``pip``; the ``fruitbat`` source code can be found at https://github.com/abatten/fruitbat; tutorials for getting started with ``fruitbat`` and the online documentation can be found at https://fruitbat.readthedocs.io.
 
