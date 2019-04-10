@@ -34,7 +34,7 @@ We have constructed the tool ``fruitbat`` to assist the estimation of redshifts 
 
 ![Comparison of builtin methods and cosmologies](methods_cosmology_plots.png)
 
-Furthermore, ``fruitbat`` has the functionality for users to define their own DM relations, create custom cosmologies (including non-$\Lambda$CDM cosmologies) and generate their own look-up tables. This feature in particular allows for much greater flexibility than exisiting techniques in the analysis of FRBs as well as providing the option of adding non-analytical DM - redshift relations such those derived from cosmological simulations. 
+Furthermore, ``fruitbat`` has the functionality for users to define their own DM relations, create custom cosmologies (including non-$\Lambda$CDM cosmologies) and generate their own look-up tables. This feature in particular allows for much greater flexibility than existing techniques in the analysis of FRBs as well as providing the option of adding non-analytical DM-redshift relations such as those derived from cosmological simulations. 
 
 To account for the galactic DM contribution due to electrons in the interstellar and circumgalactic medium, ``fruitbat`` utilises the YMW16 galactic free electron density model (@Yao2017) to estimate the line-of-sight DM of the Milky Way.
 

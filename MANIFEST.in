@@ -8,4 +8,5 @@ exclude tox.ini
 exclude docs
 recursive-exclude docs *
 exclude *.yml
-recursive-exclude joss_paper *
+recursive-exclude paper *
+recursive-excluse logos *
