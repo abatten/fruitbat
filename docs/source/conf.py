@@ -43,10 +43,11 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
+    'sphinx.ext.coverage',
     'sphinx.ext.intersphinx'
 ]
 intersphinx_mapping = {#'python': ('https://docs.python.org/3', None),
-                       #'numpy': ('https://docs.scipy.org/doc/numpy', None),
+                       'numpy': ('https://docs.scipy.org/doc/numpy', None),
                        #'matplotlib': ('https://matplotlib.org', None),
                        #'h5py': ('https://h5py.readthedocs.io/en/stable', None),
                        'scipy':('http://scipy.github.io/devdocs/', None),
@@ -87,7 +88,7 @@ exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
-highlight_language = 'default'
+highlight_language = 'python'
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -102,7 +103,13 @@ html_theme = 'sphinx_rtd_theme'#'alabaster'
 # documentation.
 #
 # html_theme_options = {}
-
+html_theme_options = {
+    'prev_next_buttons_location': 'both',
+    'collapse_navigation': False,
+    'sticky_navigation': False,
+    'includehidden': False,
+    'titles_only': False
+}
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".

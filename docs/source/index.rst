@@ -23,6 +23,7 @@ by *Adam Batten*
     api/fruitbat.Frb
     api/fruitbat.methods
     api/fruitbat.cosmologies
+    api/fruitbat.catalogue
     api/fruitbat.table
     api/fruitbat.plot
     api/fruitbat.utils

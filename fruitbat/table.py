@@ -6,6 +6,8 @@ import scipy.interpolate as interpolate
 
 from fruitbat.methods import available_methods, method_functions
 
+__all__ = ["create", "load", "get_z_from_table"]
+
 
 def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
            num_samples=10000, **kwargs):
@@ -22,12 +24,12 @@ def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
         The path of the output directory. If ``output_dir = 'data'``,
         then created table will created in the same directory with
         the builtin tables and will be found when using functions
-        such as `~:meth:fruitbat.Frb.calc_redshift()`.
+        such as :meth:`~fruitbat._frb.calc_redshift()`.
         Default: 'data'
 
     filename : str, optional
         The output filename. If ``name=None`` then the filename will
-        become 'custom_' + method.Default: *None*
+        become custom_method. Default: *None*
 
     zmin : int or float, optional
         The minimum redshift in the table. Default: 0
