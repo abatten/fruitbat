@@ -61,7 +61,7 @@ To calculate the redshift of the FRB use the method
 ::
 
     >>> import fruitbat
-    >>> FRB121102 = fruitbat.Frb(dm=557, dm_excess=369)
+    >>> FRB121102 = fruitbat.Frb(557, dm_excess=369)
     >>> FRB121102.calc_redshift()
     <Quantity 0.37581945>
     
@@ -81,7 +81,7 @@ calculate the excess dispersion measure for the redshift calculation.
 
 ::
 
-    >>> FRB190222 = fruitbat.Frb(dm=500, raj="12:34:43.5", decj="2:34:15.2")
+    >>> FRB190222 = fruitbat.Frb(500, raj="12:34:43.5", decj="2:34:15.2")
     >>> FRB190222.calc_dm_galaxy()
     <Quantity 22.43696785 pc / cm3>
     >>> FRB190222.calc_redshift()

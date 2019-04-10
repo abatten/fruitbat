@@ -63,6 +63,17 @@ def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
     A compressed file in .npz format containing the arrays ``'dm'``
     and ``'z'``.
 
+    Example
+    -------
+    >>> def simple_dm(z):
+        dm = 1200 * z
+        return dm
+    >>> fruitbat.add_method("simple_dm", simple_dm)
+    >>> fruitbat.table.create("simple_dm")
+    >>> frb = fruitbat.Frb(1200)
+    >>> frb.calc_redshift(method="simple_dm")
+    <Quantity 1.>
+
     """
 
     if method not in available_methods():
