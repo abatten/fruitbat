@@ -1,5 +1,5 @@
 ---
-title: 'Fruitbat: A tool for estimating distances to FRBs'
+title: 'Fruitbat: A Python Package for Estimating Redshifts for FRBs'
 tags:
   - astrophysics
   - frb
@@ -30,27 +30,25 @@ Unfortunately most telescopes do not have high enough resolution to unambiguousl
 
 We have constructed the tool ``fruitbat`` to assist the estimation of redshifts and galactic DM values of FRBs. ``fruitbat`` generates and utilises 'look-up tables' of existing DM - redshift relations found in the literature (@Ioka2003, @Inoue2004, @Zhang2018) in conjunction with cosmological parameters determined from both the WMAP and Planck missions. 
 
-``fruitbat`` allows the user to independently choose the DM-redshift relation and the cosmological parameters which was typically not an option when using the relations from the literature. Additionally, ``fruitbat`` explicitly integrates the entire DM-z relation at each redshift instead of assuming an average value for across redshifts; an assumption which introduces a 6\% error (see Equation (6) in @Zhang2018). In Figure 1 we compare the different DM-redshift relations and the effects of different cosmologies.
+``fruitbat`` allows the user to independently choose the DM-redshift relation and the cosmological parameters which was typically not an option when using the relations from the literature. Additionally, ``fruitbat`` explicitly integrates the entire DM-z relation at each redshift instead of assuming an average value for across redshifts; an assumption which introduces a 6\% error (see Equation (6) in @Zhang2018). In the figure below we compare the different DM-redshift relations and cosmologies that have been built into ``fruitbat``. The left figure compares the three DM-redshift relations assuming a @Planck18 cosmology. The right figure compares how the @Inoue2004 relation changes with six different cosmologies.
 
 ![Comparison of builtin methods and cosmologies](methods_cosmology_plots.png)
 
-Furthermore, ``fruitbat`` has the functionality for users to define their own DM relations, create custom cosmologies (including non-$\Lambda$CDM cosmologies) and generate their own lookup tables during their analysis. This feature in allows for much greater flexibility than esiting methods in the analysis of FRBs as well as providing the option of adding non-analytical DM - redshift relations such those from cosmological simulations (Batten et al. in prep.) or observations.
+Furthermore, ``fruitbat`` has the functionality for users to define their own DM relations, create custom cosmologies (including non-$\Lambda$CDM cosmologies) and generate their own look-up tables. This feature in allows for much greater flexibility than exisiting techniques in the analysis of FRBs as well as providing the option of adding non-analytical DM - redshift relations such those derived from cosmological simulations. 
 
 To account for the galactic DM contribution due to electrons in the interstellar and circumgalatic medium, ``fruitbat`` utilises the YMW16 galactic free electron density model (@Yao2017) to estimate the line-of-sight DM of the Milky Way.
 
-``fruitbat`` additionally has the capacity to estimate the following FRB values:
-
+In addition to estimating the redshifts and the line-of-sight galactic disperison measure, ``fruitbat`` also has the capability to calculate other quantities of FRBs including:
+* Luminosity distances
+* Comoving distance
 * Burst energy
 * Average luminosity 
-* Comoving distance
-* Luminosity distance
-* Fluence
 
-``fruitbat`` has been used in Price et al. submitted to estimate the redshift of FRB 180301.
+``fruitbat`` was developed due to a need for a tool that can utilise DM-redshift relations derived analytically and from cosmological simulations (Batten et al. in prep). ``fruitbat`` has sincebeen used by Price et al. submitted to estimate the redshift of FRB 180301.
 
-``fruitbat`` is released under the BSD 3-Clause licence, and is avaliable from PyPi via ``pip``; the ``fruitbat`` source code can be found at https://github.com/abatten/fruitbat.
+``fruitbat`` is released under the BSD 3-Clause licence, and is avaliable from PyPi via ``pip``; the ``fruitbat`` source code can be found at https://github.com/abatten/fruitbat; tutorials for getting started with ``fruitbat`` and the online documentation can be found at https://fruitbat.readthedocs.io.
 
 # Acknowledgements
-The author would like to thank Alan Duffy (@astroduff), Ellert van der Velden (@1313e) and Daniel Price (@telegraphic) for their helpful discussions during the development of this project. This research was supported by the Australian Research Council Centre of Excellence for All Sky Astrophysics in 3 Dimensions (ASTRO 3D), through project number CE170100013 .
+The author would like to thank Alan Duffy, Ellert van der Velden and Daniel Price for their helpful discussions during the development of this project. This research was supported by the Australian Research Council Centre of Excellence for All Sky Astrophysics in 3 Dimensions (ASTRO 3D), through project number CE170100013 .
 
 # References
