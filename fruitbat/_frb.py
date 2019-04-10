@@ -1047,8 +1047,8 @@ class Frb(object):
     @property
     def utc(self):
         """
-        :obj:`astropy.time.Time` or None:
-            The UTC time of the burst.
+        :obj:`astropy.time.Time` or None
+        The UTC time of the burst.
         """
         return self._utc
 
@@ -1062,8 +1062,8 @@ class Frb(object):
     @property
     def snr(self):
         """
-        :obj:`astropy.units.Quantity` or None:
-            The signal-to-noise ratio of the burst.
+        :obj:`astropy.units.Quantity`:
+        The signal-to-noise  ratio of the burst.
         """
         return self._snr
 

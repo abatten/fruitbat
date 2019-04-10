@@ -8,10 +8,10 @@ import astropy.cosmology
 from astropy.cosmology.core import (FlatLambdaCDM, FlatwCDM, LambdaCDM, wCDM)
 from e13tools import docstring_copy
 
-__all__ = ["WMAP5", "WMAP7", "WMAP9", "Planck13", "Planck15", "Planck18",
-           "create_cosmology", "builtin_cosmology_functions",
-           "add_cosmology", "reset_cosmologies", "available_cosmologies",
-           "cosmology_functions"]
+__all__ = ["add_cosmology", "available_cosmologies", 
+           "builtin_cosmology_functions", "cosmology_functions",
+           "create_cosmology", "reset_cosmologies", "Planck13", 
+           "Planck15", "Planck18", "WMAP5", "WMAP7", "WMAP9"]
 
 
 @docstring_copy(astropy.cosmology.WMAP5)

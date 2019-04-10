@@ -6,7 +6,10 @@ recursive-include fruitbat *.npy
 recursive-include fruitbat *.npz
 recursive-include fruitbat *.csv
 
+
 exclude tox.ini
 exclude docs
 recursive-exclude docs *
 exclude *.yml
+recursive-exclude paper *
+recursive-excluse logos *
