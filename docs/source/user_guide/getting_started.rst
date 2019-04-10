@@ -52,6 +52,8 @@ doing this is by cloning the `source directory`_, install all requirements and r
     pip install -r requirements_dev.txt
     pytest
 
+Pytest should take around 5 minutes.
+
 .. _requirements_dev: https://raw.githubusercontent.com/abatten/fruitbat/master/requirements_dev.txt
 .. _source directory: https://github.com/abatten/fruitbat
 
