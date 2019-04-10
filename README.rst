@@ -1,7 +1,6 @@
 |PyPI| |Python| |License| |Travis| |Docs| |CodeCov|
 
-Fruitbat
-========
+|Logo|
 
 ``Fruitbat`` is an open source python package used to estimate the redshift of 
 Fast Radio Burst (FRB) from their dispersion measure. ``Fruitbat`` combines 
@@ -62,7 +61,7 @@ To calculate the redshift of the FRB use the method
 ::
 
     >>> import fruitbat
-    >>> FRB121102 = fruitbat.Frb(dm=557, dm_excess=369)
+    >>> FRB121102 = fruitbat.Frb(557, dm_excess=369)
     >>> FRB121102.calc_redshift()
     <Quantity 0.37581945>
     
@@ -82,7 +81,7 @@ calculate the excess dispersion measure for the redshift calculation.
 
 ::
 
-    >>> FRB190222 = fruitbat.Frb(dm=500, raj="12:34:43.5", decj="2:34:15.2")
+    >>> FRB190222 = fruitbat.Frb(500, raj="12:34:43.5", decj="2:34:15.2")
     >>> FRB190222.calc_dm_galaxy()
     <Quantity 22.43696785 pc / cm3>
     >>> FRB190222.calc_redshift()
@@ -116,7 +115,8 @@ If you use ``fruitbat`` in your research, we would like it if you could
 reference our paper.
 
 
-
+.. |Logo| image:: logo/fruitbat_logo.svg
+    :alt: Fruitbat Logo
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/fruitbat.svg?label=PyPI
     :target: https://pypi.python.org/pypi/fruitbat

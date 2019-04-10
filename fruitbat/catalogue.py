@@ -5,7 +5,8 @@ from e13tools import docstring_substitute
 
 from fruitbat import Frb, methods, cosmologies
 
-__all__ = ["create_analysis_catalogue", "read_frb_row"]
+__all__ = ["create_analysis_catalogue", "create_methods_catalogue", 
+           "read_frb_row"]
 
 
 @docstring_substitute(meth=methods.available_methods(),

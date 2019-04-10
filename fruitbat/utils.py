@@ -1,6 +1,4 @@
 """
-Utilities
-=========
 The collection of utility functions for Fruitbat.
 """
 from __future__ import print_function, absolute_import, division

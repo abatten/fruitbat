@@ -220,10 +220,9 @@ def add_method(name, func):
     Example
     -------
     >>> def simple_dm(z):
-        dm = 1200 * z
-        return dm
-
-    >>> add_method("simple_dm", simple_dm)
+            dm = 1200 * z
+            return dm
+    >>> fruitbat.add_method("simple_dm", simple_dm)
     """
 
     method = {name: func}

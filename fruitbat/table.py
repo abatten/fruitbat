@@ -6,6 +6,8 @@ import scipy.interpolate as interpolate
 
 from fruitbat.methods import available_methods, method_functions
 
+__all__ = ["create", "load", "get_z_from_table"]
+
 
 def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
            num_samples=10000, **kwargs):
@@ -22,12 +24,12 @@ def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
         The path of the output directory. If ``output_dir = 'data'``,
         then created table will created in the same directory with
         the builtin tables and will be found when using functions
-        such as `~:meth:fruitbat.Frb.calc_redshift()`.
+        such as :meth:`~fruitbat._frb.calc_redshift()`.
         Default: 'data'
 
     filename : str, optional
         The output filename. If ``name=None`` then the filename will
-        become 'custom_' + method.Default: *None*
+        become custom_method. Default: *None*
 
     zmin : int or float, optional
         The minimum redshift in the table. Default: 0
@@ -61,6 +63,17 @@ def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
     A compressed file in .npz format containing the arrays ``'dm'``
     and ``'z'``.
 
+    Example
+    -------
+    >>> def simple_dm(z):
+        dm = 1200 * z
+        return dm
+    >>> fruitbat.add_method("simple_dm", simple_dm)
+    >>> fruitbat.table.create("simple_dm")
+    >>> frb = fruitbat.Frb(1200)
+    >>> frb.calc_redshift(method="simple_dm")
+    <Quantity 1.>
+
     """
 
     if method not in available_methods():
@@ -78,7 +91,7 @@ def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
         if filename is not None:
             output_name = filename
         else:
-            output_name = "custom_{}".format(filename)
+            output_name = "custom_{}".format(method)
 
         if output_dir == 'data':
             output_file = os.path.join(os.path.dirname(__file__),
