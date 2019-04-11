@@ -9,8 +9,7 @@ dispersion measure model into a single easy to use API.
 
 Documentation
 -------------
-The documentation for ``fruitbat`` can be found at 
-https://fruitbat.readthedocs.io/en/latest/index.html.
+The documentation for ``fruitbat`` can be found at https://fruitbat.readthedocs.io/.
 
 Installation
 ------------
