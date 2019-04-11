@@ -16,13 +16,12 @@ def get_version():
     with open(version_file) as vf:
         lines = vf.read()
         version = lines.strip("__version__ = ").strip("").strip()
-        print(version)
         return version
 
 
 setup(
     name='fruitbat',
-    version=get_version(),
+    version='1.0.0',
     author='Adam Batten',
     author_email='adamjbatten@gmail.com',
     url='https://github.com/abatten/fruitbat',
@@ -35,8 +34,8 @@ setup(
     long_description=long_description,
     install_requires=requirements,
     classifiers=[
-        "Programming Language :: Python :: 2"
-        "Programming Language :: Python :: 2.7"
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
