@@ -15,8 +15,10 @@ def get_version():
 
     with open(version_file) as vf:
         lines = vf.read()
-        version = lines.strip("__version__ = ").strip("'")
+        version = lines.strip("__version__ = ").strip("").strip()
+        print(version)
         return version
+
 
 setup(
     name='fruitbat',
