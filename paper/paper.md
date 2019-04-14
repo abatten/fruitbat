@@ -7,7 +7,7 @@ tags:
   - transients
 authors:
   - name: Adam J. Batten
-    orcid: 0000-0001-7559-6488
+    orcid: 0000-0001-7599-6488
     affiliation: "1, 2"
 affiliations:
 - name: Centre for Astrophysics and Supercomputing, Swinburne University of Technology, PO Box 218, Hawthorn, VIC 3122, Australia
