@@ -24,9 +24,9 @@ copyright = '2019, Adam Batten'
 author = 'Adam Batten'
 
 # The short X.Y version
-version = ''
+version = '1.0.0'
 # The full version, including alpha/beta/rc tags
-release = '0.2.0'
+release = '1.0.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -47,22 +47,18 @@ extensions = [
     'sphinx.ext.intersphinx'
 ]
 intersphinx_mapping = {#'python': ('https://docs.python.org/3', None),
-                       #'numpy': ('https://docs.scipy.org/doc/numpy', None),
+                       'numpy': ('https://docs.scipy.org/doc/numpy', None),
                        #'matplotlib': ('https://matplotlib.org', None),
                        #'h5py': ('https://h5py.readthedocs.io/en/stable', None),
                        'scipy':('http://scipy.github.io/devdocs/', None),
                        'astropy':('http://docs.astropy.org/en/stable/', None)}
 
-autodoc_default_options = {'members': None,
-                           'private-members':None}
-auto_member_order = 'groupwise'
-
 napoleon_include_init_with_doc = False
 napoleon_use_admonition_for_notes = True
 napoleon_use_ivar = True
-napoleon_use_param = True
-napoleon_use_keyword = True
-napoleon_use_rtype = True
+napoleon_use_param = False
+napoleon_use_keyword = False
+napoleon_use_rtype = False
 
 napoleon_custom_sections = ['Generates']
 
@@ -92,7 +88,7 @@ exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
-highlight_lenguage = 'default'
+highlight_language = 'python'
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -107,7 +103,13 @@ html_theme = 'sphinx_rtd_theme'#'alabaster'
 # documentation.
 #
 # html_theme_options = {}
-
+html_theme_options = {
+    'prev_next_buttons_location': 'both',
+    'collapse_navigation': False,
+    'sticky_navigation': False,
+    'includehidden': False,
+    'titles_only': False
+}
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
