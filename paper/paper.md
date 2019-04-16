@@ -1,8 +1,11 @@
 ---
 title: 'Fruitbat: A Python Package for Estimating Redshifts of Fast Radio Bursts'
 tags:
+  - python
   - astrophysics
   - frb
+  - redshift
+  - dispersion measure
   - radio
   - transients
 authors:
