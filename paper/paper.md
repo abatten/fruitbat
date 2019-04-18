@@ -36,7 +36,7 @@ We have constructed the tool ``fruitbat`` to assist the estimation of redshifts 
 
 ``fruitbat`` allows the user to independently choose the DM-redshift relation and the cosmological parameters which was typically not an option when using the relations from the literature. Additionally, ``fruitbat`` explicitly integrates the entire DM-redshift relation at each redshift instead of assuming an average value across redshifts; an assumption that introduces a 6\% error (see Equation (6) in @Zhang2018). In Figure 1 we compare the different DM-redshift relations and cosmologies that have been built into ``fruitbat``.
 
-![Left: Comparison of three DM-redshift relations assuming a @Planck18 cosmology. Right: Comparison the @Inoue2004 relation with six different cosmologies.](methods_cosmology_plots.png)
+![Left: Comparison of three DM-redshift relations assuming a @Planck18 cosmology. Right: Comparison of the @Inoue2004 relation with six different cosmologies.](methods_cosmology_plots.png)
 
 Furthermore, ``fruitbat`` has the functionality for users to define their own DM relations, create custom cosmologies (including non-$\Lambda$CDM cosmologies) and generate their own look-up tables. This feature in particular allows for much greater flexibility than existing techniques in the analysis of FRBs as well as providing the option of adding non-analytical DM-redshift relations such as those derived from cosmological simulations. 
 
