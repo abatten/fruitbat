@@ -48,6 +48,8 @@ In addition to estimating the redshifts and the line-of-sight galactic DM, ``fru
 
 ``fruitbat`` is released under the BSD 3-Clause licence, and is avaliable from PyPi via ``pip``; the ``fruitbat`` source code can be found at https://github.com/abatten/fruitbat; tutorials for getting started with ``fruitbat`` and online documentation can be found at https://fruitbat.readthedocs.io.
 
+![The ``fruitbat`` logo](../logo/fruitbat_logo_small.png)
+
 # Acknowledgements
 The author would like to thank Alan Duffy, Ellert van der Velden and Daniel Price for their helpful discussions during the development of this project. The author would also like to thank James Josephides for designing the ``fruitbat`` logo. This research was supported by the Australian Research Council Centre of Excellence for All Sky Astrophysics in 3 Dimensions (ASTRO 3D), through project number CE170100013 .
 
