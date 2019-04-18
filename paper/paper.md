@@ -44,11 +44,11 @@ To account for the galactic DM contribution due to electrons in the interstellar
 
 In addition to estimating the redshifts and the line-of-sight galactic DM, ``fruitbat`` also has the capability to calculate other quantities of FRBs including: luminosity distances, comoving distance, burst energy and average luminosity.
 
-``fruitbat`` was developed due to a need for a tool that can utilise DM-redshift relations derived analytically and from cosmological simulations (Batten et al. in prep). ``fruitbat`` has since been used by Price et al. (MNRAS accepted) to estimate the redshift of FRB 180301.
+``fruitbat`` was developed due to the need for a tool that can utilise DM-redshift relations derived analytically and from cosmological simulations (Batten et al. in prep). ``fruitbat`` has since been used by Price et al. (MNRAS accepted) to estimate the redshift of FRB 180301.
 
 ``fruitbat`` is released under the BSD 3-Clause licence, and is avaliable from PyPi via ``pip``; the ``fruitbat`` source code can be found at https://github.com/abatten/fruitbat; tutorials for getting started with ``fruitbat`` and online documentation can be found at https://fruitbat.readthedocs.io.
 
-![The ``fruitbat`` logo](../logo/fruitbat_logo_small.png)
+![The ``fruitbat`` logo.](../logo/fruitbat_logo_small.png)
 
 # Acknowledgements
 The author would like to thank Alan Duffy, Ellert van der Velden and Daniel Price for their helpful discussions during the development of this project. The author would also like to thank James Josephides for designing the ``fruitbat`` logo. This research was supported by the Australian Research Council Centre of Excellence for All Sky Astrophysics in 3 Dimensions (ASTRO 3D), through project number CE170100013 .
