@@ -34,8 +34,9 @@ Unfortunately most telescopes do not have high enough resolution to unambiguousl
 
 We have constructed the tool ``fruitbat`` to assist the estimation of redshifts and galactic DM values of FRBs. ``fruitbat`` generates and utilises 'look-up tables' of existing DM-redshift relations found in the literature (@Ioka2003, @Inoue2004, @Zhang2018) in conjunction with cosmological parameters determined from both the WMAP (@WMAP5, @WMAP7, @WMAP9) and Planck missions (@Planck13, @Planck15, @Planck18). 
 
-``fruitbat`` allows the user to independently choose the DM-redshift relation and the cosmological parameters which was typically not an option when using the relations from the literature. Additionally, ``fruitbat`` explicitly integrates the entire DM-redshift relation at each redshift instead of assuming an average value across redshifts; an assumption which introduces a 6\% error (see Equation (6) in @Zhang2018). In Figure 1 we compare the different DM-redshift relations and cosmologies that have been built into ``fruitbat``. 
-![Left: Comparison of three DM-redshift relations assuming a @Planck18 cosmology. Right: Comparison of how the @Inoue2004 relation changes with six different cosmologies.](methods_cosmology_plots.png)
+``fruitbat`` allows the user to independently choose the DM-redshift relation and the cosmological parameters which was typically not an option when using the relations from the literature. Additionally, ``fruitbat`` explicitly integrates the entire DM-redshift relation at each redshift instead of assuming an average value across redshifts; an assumption that introduces a 6\% error (see Equation (6) in @Zhang2018). In Figure 1 we compare the different DM-redshift relations and cosmologies that have been built into ``fruitbat``.
+
+![Left: Comparison of three DM-redshift relations assuming a @Planck18 cosmology. Right: Comparison of the @Inoue2004 relation with six different cosmologies.](methods_cosmology_plots.png)
 
 Furthermore, ``fruitbat`` has the functionality for users to define their own DM relations, create custom cosmologies (including non-$\Lambda$CDM cosmologies) and generate their own look-up tables. This feature in particular allows for much greater flexibility than existing techniques in the analysis of FRBs as well as providing the option of adding non-analytical DM-redshift relations such as those derived from cosmological simulations. 
 
@@ -43,10 +44,11 @@ To account for the galactic DM contribution due to electrons in the interstellar
 
 In addition to estimating the redshifts and the line-of-sight galactic DM, ``fruitbat`` also has the capability to calculate other quantities of FRBs including: luminosity distances, comoving distance, burst energy and average luminosity.
 
-``fruitbat`` was developed due to a need for a tool that can utilise DM-redshift relations derived analytically and from cosmological simulations (Batten et al. in prep). ``fruitbat`` has since been used by Price et al. (MNRAS accepted) to estimate the redshift of FRB 180301.
+``fruitbat`` was developed due to the need for a tool that can utilise DM-redshift relations derived analytically and from cosmological simulations (Batten et al. in prep). ``fruitbat`` has since been used by Price et al. (MNRAS accepted) to estimate the redshift of FRB 180301.
 
 ``fruitbat`` is released under the BSD 3-Clause licence, and is avaliable from PyPi via ``pip``; the ``fruitbat`` source code can be found at https://github.com/abatten/fruitbat; tutorials for getting started with ``fruitbat`` and online documentation can be found at https://fruitbat.readthedocs.io.
 
+![The ``fruitbat`` logo.](../logo/fruitbat_logo_small.png)
 
 # Acknowledgements
 The author would like to thank Alan Duffy, Ellert van der Velden and Daniel Price for their helpful discussions during the development of this project. The author would also like to thank James Josephides for designing the ``fruitbat`` logo. This research was supported by the Australian Research Council Centre of Excellence for All Sky Astrophysics in 3 Dimensions (ASTRO 3D), through project number CE170100013 .
