@@ -42,6 +42,8 @@ each requirement.
 
  - pandas: Reading csv files from FRBCAT
 
+ - pybind11: Python bindings for C++. Needed for pyymw16.
+
  - pyymw16: Python wrapper for YMW16 galactic dispersion measure model.
 
  - e13tools: Utility tools for writing docstrings.
