@@ -114,6 +114,23 @@ Referencing Fruitbat
 If you use ``fruitbat`` in your research, we would like it if you could
 reference our paper.
 
+::
+
+    @article{Batten2019,
+        author = {{Batten}, A.~J.},
+        title = {{Fruitbat}: A Python Package for Estimating Redshifts of Fast Radio Bursts},
+        doi = {10.21105/joss.01399},
+        url = {http://dx.doi.org/10.21105/joss.01399},
+        year  = {2019},
+        month = {may},
+        publisher = {The Open Journal},
+        volume = {4},
+        number = {36},
+        pages = {1399},
+        journal = {JOSS}
+    }
+
+
 
 .. |Logo| image:: logo/fruitbat_logo.svg
     :alt: Fruitbat Logo
