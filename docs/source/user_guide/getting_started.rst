@@ -3,15 +3,15 @@ Getting started
 
 Installation
 ------------
-You can install the latest release of ``fruitbat`` from PyPi_ by running 
+You can install the latest release of **fruitbat** from PyPi_ by running 
 the following:
 
 .. code-block:: none
 
     pip install fruitbat
 
-You can install the latest development version of ``fruitbat`` by cloning 
-the repository:
+You can install the latest development version of **fruitbat** by cloning 
+the repository_:
 
 .. code-block:: none
     
@@ -21,7 +21,7 @@ the repository:
 
 Requirements
 ************
-Below are the listed requirements for running ``fruitbat`` and the purpose for
+Below are the listed requirements for running **fruitbat** and the purpose for
 each requirement.
 
  - numpy: Array manipulation
