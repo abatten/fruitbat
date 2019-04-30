@@ -11,7 +11,7 @@ the following:
     pip install fruitbat
 
 You can install the latest development version of **fruitbat** by cloning 
-the repository:
+the repository_:
 
 .. code-block:: none
     

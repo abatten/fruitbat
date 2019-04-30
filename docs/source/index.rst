@@ -14,6 +14,12 @@ As a user you can independantly choose the dispersion measure-reshift relation
 and the cosmological parameters, or define your own relation, create new cosmologies and
 generate custom look-up tables for **fruitbat**.
 
+**Fruitbat** is installable via ``pip`` (see `Getting Started`_) or the source code is made avaliable here_.
+
+.. _here: https://github.com/abatten/fruitbat
+.. _PyPI: https://pypi.org/project/fruitbat
+.. _Getting Started: https://fruitbat.readthedocs.io/en/latest/user_guide/getting_started.html
+
 .. toctree::
    :maxdepth: 2
    :caption: User Guide
@@ -45,6 +51,7 @@ generate custom look-up tables for **fruitbat**.
 
 
 .. |Logo| image:: ../../logo/fruitbat_logo.svg 
+    :target: https://github.com/abatten/fruitbat 
 
 .. _Ioka 2003: https://adsabs.harvard.edu/abs/2003ApJ...598L..79I
 
