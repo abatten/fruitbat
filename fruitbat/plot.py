@@ -102,7 +102,7 @@ def cosmology_comparison(filename="", extension="png", usetex=False,
     The filename of the saved figure. Default: "cosmology_comparison"
 
     extension: string, optional
-        The format to save the figure. e.g "png", "pdf", "esp", etc...
+        The format to save the figure. e.g "png", "pdf", "eps", etc...
         Default: "png"
 
     Generates

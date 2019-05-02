@@ -10,6 +10,8 @@ the following:
 
     pip install fruitbat
 
+.. _PyPi: https://pypi.python.org/pypi/fruitbat 
+
 You can install the latest development version of **fruitbat** by cloning 
 the repository_:
 
@@ -18,6 +20,14 @@ the repository_:
     git clone https://github.com/abatten/fruitbat
     cd fruitbat
     pip install .
+
+.. _repository: https://github.com/abatten/fruitbat
+
+If you are installing the latest development version of ``fruitbat`` then you 
+will also need to install git-lfs. Instructions for installing git-lfs for
+your operating system can be found here_.
+
+.. _here: https://help.github.com/en/articles/installing-git-large-file-storage
 
 Requirements
 ************
@@ -78,7 +88,4 @@ A detailed explanation of this example can be viewed at `Using Fruitbat`_.
 
 
 
-.. _repository: https://github.com/abatten/fruitbat
-.. _PyPI: https://pypi.org/project/fruitbat
-.. _Pyymw16: https://github.com/telegraphic/pyymw16
 .. _Using Fruitbat: https://fruitbat.readthedocs.io/en/latest/user_guide/using_fruitbat.html

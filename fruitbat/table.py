@@ -124,7 +124,7 @@ def load(name, data_dir='data'):
 
     Example
     -------
-    >>> table = fruitbat.table.load('Zhang2018_Planck18.npy')
+    >>> table = fruitbat.table.load('Zhang2018_Planck18.npz')
     >>> table["dm"]
     array([0.00000000e+00, 1.62251609e+00, 3.24675204e+00, ...,
            1.00004587e+04, 1.00010926e+04, 1.00017266e+04])

@@ -3,7 +3,7 @@
 |Logo|
 
 ``Fruitbat`` is an open source python package used to estimate the redshift of 
-Fast Radio Burst (FRB) from their dispersion measure. ``Fruitbat`` combines 
+Fast Radio Bursts (FRB) from their dispersion measure. ``Fruitbat`` combines 
 various dispersion measure (DM) and redshift relations with the YMW16 galactic 
 dispersion measure model into a single easy to use API. 
 
@@ -25,7 +25,13 @@ this repository::
     cd fruitbat
     pip install .
 
+If you are installing the latest development version of ``fruitbat`` then you 
+will also need to install git-lfs. Instructions for installing git-lfs for
+your operating system can be found here_.
+
 .. _PyPi: https://pypi.python.org/pypi/fruitbat 
+.. _here: https://help.github.com/en/articles/installing-git-large-file-storage
+
 
 Requirements
 ------------
@@ -86,13 +92,10 @@ calculate the excess dispersion measure for the redshift calculation.
     >>> FRB190222.calc_redshift()
     <Quantity 0.4808557>
 
-
-
 .. _Frb class: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Frb.html
 .. _calc_redshift: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Frb.html#fruitbat.Frb.calc_redshift
 .. _calc_dm_galaxy: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Frb.html#fruitbat.Frb.calc_dm_galaxy
 .. _Getting Started: https://fruitbat.readthedocs.io/en/latest/user_guide/getting_started
-
 
 Issues and Contributing
 -----------------------
@@ -102,10 +105,7 @@ outlining the feature. Similar to contributing, if you find a problem with
 ``fruitbat`` or are having difficulties using ``fruitbat`` please do not 
 hesitate to open a `Github Issue`_.
 
-
-
 .. _Github Issue: https://github.com/abatten/fruitbat/issues
-
 
 Referencing Fruitbat
 --------------------
@@ -128,8 +128,6 @@ reference our paper.
         pages = {1399},
         journal = {JOSS}
     }
-
-
 
 .. |Logo| image:: logo/fruitbat_logo.svg
     :alt: Fruitbat Logo
