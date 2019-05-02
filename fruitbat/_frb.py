@@ -308,6 +308,7 @@ class Frb(object):
             lookup_table = table.load(table_name)
 
         self.z = table.get_z_from_table(input_dm, lookup_table)
+        lookup_table.close()
 
         self.cosmology = cosmology
         self.method = method
