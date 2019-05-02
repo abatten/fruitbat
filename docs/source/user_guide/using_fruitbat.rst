@@ -180,6 +180,9 @@ after calculating the redshift.
 
 .. code-block:: python
 
+    >>> frb = fruitbat.Frb(635.1, gl="35.1", gb="12.5")
+    >>> frb.calc_dm_galaxy()
+    >>> frb.calc_redshift()
     >>> frb.calc_comoving_distance()
     <Quantity 2020.29768846 Mpc>
 
@@ -200,8 +203,6 @@ after calculating the redshift.
     >>> frb.calc_redshift()
     >>> frb.calc_luminosity_distance()
     <Quantity 3075.79950018 Mpc>
-
-
 
 
 Calculating Energy
@@ -256,7 +257,7 @@ Custom Cosmologies
 .. code-block:: python
 
     >>> params = {"H0": 72.4, "Om0": 0.26}
-    >>> new_cosmology = fruitbat.cosmology.create_cosmology(parameters=params)
+    >>> new_cosmology = fruitbat.cosmologies.create_cosmology(parameters=params)
     >>> fruitbat.add_cosmology("new_cosmology", new_cosmology)
     >>> fruitbat.available_cosmologies()
     ['WMAP5', 'WMAP7', 'WMAP9', 'Planck13', 'Planck15', 'Planck18', 'EAGLE', 'new_cosmology']
