@@ -21,7 +21,7 @@ def get_version():
 
 setup(
     name='fruitbat',
-    version='1.0.1',
+    version='1.0.2',
     author='Adam Batten',
     author_email='adamjbatten@gmail.com',
     url='https://github.com/abatten/fruitbat',
