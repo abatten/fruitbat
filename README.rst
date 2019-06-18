@@ -114,20 +114,26 @@ If you use ``fruitbat`` in your research, we would like it if you could
 reference our paper.
 
 ::
-
-    @article{Batten2019,
-        author = {{Batten}, A.~J.},
-        title = {{Fruitbat}: A Python Package for Estimating Redshifts of Fast Radio Bursts},
-        doi = {10.21105/joss.01399},
-        url = {http://dx.doi.org/10.21105/joss.01399},
-        year  = {2019},
-        month = {may},
-        publisher = {The Open Journal},
-        volume = {4},
-        number = {36},
-        pages = {1399},
-        journal = {JOSS}
+    @ARTICLE{2019JOSS....4.1399B,
+           author = {{Batten}, Adam},
+            title = "{Fruitbat: A Python Package for Estimating Redshifts of Fast Radio Bursts}",
+          journal = {The Journal of Open Source Software},
+         keywords = {Astrophysics - Instrumentation and Methods for Astrophysics, Astrophysics - High Energy Astrophysical Phenomena},
+             year = "2019",
+            month = "May",
+           volume = {4},
+           number = {37},
+            pages = {1399},
+              doi = {10.21105/joss.01399},
+    archivePrefix = {arXiv},
+           eprint = {1905.04294},
+     primaryClass = {astro-ph.IM},
+           adsurl = {https://ui.adsabs.harvard.edu/abs/2019JOSS....4.1399B},
+          adsnote = {Provided by the SAO/NASA Astrophysics Data System}
     }
+
+
+
 
 .. |Logo| image:: logo/fruitbat_logo.svg
     :alt: Fruitbat Logo
