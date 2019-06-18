@@ -111,7 +111,9 @@ Referencing Fruitbat
 --------------------
 
 If you use ``fruitbat`` in your research, we would like it if you could
-reference our paper.
+reference `our paper`_.
+
+.. _our paper: https://ui.adsabs.harvard.edu/abs/2019JOSS....4.1399B/abstract
 
 ::
 
