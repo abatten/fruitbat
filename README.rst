@@ -114,6 +114,7 @@ If you use ``fruitbat`` in your research, we would like it if you could
 reference our paper.
 
 ::
+
     @ARTICLE{2019JOSS....4.1399B,
            author = {{Batten}, Adam},
             title = "{Fruitbat: A Python Package for Estimating Redshifts of Fast Radio Bursts}",
