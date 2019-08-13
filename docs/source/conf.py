@@ -26,7 +26,7 @@ author = 'Adam Batten'
 
 def get_version():
     here = os.path.abspath(os.path.dirname(__file__))
-    version_file = os.path.join(here, 'fruitbat', '__version__.py')
+    version_file = os.path.join(here, '../../fruitbat', '__version__.py')
 
     with open(version_file, "r") as vf:
         lines = vf.read()

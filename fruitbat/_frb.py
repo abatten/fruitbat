@@ -391,9 +391,11 @@ class Frb(object):
 
         Parameters
         ----------
-        model : str, optional
-            The Milky Way dispersion measure model. Currently the only
-            implemented model is the YMW16 model.
+        model : 'ymw16' or 'ne2001', optional
+            The Milky Way dispersion measure model. To use 'ne2001' you
+            will need to install the python port. See 
+            https://fruitbat.readthedocs.io/en/latest/user_guide/ne2001_installation.html
+            Default: 'ymw16'
 
         Returns
         -------
