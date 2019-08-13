@@ -14,6 +14,7 @@
 #
 import os
 import sys
+import re
 sys.path.insert(0, os.path.abspath('../../'))
 
 
@@ -23,10 +24,22 @@ project = 'Fruitbat'
 copyright = '2019, Adam Batten'
 author = 'Adam Batten'
 
+def get_version():
+    here = os.path.abspath(os.path.dirname(__file__))
+    version_file = os.path.join(here, '../../fruitbat', '__version__.py')
+
+    with open(version_file, "r") as vf:
+        lines = vf.read()
+        version = re.search(r"^_*version_* = ['\"]([^'\"]*)['\"]", lines, re.M).group(1)
+        return version
+
+
+fruitbat_version = get_version()
+
 # The short X.Y version
-version = '1.0.1'
+version = fruitbat_version
 # The full version, including alpha/beta/rc tags
-release = '1.0.1'
+release = fruitbat_version
 
 
 # -- General configuration ---------------------------------------------------

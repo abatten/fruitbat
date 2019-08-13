@@ -29,6 +29,14 @@ If you are installing the latest development version of ``fruitbat`` then you
 will also need to install git-lfs. Instructions for installing git-lfs for
 your operating system can be found here_.
 
+Linux Users
+***********
+If you are installing ``fruitbat`` on a linux machine you may see this 'error':
+``ERROR: Failed building wheel for pyymw16``. This does not mean the installation
+failed. The C++ bindings were compiled using MacOS and needed to be recompiled
+for your machine. The installation process does this for you. You should still
+be able to run ``fruitbat`` normally.
+
 .. _PyPi: https://pypi.python.org/pypi/fruitbat 
 .. _here: https://help.github.com/en/articles/installing-git-large-file-storage
 
@@ -111,23 +119,32 @@ Referencing Fruitbat
 --------------------
 
 If you use ``fruitbat`` in your research, we would like it if you could
-reference our paper.
+reference `our paper`_.
+
+.. _our paper: https://ui.adsabs.harvard.edu/abs/2019JOSS....4.1399B/abstract
 
 ::
 
-    @article{Batten2019,
-        author = {{Batten}, A.~J.},
-        title = {{Fruitbat}: A Python Package for Estimating Redshifts of Fast Radio Bursts},
-        doi = {10.21105/joss.01399},
-        url = {http://dx.doi.org/10.21105/joss.01399},
-        year  = {2019},
-        month = {may},
-        publisher = {The Open Journal},
-        volume = {4},
-        number = {36},
-        pages = {1399},
-        journal = {JOSS}
+    @ARTICLE{2019JOSS....4.1399B,
+           author = {{Batten}, Adam},
+            title = "{Fruitbat: A Python Package for Estimating Redshifts of Fast Radio Bursts}",
+          journal = {The Journal of Open Source Software},
+         keywords = {Astrophysics - Instrumentation and Methods for Astrophysics, Astrophysics - High Energy Astrophysical Phenomena},
+             year = "2019",
+            month = "May",
+           volume = {4},
+           number = {37},
+            pages = {1399},
+              doi = {10.21105/joss.01399},
+    archivePrefix = {arXiv},
+           eprint = {1905.04294},
+     primaryClass = {astro-ph.IM},
+           adsurl = {https://ui.adsabs.harvard.edu/abs/2019JOSS....4.1399B},
+          adsnote = {Provided by the SAO/NASA Astrophysics Data System}
     }
+
+
+
 
 .. |Logo| image:: logo/fruitbat_logo.svg
     :alt: Fruitbat Logo
