@@ -29,6 +29,14 @@ If you are installing the latest development version of ``fruitbat`` then you
 will also need to install git-lfs. Instructions for installing git-lfs for
 your operating system can be found here_.
 
+Linux Users
+***********
+If you are installing ``fruitbat`` on a linux machine you may see this 'error':
+``ERROR: Failed building wheel for pyymw16``. This does not mean the installation
+failed. The C++ bindings were compiled using MacOS and needed to be recompiled
+for your machine. The installation process does this for you. You should still
+be able to run ``fruitbat`` normally.
+
 .. _PyPi: https://pypi.python.org/pypi/fruitbat 
 .. _here: https://help.github.com/en/articles/installing-git-large-file-storage
 
