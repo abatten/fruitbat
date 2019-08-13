@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 from codecs import open
 import os
+import re
 
 with open("README.rst", "r") as f:
     long_description = f.read()
