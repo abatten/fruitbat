@@ -8,20 +8,21 @@ with open("README.rst", "r") as f:
 with open("requirements.txt", "r") as f:
     requirements = f.read().splitlines()
 
-
 def get_version():
     here = os.path.abspath(os.path.dirname(__file__))
     version_file = os.path.join(here, 'fruitbat', '__version__.py')
 
-    with open(version_file) as vf:
+    with open(version_file, "r") as vf:
         lines = vf.read()
-        version = lines.strip("__version__ = ").strip("").strip()
+        version = re.search(r"^_*version_* = ['\"]([^'\"]*)['\"]", lines, re.M).group(1)
         return version
 
 
+fruitbat_version = get_version()
+
 setup(
     name='fruitbat',
-    version='1.0.2',
+    version=fruitbat_version,
     author='Adam Batten',
     author_email='adamjbatten@gmail.com',
     url='https://github.com/abatten/fruitbat',
