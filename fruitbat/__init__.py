@@ -8,10 +8,10 @@ Authors: Adam J. Batten (@abatten)
 
 Short Description
 -----------------
-This is the ``fruitbat`` package, which allows for easy estimation of FRB
+This is the *FRUITBAT* package, which allows for easy estimation of FRB
 quantities from observed parameters.
 
-A simple example calculate with ``fruitbat`` is to estimate the redshift of 
+A simple example calculate with *FRUITBAT* is to estimate the redshift of 
 a FRB from its dispersion measure.
 
 >>> import fruitbat
@@ -21,7 +21,7 @@ a FRB from its dispersion measure.
 >>> print(frb_redshift, dm_milky_way)
 0.3646537633283661 30.56254087351872 pc / cm3
 
-There are more detailed guides for getting started with ``fruitbat`` in the 'Using Fruitbat' section of the online documentation.
+There are more detailed guides for getting started with *FRUITBAT* in the 'Using Fruitbat' section of the online documentation.
 
 https://fruitbat.readthedocs.io/en/latest/user_guide/using_fruitbat.html
 

@@ -1,12 +1,12 @@
 NE2001 Installation Instructions
 ================================
 
-When you install ``fruitbat`` it automatically installs the YMW16 galactic 
+When you install *FRUITBAT* it automatically installs the YMW16 galactic 
 electron density model ``pyywm16`` from PyPi. However, if you have the python
-port of the NE2001 model by Ben Baror and JXP you can use it with ``fruitbat``
+port of the NE2001 model by Ben Baror and JXP you can use it with *FRUITBAT*
 to estimate the galactic contribution to dispersion measure.
 
-The python port that is compatible with ``fruitbat`` is found at: 
+The python port that is compatible with *FRUITBAT* is found at: 
 https://github.com/FRBs/ne2001. 
 
 You will need to download and install the NE2001 model to use it.

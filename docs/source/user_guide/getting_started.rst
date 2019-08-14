@@ -23,7 +23,7 @@ the repository_:
 
 .. _repository: https://github.com/abatten/fruitbat
 
-If you are installing the latest development version of ``fruitbat`` then you 
+If you are installing the latest development version of *FRUITBAT* then you 
 will also need to install git-lfs. Instructions for installing git-lfs for
 your operating system can be found here_.
 

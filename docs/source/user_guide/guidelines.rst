@@ -6,7 +6,7 @@ Guidelines
 Reference
 ---------
 If you use **Fruitbat** in your research, please add the acknowledgement statement
-"Some of the results of this paper have been derived using the ``fruitbat`` package"
+"Some of the results of this paper have been derived using the *FRUITBAT* package"
 and cite the JOSS paper.
 
 .. code-block:: none
@@ -32,10 +32,10 @@ and cite the JOSS paper.
 
 Issues and Contributing
 -----------------------
-If there is a feature of ``fruitbat`` that currently does not exist, but you
+If there is a feature of *FRUITBAT* that currently does not exist, but you
 would like it to, you can contribute by openning a `Github Issue`_ and 
 outlining the feature. Similar to contributing, if you find a problem with
-``fruitbat`` or are having difficulties using ``fruitbat`` please do not 
+*FRUITBAT* or are having difficulties using *FRUITBAT* please do not 
 hesitate to open a `Github Issue`_.
 
 .. _Github Issue: https://github.com/abatten/fruitbat/issues

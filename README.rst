@@ -9,33 +9,33 @@ dispersion measure model into a single easy to use API.
 
 Documentation
 -------------
-The documentation for ``fruitbat`` can be found at https://fruitbat.readthedocs.io/.
+The documentation for *FRUITBAT* can be found at https://fruitbat.readthedocs.io/.
 
 Installation
 ------------
-You can install the latest release of ``fruitbat`` from PyPi_ by running 
+You can install the latest release of *FRUITBAT* from PyPi_ by running 
 the following::
 
     pip install fruitbat
 
-You can install the latest development version of ``fruitbat`` by cloning 
+You can install the latest development version of *FRUITBAT* by cloning 
 this repository::
     
     git clone https://github.com/abatten/fruitbat
     cd fruitbat
     pip install .
 
-If you are installing the latest development version of ``fruitbat`` then you 
+If you are installing the latest development version of *FRUITBAT* then you 
 will also need to install git-lfs. Instructions for installing git-lfs for
 your operating system can be found here_.
 
 Linux Users
 ***********
-If you are installing ``fruitbat`` on a linux machine you may see this 'error':
+If you are installing *FRUITBAT* on a linux machine you may see this 'error':
 ``ERROR: Failed building wheel for pyymw16``. This does not mean the installation
 failed. The C++ bindings were compiled using MacOS and needed to be recompiled
 for your machine. The installation process does this for you. You should still
-be able to run ``fruitbat`` normally.
+be able to run *FRUITBAT* normally.
 
 .. _PyPi: https://pypi.python.org/pypi/fruitbat 
 .. _here: https://help.github.com/en/articles/installing-git-large-file-storage
@@ -43,7 +43,7 @@ be able to run ``fruitbat`` normally.
 
 Requirements
 ------------
-Below are the listed requirements for running ``fruitbat`` and the purpose for
+Below are the listed requirements for running *FRUITBAT* and the purpose for
 each requirement.
 
  - numpy: Array manipulation
@@ -62,7 +62,7 @@ each requirement.
 
 Usage
 -----
-If you want to get started using ``fruitbat`` there is a `Getting Started`_ 
+If you want to get started using *FRUITBAT* there is a `Getting Started`_ 
 section of the documentation made just for you! Otherwise the tl;dr is the
 following:
 
@@ -107,10 +107,10 @@ calculate the excess dispersion measure for the redshift calculation.
 
 Issues and Contributing
 -----------------------
-If there is a feature of ``fruitbat`` that currently does not exist, but you
+If there is a feature of *FRUITBAT* that currently does not exist, but you
 would like it to, you can contribute by openning a `Github Issue`_ and 
 outlining the feature. Similar to contributing, if you find a problem with
-``fruitbat`` or are having difficulties using ``fruitbat`` please do not 
+*FRUITBAT* or are having difficulties using *FRUITBAT* please do not 
 hesitate to open a `Github Issue`_.
 
 .. _Github Issue: https://github.com/abatten/fruitbat/issues
@@ -118,7 +118,7 @@ hesitate to open a `Github Issue`_.
 Referencing Fruitbat
 --------------------
 
-If you use ``fruitbat`` in your research, we would like it if you could
+If you use *FRUITBAT* in your research, we would like it if you could
 reference `our paper`_.
 
 .. _our paper: https://ui.adsabs.harvard.edu/abs/2019JOSS....4.1399B/abstract

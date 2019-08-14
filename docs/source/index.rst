@@ -15,12 +15,12 @@ is also possible to use the NE2001 model if the python port has been installed
 
 As a user you can independantly choose the dispersion measure-reshift relation 
 and the cosmological parameters, or define your own relation, create new cosmologies and
-generate custom look-up tables for ``fruitbat``.
+generate custom look-up tables for *FRUITBAT*.
 
 ``Fruitbat`` is installable via ``pip`` (see `Getting Started`_) or the source code is made avaliable here_.
 
 If you use **Fruitbat** in your research, please add the acknowledgement statement
-"Some of the results of this paper have been derived using the ``fruitbat`` package"
+"Some of the results of this paper have been derived using the *FRUITBAT* package"
 and cite the JOSS paper.
 
 .. code-block:: none
