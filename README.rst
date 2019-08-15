@@ -118,8 +118,9 @@ hesitate to open a `Github Issue`_.
 Referencing Fruitbat
 --------------------
 
-If you use *FRUITBAT* in your research, we would like it if you could
-reference `our paper`_.
+If you use *FRUITBAT* in your research, we would like it if you could add an 
+acknowledgement statement “Some of the results of this paper have been derived
+using the *FRUITBAT* package” and reference `our paper`_.
 
 .. _our paper: https://ui.adsabs.harvard.edu/abs/2019JOSS....4.1399B/abstract
 
