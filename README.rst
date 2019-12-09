@@ -89,8 +89,9 @@ will specify which cosmology to assume.
 
 It is also possible to specify the coordinates of the burst and use the 
 `calc_dm_galaxy`_ function to calculate the DM contribution from the Milky Way
-using the YMW16 model. Performing `calc_dm_galaxy`_ will automatically
-calculate the excess dispersion measure for the redshift calculation.
+using the YMW16 or NE2001 galactic electron distribution model. Performing 
+`calc_dm_galaxy`_ will automatically calculate the excess dispersion measure 
+for the redshift calculation.
 
 ::
 
