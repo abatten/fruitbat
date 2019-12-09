@@ -1,4 +1,4 @@
-|PyPI| |Python| |License| |Travis| |Docs| |CodeCov| |JOSS|
+|PyPI| |Python| |License| |Travis| |Docs| |CodeCov| |JOSS| |ASCL|
 
 |Logo|
 
@@ -177,3 +177,6 @@ using the *FRUITBAT* package” and reference `our paper`_.
     :target: http://joss.theoj.org/papers/634bb69f2445c7457bea5dbc0b83e650
     :alt: JOSS Review Status
 
+.. |ASCL| image:: https://img.shields.io/badge/ascl-1911.010-blue.svg?colorB=262255"
+    :target: http://ascl.net/1911.010
+    :alt: ascl:1911.010
