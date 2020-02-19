@@ -11,6 +11,7 @@ import astropy.units as u
 
 from e13tools import docstring_substitute
 import pyymw16 as ymw16
+import pygedm
 
 from fruitbat import cosmologies, methods, table
 
