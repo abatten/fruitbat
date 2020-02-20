@@ -412,7 +412,7 @@ class Frb(object):
         elif model in NE2001_options:
             model = 'ne2001'
         else:
-            raise ValueError(f"'{model}' is not a valid galactic DM model")
+            raise ValueError("'{}' is not a valid galactic DM model".format(model))
 
        # Check to make sure some of the keyword are not None
        coord_list = [self.skycoords, self.raj, self.decj, self.gl, self.gb]
