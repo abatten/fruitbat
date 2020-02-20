@@ -1,6 +1,6 @@
-numpy>=1.16.0
+numpy>=1.18.1
 scipy>=1.0.0
-astropy>=2.0.0
+astropy>=3.2.3
 matplotlib>=2.2.4
 pandas>=0.22.0
 pyymw16>=2.0.6
