@@ -383,7 +383,7 @@ class Frb(object):
             self.dm_excess = dm_excess
         return dm_excess
 
-    def calc_dm_galaxy(self, model='ymw16'):
+    def calc_dm_galaxy(self, model='ymw16', include_halo=False):
         """
         Calculates the dispersion measure contribution of the Milky Way
         from either (:attr:`raj`, :attr:`decj`) or (:attr:`gl`,
@@ -405,65 +405,94 @@ class Frb(object):
             the FRB.
         """
         YMW16_options = ["ymw16", "YMW16"]
-
         NE2001_options = ["ne2001", "NE2001"]
 
         if model in YMW16_options:
-            # Since the YMW16 model only gives you a dispersion measure out to a
-            # distance within the galaxy, to get the entire DM contribution of the
-            # galaxy we need to specify the furthest distance in the YMW16 model.
-            max_galaxy_dist = 25000  # units: pc
-
-            # Check to make sure some of the keyword are not None
-            coord_list = [self.skycoords, self.raj, self.decj, self.gl, self.gb]
-            if all(val is None for val in coord_list):
-                raise ValueError("""Can not calculate dm_galaxy since coordinates
-                                 for FRB burst were not provided. Please provide
-                                 (raj, decj) or (gl, gb) coordinates.""")
-
-            # Calculate skycoords position if it
-            elif (self.skycoords is None and
-                    (self.raj is not None and self.decj is not None) or
-                    (self.gl is not None and self.gb is not None)):
-
-                self._skycoords = self.calc_skycoords()
-
-            dm_galaxy, tau_sc = ymw16.dist_to_dm(self._skycoords.galactic.l,
-                                                 self._skycoords.galactic.b,
-                                                 max_galaxy_dist)
-
+            model = 'ymw16'
         elif model in NE2001_options:
-            try:
-                from ne2001 import density
-            except ModuleNotFoundError:
-                msg = (
-                """
-                By default only the YMW16 Milky Way electron density model
-                is installed with Fruitbat. However Fruitbat due support using  
-                the NE2001 model via a python port from JXP and Ben Baror. 
+            model = 'ne2001'
+        else:
+            raise ValueError(f"'{model}' is not a valid galactic DM model")
 
-                To install the ne2001 model compatible with Fruitbat download
-                and install it from github:
+       # Check to make sure some of the keyword are not None
+       coord_list = [self.skycoords, self.raj, self.decj, self.gl, self.gb]
+       if all(val is None for val in coord_list):
+           raise ValueError("""Can not calculate dm_galaxy since coordinates
+                            for FRB burst were not provided. Please provide
+                            (raj, decj) or (gl, gb) coordinates.""")
 
-                >>> git clone https://github.com/FRBs/ne2001
-                >>> cd ne2001
-                >>> pip install .
+       # Calculate skycoords position if it
+       elif (self.skycoords is None and
+               (self.raj is not None and self.decj is not None) or
+               (self.gl is not None and self.gb is not None)):
 
-                Once you have installed it you should be able to use Fruitbat
-                in exactly the same way by passing 'ne2001' instead of 'ymw16'.
-                """)
-                raise ModuleNotFoundError(msg)
-            
-            # This is the same max distanc e that we used for the YMW16 model
-            # However the NE2001 model specifies distance in kpc not pc.
-            max_galaxy_dist = 25  # units kpc
+           self._skycoords = self.calc_skycoords()
+        
+        dm_galaxy, tau_sc = pygedm.dist_to_dm(
+            gl=self._skycoords.galactic.l,
+            gb=self._skycoords.galactic.b,
+            dist=25000,
+            method=model)
 
-            # NE2001 models needs gl and gb in floats
-            gl = float(self._skycoords.galactic.l.value)
-            gb = float(self._skycoords.galactic.b.value)
 
-            ne = density.ElectronDensity()
-            dm_galaxy = ne.DM(gl, gb, max_galaxy_dist)
+
+
+#        if model in YMW16_options:
+#            # Since the YMW16 model only gives you a dispersion measure out to a
+#            # distance within the galaxy, to get the entire DM contribution of the
+#            # galaxy we need to specify the furthest distance in the YMW16 model.
+#            max_galaxy_dist = 25000  # units: pc
+#
+#            # Check to make sure some of the keyword are not None
+#            coord_list = [self.skycoords, self.raj, self.decj, self.gl, self.gb]
+#            if all(val is None for val in coord_list):
+#                raise ValueError("""Can not calculate dm_galaxy since coordinates
+#                                 for FRB burst were not provided. Please provide
+#                                 (raj, decj) or (gl, gb) coordinates.""")
+#
+#            # Calculate skycoords position if it
+#            elif (self.skycoords is None and
+#                    (self.raj is not None and self.decj is not None) or
+#                    (self.gl is not None and self.gb is not None)):
+#
+#                self._skycoords = self.calc_skycoords()
+#
+#            dm_galaxy, tau_sc = ymw16.dist_to_dm(self._skycoords.galactic.l,
+#                                                 self._skycoords.galactic.b,
+#                                                 max_galaxy_dist)
+#
+#        elif model in NE2001_options:
+#            try:
+#                from ne2001 import density
+#            except ModuleNotFoundError:
+#                msg = (
+#                """
+#                By default only the YMW16 Milky Way electron density model
+#                is installed with Fruitbat. However Fruitbat due support using  
+#                the NE2001 model via a python port from JXP and Ben Baror. 
+#
+#                To install the ne2001 model compatible with Fruitbat download
+#                and install it from github:
+#
+#                >>> git clone https://github.com/FRBs/ne2001
+#                >>> cd ne2001
+#                >>> pip install .
+#
+#                Once you have installed it you should be able to use Fruitbat
+#                in exactly the same way by passing 'ne2001' instead of 'ymw16'.
+#                """)
+#                raise ModuleNotFoundError(msg)
+#            
+#            # This is the same max distanc e that we used for the YMW16 model
+#            # However the NE2001 model specifies distance in kpc not pc.
+#            max_galaxy_dist = 25  # units kpc
+#
+#            # NE2001 models needs gl and gb in floats
+#            gl = float(self._skycoords.galactic.l.value)
+#            gb = float(self._skycoords.galactic.b.value)
+#
+#            ne = density.ElectronDensity()
+#            dm_galaxy = ne.DM(gl, gb, max_galaxy_dist)
 
         self.dm_galaxy = dm_galaxy.value
         self.calc_dm_excess()
