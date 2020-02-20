@@ -414,21 +414,21 @@ class Frb(object):
         else:
             raise ValueError("'{}' is not a valid galactic DM model".format(model))
 
-       # Check to make sure some of the keyword are not None
-       coord_list = [self.skycoords, self.raj, self.decj, self.gl, self.gb]
-       if all(val is None for val in coord_list):
-           raise ValueError("""Can not calculate dm_galaxy since coordinates
-                            for FRB burst were not provided. Please provide
-                            (raj, decj) or (gl, gb) coordinates.""")
+        # Check to make sure some of the keyword are not None
+        coord_list = [self.skycoords, self.raj, self.decj, self.gl, self.gb]
+        if all(val is None for val in coord_list):
+            raise ValueError("""Can not calculate dm_galaxy since coordinates
+                             for FRB burst were not provided. Please provide
+                             (raj, decj) or (gl, gb) coordinates.""")
 
-       # Calculate skycoords position if it
-       elif (self.skycoords is None and
-               (self.raj is not None and self.decj is not None) or
-               (self.gl is not None and self.gb is not None)):
+        # Calculate skycoords position if it
+        elif (self.skycoords is None and
+                (self.raj is not None and self.decj is not None) or
+                (self.gl is not None and self.gb is not None)):
 
-           self._skycoords = self.calc_skycoords()
+            self._skycoords = self.calc_skycoords()
         
-        dm_galaxy, tau_sc = pygedm.dist_to_dm(
+         dm_galaxy, tau_sc = pygedm.dist_to_dm(
             gl=self._skycoords.galactic.l,
             gb=self._skycoords.galactic.b,
             dist=25000,
