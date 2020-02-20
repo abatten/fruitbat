@@ -428,7 +428,7 @@ class Frb(object):
 
             self._skycoords = self.calc_skycoords()
         
-         dm_galaxy, tau_sc = pygedm.dist_to_dm(
+        dm_galaxy, tau_sc = pygedm.dist_to_dm(
             gl=self._skycoords.galactic.l,
             gb=self._skycoords.galactic.b,
             dist=25000,
