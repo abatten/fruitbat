@@ -6,9 +6,10 @@ import astropy.units as u
 import scipy.integrate as integrate
 
 
-__all__ = ["ioka2003", "inoue2004", "zhang2018", 
+__all__ = ["ioka2003", "inoue2004", "zhang2018",
            "builtin_method_functions", "add_method", 
-           "available_methods", "reset_methods", "method_functions"]
+           "available_methods", "reset_methods", "method_functions",
+           "methods_hydrodynamic", "methods_analytic"]
 
 
 def _f_integrand(z, cosmo):
@@ -69,6 +70,7 @@ def ioka2003(z, cosmo, zmin=0):
     -------
     dm : float
         The dispersion measure at the redshift ``z``.
+  
     """
     # Calculate Ioka 2003 DM coefficient
     coeff_top = 3 * const.c * cosmo.H0 * cosmo.Ob0
@@ -104,6 +106,7 @@ def inoue2004(z, cosmo, zmin=0):
     -------
     dm : float
         The dispersion measure at the redshift ``z``.
+
     """
 
     # Coefficient from Inoue 2004
@@ -178,6 +181,11 @@ def zhang2018(z, cosmo, zmin=0, **kwargs):
     return dm.value
 
 
+def batten2020():
+    pass
+
+
+
 def builtin_method_functions():
     """
     Returns a dictionary of the builtin methods with keywords and
@@ -187,12 +195,14 @@ def builtin_method_functions():
     -------
     methods: dict
         Contains the keywords and function for each method.
+
     """
 
     methods = {
         "Ioka2003": ioka2003,
         "Inoue2004": inoue2004,
-        "Zhang2018": zhang2018
+        "Zhang2018": zhang2018,
+        "Batten2020": batten2020,
     }
     return methods
 
@@ -216,6 +226,7 @@ def add_method(name, func):
 
     Return
     ------
+    None
 
     Example
     -------
@@ -223,6 +234,7 @@ def add_method(name, func):
             dm = 1200 * z
             return dm
     >>> fruitbat.add_method("simple_dm", simple_dm)
+
     """
 
     method = {name: func}
@@ -232,6 +244,7 @@ def add_method(name, func):
 def available_methods():
     """
     Returns the list containing all the keywords for valid methods.
+
     """
     return list(_available.keys())
 
@@ -239,6 +252,7 @@ def available_methods():
 def reset_methods():
     """
     Resets the list of available methods to the default builtin methods.
+
     """
 
     # Delete all keys that aren't in the list of builtin method functions
@@ -255,3 +269,22 @@ def method_functions():
     corresponding dispersion measure functions.
     """
     return _available
+
+
+def methods_analytic():
+    analytic = [
+        "Ioka2003",
+        "Inoue2004",
+        "Zhang2018",
+    ]
+
+    return analytic
+
+
+def methods_hydrodynamic():
+
+    hydro = [
+        "Batten2020",
+    ]
+
+    return hydro

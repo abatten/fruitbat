@@ -8,6 +8,8 @@ import astropy.coordinates as coord
 from astropy.coordinates import SkyCoord
 from astropy.time import Time
 import astropy.units as u
+import h5py
+import os
 
 from e13tools import docstring_substitute
 import pyymw16 as ymw16
@@ -240,8 +242,8 @@ class Frb(object):
         Parameters
         ----------
         method : str, optional
-            The dispersion meausre -redshift relation to use when 
-            calculating the redshift. Avaliable methods:  %(meth)s. 
+            The dispersion meausre -redshift relation to use when
+            calculating the redshift. Avaliable methods:  %(meth)s.
             Default: 'Inoue2004'
 
         cosmology : str, optional
@@ -289,30 +291,72 @@ class Frb(object):
                         methods.available_methods()))
             raise ValueError(err_msg)
 
-        if cosmology not in cosmologies.available_cosmologies():
-            err_msg = ("Cosmology '{}' is not a valid cosmology. Valid "
-                       "cosmologies are: {}".format(cosmology,
-                        cosmologies.available_cosmologies()))
-            raise ValueError(err_msg)
 
-        # If the user provides a table use that table for estimation.
-        if lookup_table is not None:
-            lookup_table = table.load(lookup_table)
+        if method in methods.methods_hydrodynamic():
+            if method == "Batten2020":
+                filename = os.path.join(os.path.dirname(__file__), 'data', "Batten2020_EAGLE.hdf5" )
+                with h5py.File(filename, "r") as data:
 
-        else:
-            if method in methods.builtin_method_functions().keys():
-                table_name = "".join(["_".join([method, cosmology]), ".npz"])
+                    DMzHist = data["DMz_hist"][:]
+
+                    DMBins = 10**data["DM_Bin_Edges"][:]
+                    #print(DMBins)
+                    max_bin_idx = np.where(self.dm_excess.value <= DMBins)[0][0]
+                    #print(np.where(self.dm_excess.value <= DMBins)[0])
+
+                    #print(max_bin_idx)
+                    #print(DMBins[max_bin_idx])
+                    pdf = DMzHist[max_bin_idx]
+
+                    redshifts = data["Redshifts"][:-1]
+                    redshift_bin_widths = data["Redshift_Bin_Widths"][:]
+                    mean = np.sum(pdf * redshifts * redshift_bin_widths)
+                    print(np.sum(pdf * redshift_bin_widths))
+                    print(mean)
+                    self.z = mean
+                    #cdf = np.cumsum(pdf) / np.sum(pdf)
+                    
+
+            # load_table("Batten2020")
+            # redshift_int
+
+            #def prior(length, type="uniform"):
+                # if type =="uniform":
+                    #P_d = np.ones(length)
+                # elif type == "volume_dependant":
+                #   pass
+                # return P_d 
+
+
+        elif method in methods.methods_analytic():
+            if cosmology not in cosmologies.available_cosmologies():
+                err_msg = ("Cosmology '{}' is not a valid cosmology. Valid "
+                           "cosmologies are: {}".format(cosmology,
+                            cosmologies.available_cosmologies()))
+                raise ValueError(err_msg)
+
+            # If the user provides a table use that table for estimation.
+            if lookup_table is not None:
+                lookup_table = table.load(lookup_table)
+
             else:
-                table_name = "".join(["custom_", method, ".npz"])
+                if method in methods.builtin_method_functions().keys():
+                    table_name = "".join(["_".join([method, cosmology]), ".npz"])
+                else:
+                    table_name = "".join(["custom_", method, ".npz"])
 
-            lookup_table = table.load(table_name)
+                lookup_table = table.load(table_name)
 
-        self.z = table.get_z_from_table(input_dm, lookup_table)
-        lookup_table.close()
+            self.z = table.get_z_from_table(input_dm, lookup_table)
+            lookup_table.close()
 
-        self.cosmology = cosmology
-        self.method = method
-        return self.z
+            self.cosmology = cosmology
+            self.method = method
+            return self.z
+
+
+    # def calc_redshift_conf_int(method, cosmology, ):
+
 
     def calc_skycoords(self, frame=None):
         """
@@ -403,11 +447,11 @@ class Frb(object):
             The dispersion measure contribution from the Milky Way of
             the FRB.
         """
-        YMW16_options = ["ymw16", "YMW16"]
+        ymw16_options = ["ymw16", "YMW16"]
 
-        NE2001_options = ["ne2001", "NE2001"]
+        ne2001_options = ["ne2001", "NE2001"]
 
-        if model in YMW16_options:
+        if model in ymw16_options:
             # Since the YMW16 model only gives you a dispersion measure out to a
             # distance within the galaxy, to get the entire DM contribution of the
             # galaxy we need to specify the furthest distance in the YMW16 model.
@@ -431,7 +475,7 @@ class Frb(object):
                                                  self._skycoords.galactic.b,
                                                  max_galaxy_dist)
 
-        elif model in NE2001_options:
+        elif model in ne2001_options:
             try:
                 from ne2001 import density
             except ModuleNotFoundError:
@@ -698,7 +742,7 @@ class Frb(object):
                        "energy.")
             raise ValueError(err_msg)
         else:
-            F = self.fluence
+            fluence = self.fluence
 
         if use_bandwidth:
             if self.obs_bandwidth is None:
@@ -707,8 +751,8 @@ class Frb(object):
                            "calculating energy.")
                 raise ValueError(err_msg)
             else:
-                B = self.obs_bandwidth
-            energy = F * B * 4 * np.pi * D**2 * (1 + self.z)**-1
+                bandwidth = self.obs_bandwidth
+            energy = fluence * bandwidth * 4 * np.pi * D**2 * (1 + self.z)**-1
 
         else:
             if self.obs_freq_central is None:
@@ -718,7 +762,7 @@ class Frb(object):
                 raise ValueError(err_msg)
             else:
                 nu = self.obs_freq_central
-            energy = F * nu * 4 * np.pi * D**2 * (1 + self.z)**-1
+            energy = fluence * nu * 4 * np.pi * D**2 * (1 + self.z)**-1
 
         return energy.to("erg")
 
@@ -835,8 +879,8 @@ class Frb(object):
 
     @dm_excess.setter
     def dm_excess(self, value):
-            self._dm_excess = self._set_value_units(value, u.pc * u.cm**-3,
-                                                    non_negative=True)
+        self._dm_excess = self._set_value_units(value, u.pc * u.cm**-3,
+                                                non_negative=True)
 
 
     @property
