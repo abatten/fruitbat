@@ -8,7 +8,7 @@ Authors: Adam J. Batten (@abatten)
 
 Short Description
 -----------------
-This is the *FRUITBAT* package, which allows for easy estimation of FRB
+This is the ``FRUITBAT`` package, which allows for easy estimation of FRB
 quantities from observed parameters.
 
 A simple example calculate with *FRUITBAT* is to estimate the redshift of 
@@ -24,6 +24,12 @@ a FRB from its dispersion measure.
 There are more detailed guides for getting started with *FRUITBAT* in the 'Using Fruitbat' section of the online documentation.
 
 https://fruitbat.readthedocs.io/en/latest/user_guide/using_fruitbat.html
+
+
+If you use ``FRUITBAT`` in your research, we would like it if you could reference our paper.
+You can get the bibtex using the following function:
+
+>>> fruitbat.get_bibtex()
 
 """
 
@@ -44,7 +50,7 @@ from textwrap import dedent
 
 from .__version__ import __version__
 
-__name__ = "fruitbat"
+__pkgname__ = "FRUITBAT"
 __author__ = ["Adam Batten (@abatten)", ]
 __all__ = ['Frb', 'methods', 'cosmologies', 'plot', 'table', 'utils',
            'catalogue', 'add_method', 'reset_methods', 
@@ -58,7 +64,7 @@ def get_bibtex():
     """
     Prints a string that gives the BibTeX entry for citing the ``FRUITBAT`` paper
     (Batten 2019, JOSS, vol. 4, issue 17, id. 1399).
-    
+
     """
 
     # Create string with BibTeX entry
