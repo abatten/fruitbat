@@ -9,12 +9,11 @@ from astropy.coordinates import SkyCoord
 from astropy.time import Time
 import astropy.units as u
 import h5py
-import os
 
 from e13tools import docstring_substitute
 import pyymw16 as ymw16
 
-from fruitbat import cosmologies, methods, table
+from fruitbat import cosmologies, methods, table, utils
 
 __all__ = ["Frb"]
 
@@ -276,6 +275,7 @@ class Frb(object):
 
         .. _cosmology: https://fruitbat.readthedocs.io/en/latest/user_guide/method_and_cosmology.html#cosmology
         .. _methods: https://fruitbat.readthedocs.io/en/latest/user_guide/method_and_cosmology.html#methods
+
         """
         if not isinstance(subtract_host, bool):
             raise ValueError("subtract_host must be of type bool.")
@@ -294,26 +294,77 @@ class Frb(object):
 
         if method in methods.methods_hydrodynamic():
             if method == "Batten2020":
-                filename = os.path.join(os.path.dirname(__file__), 'data', "Batten2020_EAGLE.hdf5" )
+
+
+
+
+                #def load_batten2020(filename="Batten2020_EAGLE.hdf5"):
+                #filename = os.path.join(os.path.dirname(__file__), 'data', "Batten2020_EAGLE.hdf5")
+
+
+                #data = load_batten2020()
+
+
+                #pdf = get_pdf(DM)
+
+                # def calc_mean_from_pdf(xvals, pdf, widths=None):
+                    # if bin_widths is None:
+                        #bin_widths = np.ones_like(bins)
+
+                    #return np.sum(pdf * bins * bin_widths)
+
+
+                # mean = calc_mean_from_pdf(xvals=redshifts, pdf=pdf, widths=redshift_bin_widths)
+                filename = utils.get_path_to_file_from_here("Batten2020_EAGLE_unnormed.hdf5", subdirs=["data"])
+
+                #filename = os.path.join(os.path.dirname(__file__), 'data', "Batten2020_EAGLE.hdf5")
                 with h5py.File(filename, "r") as data:
 
                     DMzHist = data["DMz_hist"][:]
+                    redshift_bin_widths = data["Redshift_Bin_Widths"][:]
+                    redshifts = data["Redshifts_Bin_Edges"][1:]
+                    DMBins = data["DM_Bin_Edges"][:]
 
-                    DMBins = 10**data["DM_Bin_Edges"][:]
-                    #print(DMBins)
                     max_bin_idx = np.where(self.dm_excess.value <= DMBins)[0][0]
+                    prev_bin_idx = max_bin_idx - 1
+                    print("DM Excess", self.dm_excess.value)
+                    print("DM Bins", DMBins[prev_bin_idx:max_bin_idx+1])
                     #print(np.where(self.dm_excess.value <= DMBins)[0])
 
                     #print(max_bin_idx)
                     #print(DMBins[max_bin_idx])
-                    pdf = DMzHist[max_bin_idx]
+                    hist_higher_dm = DMzHist[max_bin_idx]
+                    hist_lower_dm = DMzHist[prev_bin_idx]
 
-                    redshifts = data["Redshifts"][:-1]
-                    redshift_bin_widths = data["Redshift_Bin_Widths"][:]
-                    mean = np.sum(pdf * redshifts * redshift_bin_widths)
-                    print(np.sum(pdf * redshift_bin_widths))
-                    print(mean)
+                    #pdf = utils.calc_pdf_from_hist(hist, bin_widths=redshift_bin_widths, prior=uniform)
+                    pdf2 = utils.normalise_to_pdf(hist_higher_dm, bin_widths=redshift_bin_widths)
+                    pdf1 = utils.normalise_to_pdf(hist_lower_dm, bin_widths=redshift_bin_widths)
+                    
+                    #pdf = DMzHist[max_bin_idx]
+
+                    DMlower, DMhigher = DMBins[prev_bin_idx], DMBins[max_bin_idx]
+                    lin_interp_pdf = utils.linear_interpolate_pdfs(self.dm_excess.value, (DMlower, DMhigher), (pdf1, pdf2))
+
+
+                    mean_pdf = np.array([np.mean([pdf1[idx], pdf2[idx]]) for idx in range(len(pdf1))])
+
+
+
+                    mean = utils.calc_mean_from_pdf(redshifts, pdf1, dx=redshift_bin_widths)
+                    mean2 = utils.calc_mean_from_pdf(redshifts, pdf2, dx=redshift_bin_widths)
+                    mean_com = utils.calc_mean_from_pdf(redshifts, mean_pdf, dx=redshift_bin_widths)
+                    mean_lin = utils.calc_mean_from_pdf(redshifts, lin_interp_pdf, dx=redshift_bin_widths)
+
+
+                    #mean = np.sum(pdf * redshifts * redshift_bin_widths)
+                    #print(np.sum(pdf * redshift_bin_widths))
+                    print("Lower Bin mean", mean)
+                    print("Higher bin mean", mean2)
+                    print("Middle bin mean", mean_com)
+                    print("Interpolated Bin Mean", mean_lin)
+    
                     self.z = mean
+                    self.cosmology = "EAGLE"
                     #cdf = np.cumsum(pdf) / np.sum(pdf)
                     
 
@@ -355,7 +406,67 @@ class Frb(object):
             return self.z
 
 
-    # def calc_redshift_conf_int(method, cosmology, ):
+    @docstring_substitute(meth=methods.available_methods(),
+                          cosmo=cosmologies.available_cosmologies())
+    def calc_redshift_confidence_interval(self, method='Batten2020', cosmology="Planck18", sigma=1,
+                                          scatter_percentage=0, subtract_host=False, lookup_table=None):
+        """
+        Calculates the mean redshift and the confidence interval of
+        an FRB from its :attr:`dm`, :attr:`dm_excess` or 
+        :attr:`dm_excess` - :attr:`dm_host_est`.
+
+        Parameters
+        ----------
+        method : str, optional
+            The dispersion meausre -redshift relation to use when
+            calculating the redshift. Avaliable methods:  %(meth)s.
+            Default: 'Batten2020'
+
+        cosmology : str, optional
+            The cosmology to assume when calculating the redshift.
+            This value is overided if using a hydrodynamic method. 
+            Avaliable cosmologies: %(cosmo)s. Default: 'Planck18'
+
+        sigma : int (1, 2, 3, 4, 5), optional
+            The width of the confidence interval in units of standard
+            deviation. `sigma=1` is the 68\% confidence interval.
+
+        scatter_percentage : float, optional
+            The amount of line of 
+            Default: 0
+
+        subtract_host : bool, optional
+            Subtract :attr:`dm_host_est` from the :attr:`dm_excess`
+            before calculating the redshift. This is is used to account
+            for the dispersion measure that arises from the FRB host
+            galaxy. Default: False
+
+        lookup_table : str or None, optional
+            The path to the lookup table file. If ``lookup_table=None``
+            a table will attempted to be loaded from the data directory 
+            based on the method name. Default: *None*       
+
+        Returns
+        -------
+        float
+            The extimated redshift of the FRB.
+
+        float
+            The redshift confidence interval the FRB.
+
+        Notes
+        -----
+        The methods_ section in the documentation has a description for
+        each of the builtin methods.
+
+        The cosmology_ section in the documentation has a list of the
+        cosmological parameters for each cosmology
+
+        .. _cosmology: https://fruitbat.readthedocs.io/en/latest/user_guide/method_and_cosmology.html#cosmology
+        .. _methods: https://fruitbat.readthedocs.io/en/latest/user_guide/method_and_cosmology.html#methods
+
+        """
+        pass
 
 
     def calc_skycoords(self, frame=None):
