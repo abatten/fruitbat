@@ -52,9 +52,9 @@ steps:
 #    python -m pip install --upgrade pip
     python -m pip install --upgrade pip setuptools
     pip install -r requirements_dev.txt
-    pip install pytest pytest-azurepipelines
   displayName: 'Install dependencies'
 
 - script: |
+    pip install pytest pytest-azurepipelines
     pytest
   displayName: 'pytest'
