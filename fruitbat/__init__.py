@@ -11,7 +11,7 @@ Short Description
 This is the ``FRUITBAT`` package, which allows for easy estimation of FRB
 quantities from observed parameters.
 
-A simple example calculate with *FRUITBAT* is to estimate the redshift of 
+A simple example calculate with *FRUITBAT* is to estimate the redshift of
 a FRB from its dispersion measure.
 
 >>> import fruitbat
@@ -21,7 +21,8 @@ a FRB from its dispersion measure.
 >>> print(frb_redshift, dm_milky_way)
 0.3646537633283661 30.56254087351872 pc / cm3
 
-There are more detailed guides for getting started with *FRUITBAT* in the 'Using Fruitbat' section of the online documentation.
+There are more detailed guides for getting started with *FRUITBAT* in the 'Using Fruitbat'
+section of the online documentation.
 
 https://fruitbat.readthedocs.io/en/latest/user_guide/using_fruitbat.html
 
@@ -35,6 +36,8 @@ You can get the bibtex using the following function:
 
 from __future__ import absolute_import, print_function, division
 
+from textwrap import dedent
+
 from . import utils
 from . import methods
 from . import cosmologies
@@ -46,14 +49,12 @@ from .methods import add_method, reset_methods, available_methods
 from .cosmologies import (add_cosmology, reset_cosmologies,
                           available_cosmologies)
 
-from textwrap import dedent
-
 from .__version__ import __version__
 
 __pkgname__ = "FRUITBAT"
 __author__ = ["Adam Batten (@abatten)", ]
 __all__ = ['Frb', 'methods', 'cosmologies', 'plot', 'table', 'utils',
-           'catalogue', 'add_method', 'reset_methods', 
+           'catalogue', 'add_method', 'reset_methods',
            'available_methods', 'add_cosmology', 'reset_cosmologies',
            'available_cosmologies']
 
@@ -70,7 +71,7 @@ def get_bibtex():
     # Create string with BibTeX entry
     bibtex = dedent(
         r"""
-            @ARTICLE{2019JOSS....4.1399B,
+        @ARTICLE{2019JOSS....4.1399B,
                author = {{Batten}, Adam},
                 title = "{Fruitbat: A Python Package for Estimating Redshifts of Fast Radio Bursts}",
               journal = {The Journal of Open Source Software},
