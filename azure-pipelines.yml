@@ -12,18 +12,35 @@ trigger:
     include:
     - v*
 
-pool:
-  vmImage: 'ubuntu-latest'
+#pool:
+#  vmImage: 'ubuntu-latest'
 strategy:
   matrix:
-    Python27:
+    ubuntu-p27:
+      imageName: 'ubuntu-latest'
       python.version: '2.7'
-    Python35:
+    ubuntu-p35:
+      imageName: 'ubuntu-latest'
       python.version: '3.5'
-    Python36:
+    ubuntu-p36:
+      imageName: 'ubuntu-latest'
       python.version: '3.6'
-    Python37:
+    ubuntu-p37:
+      imageName: 'ubuntu-latest'
       python.version: '3.7'
+    ubuntu-p38:
+      imageName: 'ubuntu-latest'
+      python.version: '3.8'
+    macOS-p37:
+      imageName: 'macOS-latest'
+      python.version: '3.7'
+    windows-p37:
+      imageName: 'windows-latest'
+      python.version: '3.7'
+
+pool:
+  vmImage: $(imageName)
+
 
 steps:
 - task: UsePythonVersion@0
