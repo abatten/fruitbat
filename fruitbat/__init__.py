@@ -39,6 +39,9 @@ from . import catalogue
 from .methods import add_method, reset_methods, available_methods
 from .cosmologies import (add_cosmology, reset_cosmologies,
                           available_cosmologies)
+
+from textwrap import dedent
+
 from .__version__ import __version__
 
 __name__ = "fruitbat"
@@ -47,3 +50,38 @@ __all__ = ['Frb', 'methods', 'cosmologies', 'plot', 'table', 'utils',
            'catalogue', 'add_method', 'reset_methods', 
            'available_methods', 'add_cosmology', 'reset_cosmologies',
            'available_cosmologies']
+
+
+
+def get_bibtex():
+    # Thanks to Ellert van der Velden (@1313e) for this code that was blatently copied from PRISM.
+    """
+    Prints a string that gives the BibTeX entry for citing the ``FRUITBAT`` paper
+    (Batten 2019, JOSS, vol. 4, issue 17, id. 1399).
+    
+    """
+
+    # Create string with BibTeX entry
+    bibtex = dedent(
+        r"""
+            @ARTICLE{2019JOSS....4.1399B,
+               author = {{Batten}, Adam},
+                title = "{Fruitbat: A Python Package for Estimating Redshifts of Fast Radio Bursts}",
+              journal = {The Journal of Open Source Software},
+             keywords = {Astrophysics - Instrumentation and Methods for Astrophysics, Astrophysics - High Energy Astrophysical Phenomena},
+                 year = "2019",
+                month = "May",
+               volume = {4},
+               number = {37},
+                pages = {1399},
+                  doi = {10.21105/joss.01399},
+        archivePrefix = {arXiv},
+               eprint = {1905.04294},
+         primaryClass = {astro-ph.IM},
+               adsurl = {https://ui.adsabs.harvard.edu/abs/2019JOSS....4.1399B},
+              adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+        }
+        """)
+
+    # Print the string
+    print(bibtex.strip())
