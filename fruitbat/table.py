@@ -137,7 +137,7 @@ def load(name, data_dir='data'):
         data_dir = os.path.join(os.path.dirname(__file__), 'data')
 
     filename = os.path.join(data_dir, name)
-    return np.load(filename)
+    return np.load(filename, allow_pickle=True)
 
 
 def get_z_from_table(dm, table):
