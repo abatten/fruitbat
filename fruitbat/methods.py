@@ -4,10 +4,13 @@ import numpy as np
 import astropy.constants as const
 import astropy.units as u
 import scipy.integrate as integrate
+import h5py
+
+from fruitbat import utils
 
 
 __all__ = ["ioka2003", "inoue2004", "zhang2018",
-           "builtin_method_functions", "add_method", 
+           "builtin_method_functions", "add_method",
            "available_methods", "reset_methods", "method_functions",
            "methods_hydrodynamic", "methods_analytic"]
 
@@ -50,8 +53,8 @@ def _f_integrand(z, cosmo):
 
 def ioka2003(z, cosmo, zmin=0):
     """
-    Calculate the dispersion measure at a redshift ``z`` given a
-    cosmology using the Ioka (2003) relation.
+    Calculates the mean dispersion measure from redshift zero to redshift ``z``
+    given a cosmology using the Ioka (2003) relation.
 
     Parameters
     ----------
@@ -70,7 +73,7 @@ def ioka2003(z, cosmo, zmin=0):
     -------
     dm : float
         The dispersion measure at the redshift ``z``.
-  
+
     """
     # Calculate Ioka 2003 DM coefficient
     coeff_top = 3 * const.c * cosmo.H0 * cosmo.Ob0
@@ -86,8 +89,8 @@ def ioka2003(z, cosmo, zmin=0):
 
 def inoue2004(z, cosmo, zmin=0):
     """
-    Calculate the dispersion measure at a redshift ``z`` given a
-    cosmology using the Inoue (2004) relation.
+    Calculates the mean dispersion measure from redshift zero to redshift ``z``
+    given a cosmology using the Inoue (2004) relation.
 
     Parameters
     ----------
@@ -122,8 +125,8 @@ def inoue2004(z, cosmo, zmin=0):
 
 def zhang2018(z, cosmo, zmin=0, **kwargs):
     """
-    Calculates the dispersion measure at a redshift given a cosmology
-    using the Zhang (2018) relation.
+    Calculates the mean dispersion measure from redshift zero to redshift ``z``
+    given a cosmology using the Zhang (2018) relation.
 
     Parameters
     ----------
@@ -181,8 +184,27 @@ def zhang2018(z, cosmo, zmin=0, **kwargs):
     return dm.value
 
 
-def batten2020():
-    pass
+def batten2020(dm):
+    """
+    """
+
+    filename = utils.get_path_to_file_from_here("Batten2020_EAGLE.hdf5", subdirs=["data"])
+
+    with h5py.File(filename, "r") as b20_data:
+
+        DMzHist = b20_data["DMz_hist"][:]
+
+        # Convert bins to linear, since they are in log
+        DMBins = 10**b20_data["DM_Bin_Edges"][:]
+
+        max_bin_idx = np.where(dm <= DMBins)[0][0]
+
+        pdf = DMzHist[max_bin_idx]
+
+        redshifts = b20_data["Redshifts"][:-1]
+        redshift_bin_widths = b20_data["Redshift_Bin_Widths"][:]
+
+
 
 
 

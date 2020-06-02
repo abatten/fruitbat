@@ -43,7 +43,7 @@ def get_path_to_file_from_here(filename, subdirs=None):
         The name of the file
 
     subdirs: list of strs, optional
-        A list of strings containing any subdirectory names. 
+        A list of strings containing any subdirectory names.
         Default: None
 
     Returns
@@ -75,7 +75,7 @@ def calc_mean_from_pdf(x, pdf, dx=None):
 
     pdf:
 
-    dx: 
+    dx:
 
     """
     if dx is None:
@@ -149,4 +149,3 @@ def linear_interpolate_pdfs(sample, xvals, pdfs):
     dist = sample - x1
 
     return grad * dist + pdf1
-

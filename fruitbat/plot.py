@@ -10,14 +10,28 @@ def set_rc_params(usetex=False):
     """
     Set the rcParams that will be used in all the plots.
     """
-    plt.rcParams["text.usetex"] = usetex
-    plt.rcParams["axes.labelsize"] = 20
-    plt.rcParams["axes.labelpad"] = 3.0
-    plt.rcParams["xtick.minor.visible"] = True
-    plt.rcParams["ytick.minor.visible"] = True
-    plt.rcParams["xtick.labelsize"] = 16
-    plt.rcParams["ytick.labelsize"] = 16
-    plt.rcParams["legend.fontsize"] = 16
+
+    rc_params = {
+        #"axes.prop_cycle": cycler('color',
+        #    ['#1b9e77','#d95f02','#7570b3',
+        #     '#e7298a','#66a61e','#e6ab02',
+        #     '#a6761d','#666666']),
+        "axes.labelsize": 18,
+        "figure.dpi": 150,
+        "legend.fontsize": 12,
+        "legend.frameon": False,
+        "text.usetex": usetex,
+        "xtick.direction": 'in',
+        "xtick.labelsize": 14,
+        "xtick.minor.visible": True,
+        "xtick.top": True,
+        "ytick.direction": 'in',
+        "ytick.labelsize": 14,
+        "ytick.minor.visible": True,
+        "ytick.right": True,
+    }
+
+    return rc_params
 
 
 def method_comparison(filename=None, extension="png", usetex=False,
@@ -36,7 +50,7 @@ def method_comparison(filename=None, extension="png", usetex=False,
         Default: "png"
 
     usetex: bool, optional
-        Use LaTeX for for fonts. 
+        Use LaTeX for for fonts.
 
     passed_ax: or None, optional
 
@@ -45,7 +59,7 @@ def method_comparison(filename=None, extension="png", usetex=False,
     A figure displaying how estimated redshift changes as a function of
     dispersion measure for each of the different cosmologies.
     """
-    set_rc_params(usetex)
+    plt.rcParams.update(set_rc_params(usetex))
 
     if passed_ax:
         ax = passed_ax
@@ -146,7 +160,7 @@ def cosmology_comparison(filename="", extension="png", usetex=False,
             method = 'Inoue2004'
 
         table_name = "".join(["_".join([method, cosmo]), ".npz"])
-        lookup_table = table.load(table_name)        
+        lookup_table = table.load(table_name)
         for i, dm in enumerate(dm_vals):
             z_vals[i] = table.get_z_from_table(dm, lookup_table)
 
@@ -155,7 +169,7 @@ def cosmology_comparison(filename="", extension="png", usetex=False,
             axin.plot(dm_vals, z_vals, colours[j], **kwargs)
 
     ax.set_xlabel(r"$\rm{DM\ \left[pc \ cm^{-3}\right]}$")
-    
+
     if not passed_ax:
         ax.set_ylabel(r"$\rm{Redshift}$")
 

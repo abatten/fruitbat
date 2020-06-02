@@ -8,9 +8,9 @@ import astropy.cosmology
 from astropy.cosmology.core import (FlatLambdaCDM, FlatwCDM, LambdaCDM, wCDM)
 from e13tools import docstring_copy
 
-__all__ = ["add_cosmology", "available_cosmologies", 
+__all__ = ["add_cosmology", "available_cosmologies",
            "builtin_cosmology_functions", "cosmology_functions",
-           "create_cosmology", "reset_cosmologies", "Planck13", 
+           "create_cosmology", "reset_cosmologies", "Planck13",
            "Planck15", "Planck18", "WMAP5", "WMAP7", "WMAP9"]
 
 
@@ -206,7 +206,9 @@ def add_cosmology(name, cosmo):
     >>> params = {"H0": 72.4, "Om0": 0.26}
     >>> new_cosmology = fruitbat.cosmology.create_cosmology(parameters=params)
     >>> fruitbat.add_cosmology("new_cosmology", new_cosmology)
+
     """
+
     if name in available_cosmologies():
         err_msg = ("The cosmology '{}' already exists as a builtin "
                    "cosmology. Please choose a different name for "

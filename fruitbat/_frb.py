@@ -10,10 +10,11 @@ from astropy.time import Time
 import astropy.units as u
 import h5py
 
+
 from e13tools import docstring_substitute
 import pyymw16 as ymw16
 
-from fruitbat import cosmologies, methods, table, utils
+from fruitbat import cosmologies, methods, table, utils, plot
 
 __all__ = ["Frb"]
 
@@ -246,7 +247,7 @@ class Frb(object):
             Default: 'Inoue2004'
 
         cosmology : str, optional
-            The cosmology to assume when calculating the redshift. 
+            The cosmology to assume when calculating the redshift.
             Avaliable cosmologies: %(cosmo)s. Default: 'Planck18'
 
         subtract_host : bool, optional
@@ -257,8 +258,8 @@ class Frb(object):
 
         lookup_table : str or None, optional
             The path to the lookup table file. If ``lookup_table=None``
-            a table will attempted to be loaded from the data directory 
-            based on the method name. Default: *None*       
+            a table will attempted to be loaded from the data directory
+            based on the method name. Default: *None*
 
         Returns
         -------
@@ -295,6 +296,9 @@ class Frb(object):
         if method in methods.methods_hydrodynamic():
             if method == "Batten2020":
 
+                filename = utils.get_path_to_file_from_here("Batten2020_EAGLE_unnormed.hdf5", subdirs=["data"])
+                self.calc_redshift_pdf(method="Batten2020")
+
 
 
 
@@ -307,17 +311,6 @@ class Frb(object):
 
                 #pdf = get_pdf(DM)
 
-                # def calc_mean_from_pdf(xvals, pdf, widths=None):
-                    # if bin_widths is None:
-                        #bin_widths = np.ones_like(bins)
-
-                    #return np.sum(pdf * bins * bin_widths)
-
-
-                # mean = calc_mean_from_pdf(xvals=redshifts, pdf=pdf, widths=redshift_bin_widths)
-                filename = utils.get_path_to_file_from_here("Batten2020_EAGLE_unnormed.hdf5", subdirs=["data"])
-
-                #filename = os.path.join(os.path.dirname(__file__), 'data', "Batten2020_EAGLE.hdf5")
                 with h5py.File(filename, "r") as data:
 
                     DMzHist = data["DMz_hist"][:]
@@ -339,7 +332,7 @@ class Frb(object):
                     #pdf = utils.calc_pdf_from_hist(hist, bin_widths=redshift_bin_widths, prior=uniform)
                     pdf2 = utils.normalise_to_pdf(hist_higher_dm, bin_widths=redshift_bin_widths)
                     pdf1 = utils.normalise_to_pdf(hist_lower_dm, bin_widths=redshift_bin_widths)
-                    
+
                     #pdf = DMzHist[max_bin_idx]
 
                     DMlower, DMhigher = DMBins[prev_bin_idx], DMBins[max_bin_idx]
@@ -355,18 +348,19 @@ class Frb(object):
                     mean_com = utils.calc_mean_from_pdf(redshifts, mean_pdf, dx=redshift_bin_widths)
                     mean_lin = utils.calc_mean_from_pdf(redshifts, lin_interp_pdf, dx=redshift_bin_widths)
 
-
+                    #mean_func = self.calc_redshift_pdf(method="Batten2020")
                     #mean = np.sum(pdf * redshifts * redshift_bin_widths)
                     #print(np.sum(pdf * redshift_bin_widths))
                     print("Lower Bin mean", mean)
                     print("Higher bin mean", mean2)
                     print("Middle bin mean", mean_com)
                     print("Interpolated Bin Mean", mean_lin)
-    
+                    print("")
+
                     self.z = mean
                     self.cosmology = "EAGLE"
                     #cdf = np.cumsum(pdf) / np.sum(pdf)
-                    
+
 
             # load_table("Batten2020")
             # redshift_int
@@ -376,7 +370,7 @@ class Frb(object):
                     #P_d = np.ones(length)
                 # elif type == "volume_dependant":
                 #   pass
-                # return P_d 
+                # return P_d
 
 
         elif method in methods.methods_analytic():
@@ -405,14 +399,102 @@ class Frb(object):
             self.method = method
             return self.z
 
+    #@docstring_substitute(meth=methods.available_methods(),
+    #                      cosmo=cosmologies.available_cosmologies())
+    def calc_redshift_pdf(self, method="Batten2020", cosmology="Planck18", prior="uniform", subtract_host=False,
+                          lookup_table=None):
+
+
+
+        filename = utils.get_path_to_file_from_here("Batten2020_EAGLE_unnormed.hdf5", subdirs=["data"])
+        with h5py.File(filename, "r") as data:
+
+            DMzHist = data["DMz_hist"][:]
+            redshift_bin_widths = data["Redshift_Bin_Widths"][:]
+            redshifts = data["Redshifts_Bin_Edges"][1:]
+            DMBins = data["DM_Bin_Edges"][:]
+
+            max_bin_idx = np.where(self.dm_excess.value <= DMBins)[0][0]
+            prev_bin_idx = max_bin_idx - 1
+
+            hist_higher_dm = DMzHist[max_bin_idx]
+            hist_lower_dm = DMzHist[prev_bin_idx]
+
+            #pdf = utils.calc_pdf_from_hist(hist, bin_widths=redshift_bin_widths, prior=uniform)
+            pdf2 = utils.normalise_to_pdf(hist_higher_dm, bin_widths=redshift_bin_widths)
+            pdf1 = utils.normalise_to_pdf(hist_lower_dm, bin_widths=redshift_bin_widths)
+
+
+            DMlower, DMhigher = DMBins[prev_bin_idx], DMBins[max_bin_idx]
+            lin_interp_pdf = utils.linear_interpolate_pdfs(self.dm_excess.value, (DMlower, DMhigher), (pdf1, pdf2))
+
+            z_pdf = lin_interp_pdf
+            z_bins = redshifts
+            dz = redshift_bin_widths
+
+
+
+        self.z_bins = z_bins
+        self.z_pdf = z_pdf
+        self.dz = dz
+
+        return z_bins, z_pdf, dz
+
+
+    def plot_redshift_pdf(self, filename=None, outputdir=None, usetex=False):
+        """
+        """
+        import matplotlib.pyplot as plt
+        #   if not self.z_pdf:
+
+        plt.rcParams.update(plot.set_rc_params(usetex=usetex))
+
+        fig, ax = plt.subplots(ncols=1, nrows=1, constrained_layout=True)
+
+        ax.plot(self.z_bins, self.z_pdf, linewidth=2, color="k")
+        ax.axvline(self.z, linestyle="--")
+
+
+        text_items = {
+            "DM":
+
+            ""
+
+
+        }
+
+
+
+
+        ax.text(0.7, 0.9, f"$DM = {self.dm:.3f}^{{+0.1}}_{{-0.2}}$", horizontalalignment='left', verticalalignment='center', transform=ax.transAxes, fontsize=11)
+        ax.text(0.7, 0.8, f"$z = {self.z:.3f}^{{+0.1}}_{{-0.2}}$", horizontalalignment='left', verticalalignment='center', transform=ax.transAxes, fontsize=11)
+
+        if usetex:
+            ax.set_xlabel(r"$\mathrm{Redshift}$")
+            ax.set_ylabel(r"$P(z | \mathrm{DM}) P(z)$")
+
+        else:
+            ax.set_xlabel(r"Redshift")
+            ax.set_ylabel(r"P(z \| DM) P(z)")
+
+        if filename is not None:
+            plt.savefig(filename)
+        elif filename is None:
+            plt.show()
+
+        return fig, ax
+
+
+
+
 
     @docstring_substitute(meth=methods.available_methods(),
                           cosmo=cosmologies.available_cosmologies())
-    def calc_redshift_confidence_interval(self, method='Batten2020', cosmology="Planck18", sigma=1,
-                                          scatter_percentage=0, subtract_host=False, lookup_table=None):
+    def calc_redshift_conf_int(self, method='Batten2020', cosmology="Planck18", sigma=1,
+                               scatter_percentage=0, subtract_host=False, lookup_table=None):
         """
         Calculates the mean redshift and the confidence interval of
-        an FRB from its :attr:`dm`, :attr:`dm_excess` or 
+        an FRB from its :attr:`dm`, :attr:`dm_excess` or
         :attr:`dm_excess` - :attr:`dm_host_est`.
 
         Parameters
@@ -424,7 +506,7 @@ class Frb(object):
 
         cosmology : str, optional
             The cosmology to assume when calculating the redshift.
-            This value is overided if using a hydrodynamic method. 
+            This value is overided if using a hydrodynamic method.
             Avaliable cosmologies: %(cosmo)s. Default: 'Planck18'
 
         sigma : int (1, 2, 3, 4, 5), optional
@@ -432,7 +514,7 @@ class Frb(object):
             deviation. `sigma=1` is the 68\% confidence interval.
 
         scatter_percentage : float, optional
-            The amount of line of 
+            The amount of line of
             Default: 0
 
         subtract_host : bool, optional
@@ -443,8 +525,8 @@ class Frb(object):
 
         lookup_table : str or None, optional
             The path to the lookup table file. If ``lookup_table=None``
-            a table will attempted to be loaded from the data directory 
-            based on the method name. Default: *None*       
+            a table will attempted to be loaded from the data directory
+            based on the method name. Default: *None*
 
         Returns
         -------
@@ -548,7 +630,7 @@ class Frb(object):
         ----------
         model : 'ymw16' or 'ne2001', optional
             The Milky Way dispersion measure model. To use 'ne2001' you
-            will need to install the python port. See 
+            will need to install the python port. See
             https://fruitbat.readthedocs.io/en/latest/user_guide/ne2001_installation.html
             Default: 'ymw16'
 
@@ -593,8 +675,8 @@ class Frb(object):
                 msg = (
                 """
                 By default only the YMW16 Milky Way electron density model
-                is installed with Fruitbat. However Fruitbat due support using  
-                the NE2001 model via a python port from JXP and Ben Baror. 
+                is installed with Fruitbat. However Fruitbat due support using
+                the NE2001 model via a python port from JXP and Ben Baror.
 
                 To install the ne2001 model compatible with Fruitbat download
                 and install it from github:
@@ -607,7 +689,7 @@ class Frb(object):
                 in exactly the same way by passing 'ne2001' instead of 'ymw16'.
                 """)
                 raise ModuleNotFoundError(msg)
-            
+
             # This is the same max distanc e that we used for the YMW16 model
             # However the NE2001 model specifies distance in kpc not pc.
             max_galaxy_dist = 25  # units kpc
