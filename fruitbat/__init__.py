@@ -60,6 +60,7 @@ __all__ = ['Frb', 'methods', 'cosmologies', 'plot', 'table', 'utils',
 
 
 
+
 def get_bibtex():
     # Thanks to Ellert van der Velden (@1313e) for this code that was blatently copied from PRISM.
     """
@@ -92,3 +93,6 @@ def get_bibtex():
 
     # Print the string
     print(bibtex.strip())
+
+def __cite__():
+    get_bibtex()
