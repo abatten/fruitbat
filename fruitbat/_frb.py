@@ -8,6 +8,7 @@ import astropy.coordinates as coord
 from astropy.coordinates import SkyCoord
 from astropy.time import Time
 import astropy.units as u
+from scipy import interpolate
 import h5py
 
 
@@ -347,6 +348,7 @@ class Frb(object):
                     mean2 = utils.calc_mean_from_pdf(redshifts, pdf2, dx=redshift_bin_widths)
                     mean_com = utils.calc_mean_from_pdf(redshifts, mean_pdf, dx=redshift_bin_widths)
                     mean_lin = utils.calc_mean_from_pdf(redshifts, lin_interp_pdf, dx=redshift_bin_widths)
+                    median_lin = utils.calc_median_from_pdf(redshifts, lin_interp_pdf)
 
                     #mean_func = self.calc_redshift_pdf(method="Batten2020")
                     #mean = np.sum(pdf * redshifts * redshift_bin_widths)
@@ -355,15 +357,14 @@ class Frb(object):
                     print("Higher bin mean", mean2)
                     print("Middle bin mean", mean_com)
                     print("Interpolated Bin Mean", mean_lin)
+                    print("median_lin", median_lin)
                     print("")
 
-                    self.z = mean
+                    self.z = median_lin
+                    self.z_median = median_lin
+                    self.method=method
                     self.cosmology = "EAGLE"
-                    #cdf = np.cumsum(pdf) / np.sum(pdf)
 
-
-            # load_table("Batten2020")
-            # redshift_int
 
             #def prior(length, type="uniform"):
                 # if type =="uniform":
@@ -403,8 +404,9 @@ class Frb(object):
     #                      cosmo=cosmologies.available_cosmologies())
     def calc_redshift_pdf(self, method="Batten2020", cosmology="Planck18", prior="uniform", subtract_host=False,
                           lookup_table=None):
-
-
+        """
+        Calc
+        """
 
         filename = utils.get_path_to_file_from_here("Batten2020_EAGLE_unnormed.hdf5", subdirs=["data"])
         with h5py.File(filename, "r") as data:
@@ -441,35 +443,83 @@ class Frb(object):
         return z_bins, z_pdf, dz
 
 
-    def plot_redshift_pdf(self, filename=None, outputdir=None, usetex=False):
+    def plot_redshift_pdf(self, filename=None, outputdir=None, usetex=False, method="Batten2020"):
         """
         """
         import matplotlib.pyplot as plt
-        #   if not self.z_pdf:
 
+        zvals, pdf, dz = self.calc_redshift_pdf(method=method)
+        conf_int_1 = self.calc_redshift_conf_int(method=method, sigma=1)
+
+        # Update rcParams for consistent plotting style
         plt.rcParams.update(plot.set_rc_params(usetex=usetex))
 
         fig, ax = plt.subplots(ncols=1, nrows=1, constrained_layout=True)
 
-        ax.plot(self.z_bins, self.z_pdf, linewidth=2, color="k")
-        ax.axvline(self.z, linestyle="--")
+        ax.plot(zvals, pdf, linewidth=2, color="k")
+
+        # Plot a vertical dotted line for the redshift mean
+        #ax.axvline(self.z, linestyle="--")
+        # Plot vertical dotted line for the redshift median
+        ax.axvline(self.z_median, linestyle="--", color="#C10020", linewidth=2)
+
+
+        conf_interval_vals_1 = np.linspace(*conf_int_1, 100)
+
+        interp_pdf = interpolate.interp1d(zvals, pdf)
+
+        ax.fill_between(conf_interval_vals_1, 0, interp_pdf(conf_interval_vals_1), color='#FF6800', alpha=0.5)
+
+        ax.set_xlim(0, self.z_bins[-1])
+        ax.set_ylim(0, 1.05 * np.max(self.z_pdf))
+
+
+
+
+
+        if self.z < 1.5:
+            text_xpos = 0.60   # Low mean redshift -> text on right
+        else:
+            text_xpos = 0.05   # High mean redshift -> text on left
+
+        text_ypos_top = 0.90
+        text_ypos_padding = 0.06
 
 
         text_items = {
-            "DM":
-
-            ""
-
-
+             "name"     : None if self.name is None else f"\\textrm{{{self.name}}}",
+             "dm"       : r"$\mathrm{{DM}} = {}\ \mathrm{{pc\ cm^{{-3}}}}$".format(self.dm.value),
+             "dm_galaxy": r"$\mathrm{{DM_{{MW}}}} = {:.1f}\ \mathrm{{pc\ cm^{{-3}}}}$".format(self.dm_galaxy.value),
+             "dm_excess": r"$\mathrm{{DM_{{Excess}}}} = {:.1f}\ \mathrm{{pc\ cm^{{-3}}}}$".format(self.dm_excess.value),
+             "redshift" : r"$z = {:.3f}^{{+{:.3f}}}_{{-{:.3f}}}$".format(self.z, self.z-self.z_conf_int[0], self.z_conf_int[1]-self.z),
         }
 
+        # Some of the text_items may be None, we cant to count the number of
+        # non-None items. So I have set up to lune_number to count them.
+        # If I don't do this the text is placed in the wrong place when
+        # the name is None.
+        line_number = 0
 
-
-
-        ax.text(0.7, 0.9, f"$DM = {self.dm:.3f}^{{+0.1}}_{{-0.2}}$", horizontalalignment='left', verticalalignment='center', transform=ax.transAxes, fontsize=11)
-        ax.text(0.7, 0.8, f"$z = {self.z:.3f}^{{+0.1}}_{{-0.2}}$", horizontalalignment='left', verticalalignment='center', transform=ax.transAxes, fontsize=11)
+        #
+        for item in text_items:
+            if text_items[item] is not None:
+                ax.text(text_xpos,
+                        text_ypos_top - text_ypos_padding * line_number, text_items[item] ,
+                        horizontalalignment='left',
+                        verticalalignment='center',
+                        transform=ax.transAxes,
+                        fontsize=11)
+                line_number += 1
 
         if usetex:
+
+
+
+
+
+
+
+
             ax.set_xlabel(r"$\mathrm{Redshift}$")
             ax.set_ylabel(r"$P(z | \mathrm{DM}) P(z)$")
 
@@ -479,10 +529,9 @@ class Frb(object):
 
         if filename is not None:
             plt.savefig(filename)
+            plt.close()
         elif filename is None:
-            plt.show()
-
-        return fig, ax
+            return fig, ax
 
 
 
@@ -548,7 +597,18 @@ class Frb(object):
         .. _methods: https://fruitbat.readthedocs.io/en/latest/user_guide/method_and_cosmology.html#methods
 
         """
-        pass
+        if method in methods.methods_hydrodynamic():
+            if method == "Batten2020":
+                zvals, pdf, dz = self.calc_redshift_pdf(method="Batten2020")
+
+                conf_lower_lim, conf_upper_lim = utils.sigma_to_pdf_percentiles(sigma=sigma)
+
+                conf_int_lower = utils.calc_z_from_pdf_percentile(zvals, pdf, percentile=conf_lower_lim)
+                conf_int_upper = utils.calc_z_from_pdf_percentile(zvals, pdf, percentile=conf_upper_lim)
+
+        self.z_conf_int = (conf_int_lower, conf_int_upper)
+
+        return conf_int_lower, conf_int_upper
 
 
     def calc_skycoords(self, frame=None):
@@ -1027,6 +1087,8 @@ class Frb(object):
     def name(self, value):
         if isinstance(value, str):
             self._name = value
+        elif value is None:
+            self._name = None
         else:
             self._name = str(value)
 

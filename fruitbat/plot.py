@@ -34,6 +34,28 @@ def set_rc_params(usetex=False):
     return rc_params
 
 
+def redshift_confidence_interval(frb, sigma=1, method="Batten2020"):
+    """
+    Plots the redshift confidence interval for an FRB.
+
+    Parameters
+    ----------
+    frb : :obj:`fruitbat.Frb`
+
+    sigma: [1, 2, 3, 4, 5], optional
+        The width of the confidence interval in units of sigma.
+        Default: 1
+
+    method: str, optional
+
+        Default: "Batten2020"
+
+    Returns
+    -------
+    """
+    pass
+
+
 def method_comparison(filename=None, extension="png", usetex=False,
                       passed_ax=None, **kwargs):
     """

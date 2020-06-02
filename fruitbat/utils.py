@@ -4,6 +4,7 @@ The collection of utility functions for Fruitbat.
 from __future__ import print_function, absolute_import, division
 import os
 import numpy as np
+from scipy import interpolate
 
 __all__ = ["check_keys_in_dict"]
 
@@ -128,6 +129,31 @@ def calc_std_from_pdf(x, pdf, dx=None):
     return np.sqrt(calc_variance_from_pdf(x, pdf, dx))
 
 
+def calc_z_from_pdf_percentile(x, pdf, percentile):
+    """
+    """
+    cumsum = np.cumsum(pdf)
+    normed_cumsum = cumsum / cumsum[-1]
+
+    interpolated_cumsum = interpolate.interp1d(normed_cumsum, x)
+
+
+
+    return(interpolated_cumsum(percentile))
+
+
+
+
+def calc_median_from_pdf(x, pdf):
+    """
+    Calc
+    """
+
+    return calc_z_from_pdf_percentile(x, pdf, percentile=0.5)
+
+
+
+
 def normalise_to_pdf(hist, bin_widths):
     """
     """
@@ -149,3 +175,33 @@ def linear_interpolate_pdfs(sample, xvals, pdfs):
     dist = sample - x1
 
     return grad * dist + pdf1
+
+
+
+def sigma_to_pdf_percentiles(sigma):
+    """
+
+
+    Parameters
+    ----------
+    sigma: [1, 2, 3, 4, 5]
+    """
+
+    std = int(sigma)
+    std_prop = {
+        1: 0.682689492,
+        2: 0.954499736,
+        3: 0.997300204,
+        4: 0.99993666,
+        5: 0.999999426697,
+    }
+
+    std_limits = {
+        1: ((1 - std_prop[1]) / 2, (1 + std_prop[1]) / 2),
+        2: ((1 - std_prop[2]) / 2, (1 + std_prop[2]) / 2),
+        3: ((1 - std_prop[3]) / 2, (1 + std_prop[3]) / 2),
+        4: ((1 - std_prop[4]) / 2, (1 + std_prop[4]) / 2),
+        5: ((1 - std_prop[5]) / 2, (1 + std_prop[5]) / 2),
+    }
+
+    return std_limits[std]
