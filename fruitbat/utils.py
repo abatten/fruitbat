@@ -185,6 +185,14 @@ def sigma_to_pdf_percentiles(sigma):
     Parameters
     ----------
     sigma: [1, 2, 3, 4, 5]
+
+
+    Returns
+    -------
+    float
+        Lower
+    float
+        Higher
     """
 
     std = int(sigma)
@@ -205,3 +213,28 @@ def sigma_to_pdf_percentiles(sigma):
     }
 
     return std_limits[std]
+
+def redshift_prior(zbins, prior="uniform"):
+    """
+    """
+
+
+    available_priors = [
+        "uniform",
+        "volume",
+    ]
+
+    if prior not in available_priors:
+        msg = ("'{}' is not in the list of available priors".format(prior))
+        raise ValueError(msg)
+
+
+    if prior == "uniform":
+        Pz = np.ones_like(zbins)
+
+    elif prior == "volume":
+        msg = "The volume dependent prior has not been implimented yet"
+        raise NotImplementedError(msg)
+
+
+    return Pz

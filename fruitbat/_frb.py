@@ -234,7 +234,7 @@ class Frb(object):
 
     @docstring_substitute(meth=methods.available_methods(),
                           cosmo=cosmologies.available_cosmologies())
-    def calc_redshift(self, method='Inoue2004', cosmology="Planck18",
+    def calc_redshift(self, method='Batten2020', cosmology="Planck18",
                       subtract_host=False, lookup_table=None):
         """
         Calculate the redshift of the FRB from its :attr:`dm`,
@@ -321,8 +321,8 @@ class Frb(object):
 
                     max_bin_idx = np.where(self.dm_excess.value <= DMBins)[0][0]
                     prev_bin_idx = max_bin_idx - 1
-                    print("DM Excess", self.dm_excess.value)
-                    print("DM Bins", DMBins[prev_bin_idx:max_bin_idx+1])
+                    #print("DM Excess", self.dm_excess.value)
+                    #print("DM Bins", DMBins[prev_bin_idx:max_bin_idx+1])
                     #print(np.where(self.dm_excess.value <= DMBins)[0])
 
                     #print(max_bin_idx)
@@ -353,12 +353,12 @@ class Frb(object):
                     #mean_func = self.calc_redshift_pdf(method="Batten2020")
                     #mean = np.sum(pdf * redshifts * redshift_bin_widths)
                     #print(np.sum(pdf * redshift_bin_widths))
-                    print("Lower Bin mean", mean)
-                    print("Higher bin mean", mean2)
-                    print("Middle bin mean", mean_com)
-                    print("Interpolated Bin Mean", mean_lin)
-                    print("median_lin", median_lin)
-                    print("")
+                    #print("Lower Bin mean", mean)
+                    #print("Higher bin mean", mean2)
+                    #print("Middle bin mean", mean_com)
+                    #print("Interpolated Bin Mean", mean_lin)
+                    #print("median_lin", median_lin)
+                    #print("")
 
                     self.z = median_lin
                     self.z_median = median_lin
@@ -398,7 +398,7 @@ class Frb(object):
 
             self.cosmology = cosmology
             self.method = method
-            return self.z
+        return self.z
 
     #@docstring_substitute(meth=methods.available_methods(),
     #                      cosmo=cosmologies.available_cosmologies())
@@ -430,7 +430,9 @@ class Frb(object):
             DMlower, DMhigher = DMBins[prev_bin_idx], DMBins[max_bin_idx]
             lin_interp_pdf = utils.linear_interpolate_pdfs(self.dm_excess.value, (DMlower, DMhigher), (pdf1, pdf2))
 
-            z_pdf = lin_interp_pdf
+            prior = utils.redshift_prior(redshifts, prior=prior)
+
+            z_pdf = lin_interp_pdf * prior
             z_bins = redshifts
             dz = redshift_bin_widths
 
@@ -512,13 +514,6 @@ class Frb(object):
                 line_number += 1
 
         if usetex:
-
-
-
-
-
-
-
 
             ax.set_xlabel(r"$\mathrm{Redshift}$")
             ax.set_ylabel(r"$P(z | \mathrm{DM}) P(z)$")
