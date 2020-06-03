@@ -169,7 +169,7 @@ class TestFrbClass:
 
     # Test calc_redshift with subract_host
     def test_frb_calc_redshift_subtract_host(self):
-        dm_1 = self.frb_dm_host_est.calc_redshift(subtract_host=True)
+        dm_1 = self.frb_dm_host_est.calc_redshift(method="Inoue2004", subtract_host=True)
         dm_2 = self.frb.calc_redshift()
         assert np.isclose(dm_1, dm_2)
 

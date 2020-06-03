@@ -94,7 +94,8 @@ def method_comparison(filename=None, extension="png", usetex=False,
         fig = plt.figure(figsize=(8, 8), constrained_layout=True)
         ax = fig.add_subplot(111)
 
-    method_list = methods.analytic_methods()
+    method_list = methods.available_methods()
+    method_list.pop("Batten2020")
     dm_vals = np.linspace(0, 3000, 1000)
 
     colours = ["#1b9e77", "#d95f02", "#7570b3"]
