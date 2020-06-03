@@ -379,7 +379,7 @@ class TestCreateTables:
                 for dm in test_dm_list:
                     new_z = table.get_z_from_table(dm, new_calc_table, cosmo_key)
                     pre_z = table.get_z_from_table(dm, pre_calc_table, cosmo_key)
-                    assert np.isclose(new_z, pre_z)
+                    assert np.isclose(new_z, pre_z, rtol=1e-03)
 
     def test_create_table_zhang_figm_free_elec(self):
         cosmo = cosmologies.builtin_cosmology_functions()["Planck18"]
