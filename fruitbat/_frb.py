@@ -10,7 +10,6 @@ from astropy.time import Time
 import astropy.units as u
 
 from e13tools import docstring_substitute
-import pyymw16 as ymw16
 import pygedm
 
 from fruitbat import cosmologies, methods, table
@@ -241,12 +240,12 @@ class Frb(object):
         Parameters
         ----------
         method : str, optional
-            The dispersion meausre -redshift relation to use when 
-            calculating the redshift. Avaliable methods:  %(meth)s. 
+            The dispersion meausre -redshift relation to use when
+            calculating the redshift. Avaliable methods:  %(meth)s.
             Default: 'Inoue2004'
 
         cosmology : str, optional
-            The cosmology to assume when calculating the redshift. 
+            The cosmology to assume when calculating the redshift.
             Avaliable cosmologies: %(cosmo)s. Default: 'Planck18'
 
         subtract_host : bool, optional
@@ -257,8 +256,8 @@ class Frb(object):
 
         lookup_table : str or None, optional
             The path to the lookup table file. If ``lookup_table=None``
-            a table will attempted to be loaded from the data directory 
-            based on the method name. Default: *None*       
+            a table will attempted to be loaded from the data directory
+            based on the method name. Default: *None*
 
         Returns
         -------
@@ -383,7 +382,7 @@ class Frb(object):
             self.dm_excess = dm_excess
         return dm_excess
 
-    def calc_dm_galaxy(self, model='ymw16', include_halo=False):
+    def calc_dm_galaxy(self, model='ymw16', include_halo=False, return_tau_sc=False):
         """
         Calculates the dispersion measure contribution of the Milky Way
         from either (:attr:`raj`, :attr:`decj`) or (:attr:`gl`,
@@ -394,7 +393,7 @@ class Frb(object):
         ----------
         model : 'ymw16' or 'ne2001', optional
             The Milky Way dispersion measure model. To use 'ne2001' you
-            will need to install the python port. See 
+            will need to install the python port. See
             https://fruitbat.readthedocs.io/en/latest/user_guide/ne2001_installation.html
             Default: 'ymw16'
 
@@ -427,7 +426,7 @@ class Frb(object):
                 (self.gl is not None and self.gb is not None)):
 
             self._skycoords = self.calc_skycoords()
-        
+
         dm_galaxy, tau_sc = pygedm.dist_to_dm(
             gl=self._skycoords.galactic.l,
             gb=self._skycoords.galactic.b,
@@ -468,8 +467,8 @@ class Frb(object):
 #                msg = (
 #                """
 #                By default only the YMW16 Milky Way electron density model
-#                is installed with Fruitbat. However Fruitbat due support using  
-#                the NE2001 model via a python port from JXP and Ben Baror. 
+#                is installed with Fruitbat. However Fruitbat due support using
+#                the NE2001 model via a python port from JXP and Ben Baror.
 #
 #                To install the ne2001 model compatible with Fruitbat download
 #                and install it from github:
@@ -482,7 +481,7 @@ class Frb(object):
 #                in exactly the same way by passing 'ne2001' instead of 'ymw16'.
 #                """)
 #                raise ModuleNotFoundError(msg)
-#            
+#
 #            # This is the same max distanc e that we used for the YMW16 model
 #            # However the NE2001 model specifies distance in kpc not pc.
 #            max_galaxy_dist = 25  # units kpc
@@ -495,8 +494,12 @@ class Frb(object):
 #            dm_galaxy = ne.DM(gl, gb, max_galaxy_dist)
 
         self.dm_galaxy = dm_galaxy.value
+        self.tau_sc = tau_sc.value
         self.calc_dm_excess()
-        return self.dm_galaxy
+        if return_tau_sc:
+            return self.dm_galaxy, self.tau_sc
+        else:
+            return self.dm_galaxy
 
     def calc_dm_igm(self):
         """
