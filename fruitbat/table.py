@@ -13,7 +13,7 @@ __all__ = ["create", "load", "get_z_from_table"]
 
 
 def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
-           num_samples=10000, **kwargs):
+           num_samples=10000, **method_kwargs):
     """
     Creates an interpolated 1D redshift lookup table which can be read
     in  using :func:`~fruitbat.table.load`.
@@ -85,24 +85,84 @@ def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
                    "are: {}".format(method, available_methods()))
         raise ValueError(err_msg)
 
+    # The filename that the user provides can not be one of these as it would
+    # over write the built in datasets.
+    restricted_filenames = set([
+        utils.get_path_to_file_from_here("Ioka2003.hdf5", subdirs=["data"]),
+        utils.get_path_to_file_from_here("Inoue2004.hdf5", subdirs=["data"]),
+        utils.get_path_to_file_from_here("Zhang2018.hdf5", subdirs=["data"]),
+        utils.get_path_to_file_from_here("Batten2020.hdf5", subdirs=["data"]),
+    ])
 
+    # Generate the output filename.
+    if (filename is not None) and (filename not in restricted_filenames):
+        filename = "{}.hdf5".format(filename)
+    else:
+        filename = "custom_{}.hdf5".format(method)
+
+    # Generate the DM and z values for the method
     dm_function = method_functions()[method]
-
     z_vals = np.linspace(zmin, zmax, num_samples)
-    dm_vals = np.array([dm_function(z, **kwargs) for z in z_vals])
+    dm_vals = np.array([dm_function(z, **method_kwargs) for z in z_vals])
 
-    if filename is not None:
-        output_name = filename
+    if output_dir == "data":
+        output_file = utils.get_path_to_file_from_here(filename, subdirs="data")
+
     else:
-        output_name = "custom_{}".format(method)
+        output_file = os.path.join(output_dir, filename)
 
-    if output_dir == 'data':
-        output_file = os.path.join(os.path.dirname(__file__),
-                                   'data', output_name)
-    else:
-        output_file = os.path.join(output_dir, output_name)
 
-    np.savez(output_file, dm=dm_vals, z=z_vals)
+    with h5py.File(output_file, "w") as new_table:
+        new_table.create_group("Header")
+
+    #for item in model_dict:
+    #    new_table["Header"].attrs[item] = model_dict[item]
+
+
+
+        if "cosmo" in method_kwargs:
+            cosmo = method_kwargs["cosmo"]
+            add_cosmo_params_to_dataset_attrs = True
+
+            # Use a default cosmology name if the prodived one doesnt have a name
+            if not cosmo.name:
+                cosmo.name = "cosmology"
+
+            dataset_group_name = cosmo.name
+        else:
+
+            dataset_group_name = method
+
+        new_table.create_group(dataset_group_name)
+
+        new_table[dataset_group_name].create_dataset("DM", data=dm_vals, dtype=np.float)
+        new_table[dataset_group_name]["DM"].attrs["Units"] = "pc cm**-3"
+        new_table[dataset_group_name]["DM"].attrs["VarDesc"] = "Dispersion Measure"
+
+        new_table[dataset_group_name].create_dataset("z", data=z_vals, dtype=np.float)
+        new_table[dataset_group_name]["z"].attrs["Units"] = "Dimensionless"
+        new_table[dataset_group_name]["z"].attrs["VarDesc"] = "Redshift"
+
+        if add_cosmo_params_to_dataset_attrs:
+            new_table[dataset_group_name].attrs["Flat"] = True
+            new_table[dataset_group_name].attrs["H0"] = cosmo.H0.value
+            new_table[dataset_group_name].attrs["OmegaBaryon0"] = cosmo.Ob0
+            new_table[dataset_group_name].attrs["OmegaLambda0"] = cosmo.Ode0
+            new_table[dataset_group_name].attrs["OmegaMatter0"] = cosmo.Om0
+            new_table[dataset_group_name].attrs["t0"] = cosmo.age(0).value
+
+
+
+
+    #np.savez(output_file, dm=dm_vals, z=z_vals)
+
+
+
+
+
+
+
+
 
 
 def load(name, data_dir='data'):
@@ -154,7 +214,7 @@ def get_table_path(filename, datadir="data"):
     return path
 
 
-def get_z_from_table(dm, table, cosmology):
+def get_z_from_table(dm, table, cosmology=None):
     """
     Calculates the redshift from a dispersion measure by interpolating
     a lookup table
@@ -180,5 +240,9 @@ def get_z_from_table(dm, table, cosmology):
 
     """
     with h5py.File(table, "r") as data:
-        interp = interpolate.interp1d(data[cosmology]["DM"], data[cosmology]["z"])
+        if cosmology:
+            dataset_group_name = cosmology
+        else:
+            dataset_group_name = table
+        interp = interpolate.interp1d(data[dataset_group_name]["DM"], data[dataset_group_name]["z"])
     return interp(dm)

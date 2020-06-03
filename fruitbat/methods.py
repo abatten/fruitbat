@@ -62,7 +62,7 @@ def ioka2003(z, cosmo, zmin=0):
         The input redshift.
 
     cosmo: An instance of :obj:`astropy.cosmology`
-        The cosmology to assume when when calculating the dispersion
+        The cosmology to assume when calculating the dispersion
         measure at redshift ``z``.
 
     zmin: float or int, optional
@@ -98,7 +98,7 @@ def inoue2004(z, cosmo, zmin=0):
         The input redshift.
 
     cosmo: An instance of :obj:`astropy.cosmology`
-        The cosmology to assume when when calculating the dispersion
+        The cosmology to assume when calculating the dispersion
         measure at redshift ``z``.
 
     zmin: float or int, optional
@@ -134,7 +134,7 @@ def zhang2018(z, cosmo, zmin=0, **kwargs):
         The input redshift.
 
     cosmo: An instance of :obj:`astropy.cosmology`
-        The cosmology to assume when when calculating the dispersion
+        The cosmology to assume when calculating the dispersion
         measure at redshift ``z``.
 
     zmin: float or int, optional
