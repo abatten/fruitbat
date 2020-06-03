@@ -15,7 +15,10 @@ __all__ = ["create", "load", "get_z_from_table"]
 def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
            num_samples=10000, **method_kwargs):
     """
-    Creates an interpolated 1D redshift lookup table which can be read
+    Creates lookup table
+
+
+     which can be read
     in  using :func:`~fruitbat.table.load`.
 
     Parameters
@@ -61,10 +64,16 @@ def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
         applies when using ``'Zhang2018'``. Must be between 0 and 1.
         Default: 0.83
 
+
+    Returns
+    -------
+    string
+        The path to the generated hdf5 file containing the table data.
+
     Generates
     ---------
-    A compressed file in .npz format containing the arrays ``'dm'``
-    and ``'z'``.
+    A hdf5 file containing datasets for `'DM'` and 'z'`.
+
 
     Example
     -------
@@ -98,7 +107,7 @@ def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
     if (filename is not None) and (filename not in restricted_filenames):
         filename = "{}.hdf5".format(filename)
     else:
-        filename = "custom_{}.hdf5".format(method)
+        filename = "{}.hdf5".format(method)
 
     # Generate the DM and z values for the method
     dm_function = method_functions()[method]
@@ -106,7 +115,7 @@ def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
     dm_vals = np.array([dm_function(z, **method_kwargs) for z in z_vals])
 
     if output_dir == "data":
-        output_file = utils.get_path_to_file_from_here(filename, subdirs="data")
+        output_file = utils.get_path_to_file_from_here(filename, subdirs=["data"])
 
     else:
         output_file = os.path.join(output_dir, filename)
@@ -114,11 +123,6 @@ def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
 
     with h5py.File(output_file, "w") as new_table:
         new_table.create_group("Header")
-
-    #for item in model_dict:
-    #    new_table["Header"].attrs[item] = model_dict[item]
-
-
 
         if "cosmo" in method_kwargs:
             cosmo = method_kwargs["cosmo"]
@@ -130,7 +134,7 @@ def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
 
             dataset_group_name = cosmo.name
         else:
-
+            add_cosmo_params_to_dataset_attrs = False
             dataset_group_name = method
 
         new_table.create_group(dataset_group_name)
@@ -151,11 +155,7 @@ def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
             new_table[dataset_group_name].attrs["OmegaMatter0"] = cosmo.Om0
             new_table[dataset_group_name].attrs["t0"] = cosmo.age(0).value
 
-
-
-
-    #np.savez(output_file, dm=dm_vals, z=z_vals)
-
+    return output_file
 
 
 
@@ -165,42 +165,42 @@ def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
 
 
 
-def load(name, data_dir='data'):
-    """
-    Opens a saved `.npz` file containing 'dm' and 'z' arrays.
+# def load(name, data_dir='data'):
+#     """
+#     Opens a saved `.npz` file containing 'dm' and 'z' arrays.
 
-    Parameters
-    ----------
-    name : str
-        The name of the file to load.
+#     Parameters
+#     ----------
+#     name : str
+#         The name of the file to load.
 
-    data_dir : str, optional
-        The directory containing the data. The whole path must be
-        specified except if :attr:`data_dir` == 'data' then it will
-        search in the `data` subdirectory of the source code.
-        Default: 'data'
+#     data_dir : str, optional
+#         The directory containing the data. The whole path must be
+#         specified except if :attr:`data_dir` == 'data' then it will
+#         search in the `data` subdirectory of the source code.
+#         Default: 'data'
 
-    Returns
-    -------
-    table: :obj:`numpy.lib.npyio.NpzFile`
-        The lookup table containing the 'dm' and 'z' arrays.
+#     Returns
+#     -------
+#     table: :obj:`numpy.lib.npyio.NpzFile`
+#         The lookup table containing the 'dm' and 'z' arrays.
 
-    Example
-    -------
-    >>> table = fruitbat.table.load('Zhang2018_Planck18.npz')
-    >>> table["dm"]
-    array([0.00000000e+00, 1.62251609e+00, 3.24675204e+00, ...,
-           1.00004587e+04, 1.00010926e+04, 1.00017266e+04])
-    >>> table["z"]
-    array([0.00000000e+00, 2.00020002e-03, 4.00040004e-03, ...,
-           1.99959996e+01, 1.99979998e+01, 2.00000000e+01])
+#     Example
+#     -------
+#     >>> table = fruitbat.table.load('Zhang2018_Planck18.npz')
+#     >>> table["dm"]
+#     array([0.00000000e+00, 1.62251609e+00, 3.24675204e+00, ...,
+#            1.00004587e+04, 1.00010926e+04, 1.00017266e+04])
+#     >>> table["z"]
+#     array([0.00000000e+00, 2.00020002e-03, 4.00040004e-03, ...,
+#            1.99959996e+01, 1.99979998e+01, 2.00000000e+01])
 
-    """
-    if data_dir == 'data':
-        data_dir = os.path.join(os.path.dirname(__file__), 'data')
+#     """
+#     if data_dir == 'data':
+#         data_dir = os.path.join(os.path.dirname(__file__), 'data')
 
-    filename = os.path.join(data_dir, name)
-    return np.load(filename)
+#     filename = os.path.join(data_dir, name)
+#     return np.load(filename)
 
 
 def get_table_path(filename, datadir="data"):
@@ -243,6 +243,6 @@ def get_z_from_table(dm, table, cosmology=None):
         if cosmology:
             dataset_group_name = cosmology
         else:
-            dataset_group_name = table
+            dataset_group_name = os.path.basename(table).split(".")[0]
         interp = interpolate.interp1d(data[dataset_group_name]["DM"], data[dataset_group_name]["z"])
     return interp(dm)

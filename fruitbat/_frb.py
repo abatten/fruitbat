@@ -381,25 +381,35 @@ class Frb(object):
                             cosmologies.available_cosmologies()))
                 raise ValueError(err_msg)
 
-            # If the user provides a table use that table for estimation.
-            if lookup_table is not None:
-                lookup_table = table.load(lookup_table)
+#            # If the user provides a table use that table for estimation.
+#            if lookup_table is not None:
+#                lookup_table = table.load(lookup_table)
 
             else:
                 if method in methods.builtin_method_functions().keys():
                     table_name = table.get_table_path(method)
+                    self.z = table.get_z_from_table(input_dm, table_name, cosmology)
+                    self.cosmology = cosmology
+                    self.method = method
 
-                    #"./data/{}.hdf5".format(method) #"".join(["_".join([method, cosmology]), ".npz"])
-                else:
-                    table_name = "./data/{}.hdf5".format(method)#"".join(["custom_", method, ".npz"])
-
-                #lookup_table = table.load(table_name)
-
-            self.z = table.get_z_from_table(input_dm, table_name, cosmology)
-            #lookup_table.close()
-
+        else:
+            table_name = utils.get_path_to_file_from_here("{}.hdf5".format(method), subdirs=["data"])
+            self.z = table.get_z_from_table(input_dm, table_name)
             self.cosmology = cosmology
             self.method = method
+
+
+
+
+        #elif method in methods.available_methods():
+        #    table_name = utils.get_path_to_file_from_here("{}.hdf5".format(method), subdirs=["data"])
+        #   self.z = table.get_z_from_table(input_dm, table_name, cosmology)
+
+
+
+
+
+
         return self.z
 
     #@docstring_substitute(meth=methods.available_methods(),
