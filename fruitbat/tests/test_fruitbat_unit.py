@@ -1,7 +1,8 @@
 import os
+from glob import glob
 
 import numpy as np
-from glob import glob
+
 import pytest
 import pytest_mpl
 
