@@ -169,8 +169,8 @@ class TestFrbClass:
 
     # Test calc_redshift with subract_host
     def test_frb_calc_redshift_subtract_host(self):
-        dm_1 = self.frb_dm_host_est.calc_redshift(method="Inoue2004", subtract_host=True)
-        dm_2 = self.frb.calc_redshift()
+        dm_1 = self.frb_dm_host_est.calc_redshift(method="Ioka2003", subtract_host=True)
+        dm_2 = self.frb.calc_redshift(method="Ioka2003")
         assert np.isclose(dm_1, dm_2)
 
     # Test that calc_redshift will raise error if subtract_host is not a bool
