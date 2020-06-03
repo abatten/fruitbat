@@ -8,6 +8,51 @@ from scipy import interpolate
 
 __all__ = ["check_keys_in_dict"]
 
+def check_type(value_name, value, dtype, desire=True):
+    """
+    Checks the type of a variable and raises an error if not the desired type.
+
+    Parameters
+    ----------
+    value_name : str
+        The name of the variable that will be printed in the error message.
+
+    value :
+        The value of the variable
+
+    dtype : dtype
+        The data type to compare with isinstance
+
+    desire : boolean, optional
+        If `desire = True`, then the error will be raised if value does not
+        have a data type of `dtype`. If `desire = False`, then the error will
+        be raised if value does have a data type of `dtype`.
+
+    Returns
+    -------
+    None
+
+    """
+
+    if isinstance(value, dtype) is not desire:
+
+        # Change the error message depending on if we did or did
+        # not want a specific data type
+        if desire:
+            msg_add_in = "have"
+        elif not desire:
+            msg_add_in = "not have"
+
+        msg = ("The value of {0} should {3} type: {1}. "
+                "Instead type({0}) = {2}".format(value_name, dtype, type(value), msg_add_in))
+
+        raise ValueError(msg)
+
+    else:
+        pass
+
+
+
 
 def check_keys_in_dict(dictionary, keys):
     """

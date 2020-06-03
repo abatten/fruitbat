@@ -3,8 +3,11 @@ from __future__ import division, print_function, absolute_import
 import os
 import numpy as np
 import scipy.interpolate as interpolate
+import h5py
 
+from fruitbat import utils
 from fruitbat.methods import available_methods, method_functions
+
 
 __all__ = ["create", "load", "get_z_from_table"]
 
@@ -82,24 +85,24 @@ def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
                    "are: {}".format(method, available_methods()))
         raise ValueError(err_msg)
 
+
+    dm_function = method_functions()[method]
+
+    z_vals = np.linspace(zmin, zmax, num_samples)
+    dm_vals = np.array([dm_function(z, **kwargs) for z in z_vals])
+
+    if filename is not None:
+        output_name = filename
     else:
-        dm_function = method_functions()[method]
+        output_name = "custom_{}".format(method)
 
-        z_vals = np.linspace(zmin, zmax, num_samples)
-        dm_vals = np.array([dm_function(z, **kwargs) for z in z_vals])
+    if output_dir == 'data':
+        output_file = os.path.join(os.path.dirname(__file__),
+                                   'data', output_name)
+    else:
+        output_file = os.path.join(output_dir, output_name)
 
-        if filename is not None:
-            output_name = filename
-        else:
-            output_name = "custom_{}".format(method)
-
-        if output_dir == 'data':
-            output_file = os.path.join(os.path.dirname(__file__),
-                                       'data', output_name)
-        else:
-            output_file = os.path.join(output_dir, output_name)
-
-        np.savez(output_file, dm=dm_vals, z=z_vals)
+    np.savez(output_file, dm=dm_vals, z=z_vals)
 
 
 def load(name, data_dir='data'):
@@ -140,10 +143,21 @@ def load(name, data_dir='data'):
     return np.load(filename)
 
 
-def get_z_from_table(dm, table):
+def get_table_path(filename, datadir="data"):
+
+    if filename in available_methods():
+        filename += ".hdf5"
+
+    if datadir == "data":
+        path = utils.get_path_to_file_from_here(filename, subdirs=["data"])
+
+    return path
+
+
+def get_z_from_table(dm, table, cosmology):
     """
-    Calculates the redshift from a dispersion meausre by interpolating
-    a lookup table.
+    Calculates the redshift from a dispersion measure by interpolating
+    a lookup table
 
     Parameters
     ----------
@@ -165,5 +179,6 @@ def get_z_from_table(dm, table):
     1.1087964578507539
 
     """
-    interp = interpolate.interp1d(table["dm"], table["z"])
+    with h5py.File(table, "r") as data:
+        interp = interpolate.interp1d(data[cosmology]["DM"], data[cosmology]["z"])
     return interp(dm)

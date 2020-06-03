@@ -279,11 +279,11 @@ class Frb(object):
         .. _methods: https://fruitbat.readthedocs.io/en/latest/user_guide/method_and_cosmology.html#methods
 
         """
-        if not isinstance(subtract_host, bool):
-            raise ValueError("subtract_host must be of type bool.")
+        utils.check_type("subtract_host", subtract_host, bool)
 
         if subtract_host:
             input_dm = self.dm_excess - self.dm_host_est
+            print(input_dm)
         else:
             input_dm = self.dm_excess
 
@@ -319,7 +319,7 @@ class Frb(object):
                     redshifts = data["Redshifts_Bin_Edges"][1:]
                     DMBins = data["DM_Bin_Edges"][:]
 
-                    max_bin_idx = np.where(self.dm_excess.value <= DMBins)[0][0]
+                    max_bin_idx = np.where(input_dm.value <= DMBins)[0][0]
                     prev_bin_idx = max_bin_idx - 1
                     #print("DM Excess", self.dm_excess.value)
                     #print("DM Bins", DMBins[prev_bin_idx:max_bin_idx+1])
@@ -337,7 +337,7 @@ class Frb(object):
                     #pdf = DMzHist[max_bin_idx]
 
                     DMlower, DMhigher = DMBins[prev_bin_idx], DMBins[max_bin_idx]
-                    lin_interp_pdf = utils.linear_interpolate_pdfs(self.dm_excess.value, (DMlower, DMhigher), (pdf1, pdf2))
+                    lin_interp_pdf = utils.linear_interpolate_pdfs(input_dm.value, (DMlower, DMhigher), (pdf1, pdf2))
 
 
                     mean_pdf = np.array([np.mean([pdf1[idx], pdf2[idx]]) for idx in range(len(pdf1))])
@@ -387,14 +387,16 @@ class Frb(object):
 
             else:
                 if method in methods.builtin_method_functions().keys():
-                    table_name = "".join(["_".join([method, cosmology]), ".npz"])
+                    table_name = table.get_table_path(method)
+
+                    #"./data/{}.hdf5".format(method) #"".join(["_".join([method, cosmology]), ".npz"])
                 else:
-                    table_name = "".join(["custom_", method, ".npz"])
+                    table_name = "./data/{}.hdf5".format(method)#"".join(["custom_", method, ".npz"])
 
-                lookup_table = table.load(table_name)
+                #lookup_table = table.load(table_name)
 
-            self.z = table.get_z_from_table(input_dm, lookup_table)
-            lookup_table.close()
+            self.z = table.get_z_from_table(input_dm, table_name, cosmology)
+            #lookup_table.close()
 
             self.cosmology = cosmology
             self.method = method
@@ -1098,6 +1100,10 @@ class Frb(object):
 
     @dm.setter
     def dm(self, value):
+
+        utils.check_type("dm", value, str, desire=False)
+
+
         self._dm = self._set_value_units(value, unit=u.pc * u.cm**-3,
                                          non_negative=True)
 

@@ -1,5 +1,6 @@
 import os
 from glob import glob
+from textwrap import dedent
 
 import numpy as np
 
@@ -10,7 +11,37 @@ from astropy.coordinates import SkyCoord
 from astropy import units as u
 import pyymw16 as ymw16
 
+import fruitbat
 from fruitbat import Frb, utils, cosmologies, methods, table, plot, catalogue
+
+
+def test_get_bibtex_is_correct():
+
+    ads_bibtex = dedent(
+    r"""
+        @ARTICLE{2019JOSS....4.1399B,
+               author = {{Batten}, Adam},
+                title = "{Fruitbat: A Python Package for Estimating Redshifts of Fast Radio Bursts}",
+              journal = {The Journal of Open Source Software},
+             keywords = {Astrophysics - Instrumentation and Methods for Astrophysics, Astrophysics - High Energy Astrophysical Phenomena},
+                 year = "2019",
+                month = "May",
+               volume = {4},
+               number = {37},
+                pages = {1399},
+                  doi = {10.21105/joss.01399},
+        archivePrefix = {arXiv},
+               eprint = {1905.04294},
+         primaryClass = {astro-ph.IM},
+               adsurl = {https://ui.adsabs.harvard.edu/abs/2019JOSS....4.1399B},
+              adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+        }
+    """
+    )
+    assert fruitbat.get_bibtex() == ads_bibtex.strip()
+
+def test_cite_is_get_bibtex():
+    assert fruitbat.__cite__() == fruitbat.get_bibtex()
 
 
 class TestFrbClass:
@@ -28,6 +59,24 @@ class TestFrbClass:
     frb_utc = Frb(dm=1000, utc="1999-01-01T00:00:00.000")
     frb_with_units = Frb(dm=1000, obs_bandwidth=400*u.MHz)
     frb_fluence = Frb(dm=1000, fluence=2)
+
+
+    def test_frb_dm_assignment_float(self):
+        test_frb = Frb(1000)
+        assert test_frb.dm == 1000 * u.pc * u.cm**-3
+
+    def test_frb_dm_assignment_string(self):
+        with pytest.raises(ValueError):
+            test_frb = Frb("1000")
+
+    def test_frb_gl_gb_assignment_float(self):
+        test_frb = Frb(1000, gl=10, gb=20)
+        assert (test_frb.gl.value, test_frb.gb.value) == (10, 20)
+
+    def test_frb_gl_gb_assignment_string(self):
+        test_frb = Frb(1000, gl="10", gb="20")
+        assert (test_frb.gl.value, test_frb.gb.value) == (10, 20)
+
 
     # Test that methods returns the correct value for DM=1000 and planck2018
     def test_methods(self):
@@ -51,7 +100,7 @@ class TestFrbClass:
     def test_invalid_cosmology(self):
         invalid_cosmology = "cosmos_1964"
         with pytest.raises(ValueError):
-            self.frb.calc_redshift(cosmology=invalid_cosmology)
+            self.frb.calc_redshift(method="Ioka2003", cosmology=invalid_cosmology)
 
     # Test raises error on dispersion measure less than zero
     def test_frb_negative_dm(self):

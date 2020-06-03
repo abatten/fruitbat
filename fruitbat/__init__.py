@@ -93,6 +93,7 @@ def get_bibtex():
 
     # Print the string
     print(bibtex.strip())
+    return bibtex.strip()
 
 def __cite__():
-    get_bibtex()
+    return get_bibtex()
