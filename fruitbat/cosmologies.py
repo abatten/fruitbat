@@ -113,7 +113,7 @@ def create_cosmology(parameters=None, name=None):
         params.update(parameters)
 
     if params["flat"]:
-        if params['w0'] is not -1:
+        if params['w0'] != -1:
             cosmo = FlatwCDM(H0=params['H0'], Om0=params['Om0'],
                              w0=params['w0'], Tcmb0=params['Tcmb0'],
                              Neff=params['Neff'], Ob0=params['Ob0'],
@@ -126,7 +126,7 @@ def create_cosmology(parameters=None, name=None):
                                   m_nu=u.Quantity(params['m_nu'], u.eV))
 
     else:
-        if params['w0'] is not -1:
+        if params['w0'] != -1:
             cosmo = wCDM(H0=params['H0'], Om0=params['Om0'],
                          Ode0=params['Ode0'], w0=params['w0'],
                          Tcmb0=params['Tcmb0'], Neff=params['Neff'],
