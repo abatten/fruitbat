@@ -301,11 +301,12 @@ class Frb(object):
 
         else:
             if method in methods.builtin_method_functions().keys():
-                table_name = "".join(["_".join([method, cosmology]), ".npz"])
+                #table_name = "".join(["_".join([method, cosmology]), ".npz"])
+                table_name = "".join([method, ".hdf5"])
             else:
                 table_name = "".join(["custom_", method, ".npz"])
 
-            lookup_table = table.load(table_name)
+            lookup_table = "data/" + table_name#table.load(table_name)
 
         self.z = table.get_z_from_table(input_dm, lookup_table)
         lookup_table.close()
