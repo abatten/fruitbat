@@ -297,7 +297,7 @@ class Frb(object):
         if method in methods.methods_hydrodynamic():
             if method == "Batten2020":
 
-                filename = utils.get_path_to_file_from_here("Batten2020_EAGLE_unnormed.hdf5", subdirs=["data"])
+                filename = utils.get_path_to_file_from_here("Batten2020_EAGLE_unnormed_temp.hdf5", subdirs=["data"])
                 self.calc_redshift_pdf(method="Batten2020")
 
 
@@ -420,7 +420,7 @@ class Frb(object):
         Calc
         """
 
-        filename = utils.get_path_to_file_from_here("Batten2020_EAGLE_unnormed.hdf5", subdirs=["data"])
+        filename = utils.get_path_to_file_from_here("Batten2020_EAGLE_unnormed_temp.hdf5", subdirs=["data"])
         with h5py.File(filename, "r") as data:
 
             DMzHist = data["DMz_hist"][:]
@@ -501,7 +501,7 @@ class Frb(object):
 
 
         text_items = {
-             "name"     : None if self.name is None else f"\\textrm{{{self.name}}}",
+             "name"     : None if self.name is None else r"$\mathrm{{%s}}$" % self.name ,
              "dm"       : r"$\mathrm{{DM}} = {}\ \mathrm{{pc\ cm^{{-3}}}}$".format(self.dm.value),
              "dm_galaxy": r"$\mathrm{{DM_{{MW}}}} = {:.1f}\ \mathrm{{pc\ cm^{{-3}}}}$".format(self.dm_galaxy.value),
              "dm_excess": r"$\mathrm{{DM_{{Excess}}}} = {:.1f}\ \mathrm{{pc\ cm^{{-3}}}}$".format(self.dm_excess.value),
@@ -532,7 +532,7 @@ class Frb(object):
 
         else:
             ax.set_xlabel(r"Redshift")
-            ax.set_ylabel(r"P(z \| DM) P(z)")
+            ax.set_ylabel(r"P(z | DM) P(z)")
 
         if filename is not None:
             plt.savefig(filename)
