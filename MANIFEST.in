@@ -1,13 +1,15 @@
 include LICENSE
+include CITATION
 include requirements.txt
 include requirements_dev.txt
 include README.rst
 recursive-include fruitbat *.npy
 recursive-include fruitbat *.npz
 recursive-include fruitbat *.csv
+recursive-include fruitbat *.hdf5
+recursive-include fruitbat *.h5
 
 
-exclude tox.ini
 exclude docs
 recursive-exclude docs *
 exclude *.yml

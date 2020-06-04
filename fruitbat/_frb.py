@@ -279,11 +279,11 @@ class Frb(object):
         .. _methods: https://fruitbat.readthedocs.io/en/latest/user_guide/method_and_cosmology.html#methods
 
         """
-        if not isinstance(subtract_host, bool):
-            raise ValueError("subtract_host must be of type bool.")
+        utils.check_type("subtract_host", subtract_host, bool)
 
         if subtract_host:
             input_dm = self.dm_excess - self.dm_host_est
+            print(input_dm)
         else:
             input_dm = self.dm_excess
 
@@ -297,7 +297,7 @@ class Frb(object):
         if method in methods.methods_hydrodynamic():
             if method == "Batten2020":
 
-                filename = utils.get_path_to_file_from_here("Batten2020_EAGLE_unnormed.hdf5", subdirs=["data"])
+                filename = utils.get_path_to_file_from_here("Batten2020_EAGLE_unnormed_temp.hdf5", subdirs=["data"])
                 self.calc_redshift_pdf(method="Batten2020")
 
 
@@ -319,7 +319,7 @@ class Frb(object):
                     redshifts = data["Redshifts_Bin_Edges"][1:]
                     DMBins = data["DM_Bin_Edges"][:]
 
-                    max_bin_idx = np.where(self.dm_excess.value <= DMBins)[0][0]
+                    max_bin_idx = np.where(input_dm.value <= DMBins)[0][0]
                     prev_bin_idx = max_bin_idx - 1
                     #print("DM Excess", self.dm_excess.value)
                     #print("DM Bins", DMBins[prev_bin_idx:max_bin_idx+1])
@@ -337,7 +337,7 @@ class Frb(object):
                     #pdf = DMzHist[max_bin_idx]
 
                     DMlower, DMhigher = DMBins[prev_bin_idx], DMBins[max_bin_idx]
-                    lin_interp_pdf = utils.linear_interpolate_pdfs(self.dm_excess.value, (DMlower, DMhigher), (pdf1, pdf2))
+                    lin_interp_pdf = utils.linear_interpolate_pdfs(input_dm.value, (DMlower, DMhigher), (pdf1, pdf2))
 
 
                     mean_pdf = np.array([np.mean([pdf1[idx], pdf2[idx]]) for idx in range(len(pdf1))])
@@ -381,23 +381,35 @@ class Frb(object):
                             cosmologies.available_cosmologies()))
                 raise ValueError(err_msg)
 
-            # If the user provides a table use that table for estimation.
-            if lookup_table is not None:
-                lookup_table = table.load(lookup_table)
+#            # If the user provides a table use that table for estimation.
+#            if lookup_table is not None:
+#                lookup_table = table.load(lookup_table)
 
             else:
                 if method in methods.builtin_method_functions().keys():
-                    table_name = "".join(["_".join([method, cosmology]), ".npz"])
-                else:
-                    table_name = "".join(["custom_", method, ".npz"])
+                    table_name = table.get_table_path(method)
+                    self.z = table.get_z_from_table(input_dm, table_name, cosmology)
+                    self.cosmology = cosmology
+                    self.method = method
 
-                lookup_table = table.load(table_name)
-
-            self.z = table.get_z_from_table(input_dm, lookup_table)
-            lookup_table.close()
-
+        else:
+            table_name = utils.get_path_to_file_from_here("{}.hdf5".format(method), subdirs=["data"])
+            self.z = table.get_z_from_table(input_dm, table_name)
             self.cosmology = cosmology
             self.method = method
+
+
+
+
+        #elif method in methods.available_methods():
+        #    table_name = utils.get_path_to_file_from_here("{}.hdf5".format(method), subdirs=["data"])
+        #   self.z = table.get_z_from_table(input_dm, table_name, cosmology)
+
+
+
+
+
+
         return self.z
 
     #@docstring_substitute(meth=methods.available_methods(),
@@ -408,7 +420,7 @@ class Frb(object):
         Calc
         """
 
-        filename = utils.get_path_to_file_from_here("Batten2020_EAGLE_unnormed.hdf5", subdirs=["data"])
+        filename = utils.get_path_to_file_from_here("Batten2020_EAGLE_unnormed_temp.hdf5", subdirs=["data"])
         with h5py.File(filename, "r") as data:
 
             DMzHist = data["DMz_hist"][:]
@@ -489,7 +501,7 @@ class Frb(object):
 
 
         text_items = {
-             "name"     : None if self.name is None else f"\\textrm{{{self.name}}}",
+             "name"     : None if self.name is None else r"$\mathrm{{%s}}$" % self.name ,
              "dm"       : r"$\mathrm{{DM}} = {}\ \mathrm{{pc\ cm^{{-3}}}}$".format(self.dm.value),
              "dm_galaxy": r"$\mathrm{{DM_{{MW}}}} = {:.1f}\ \mathrm{{pc\ cm^{{-3}}}}$".format(self.dm_galaxy.value),
              "dm_excess": r"$\mathrm{{DM_{{Excess}}}} = {:.1f}\ \mathrm{{pc\ cm^{{-3}}}}$".format(self.dm_excess.value),
@@ -520,7 +532,7 @@ class Frb(object):
 
         else:
             ax.set_xlabel(r"Redshift")
-            ax.set_ylabel(r"P(z \| DM) P(z)")
+            ax.set_ylabel(r"P(z | DM) P(z)")
 
         if filename is not None:
             plt.savefig(filename)
@@ -1098,6 +1110,10 @@ class Frb(object):
 
     @dm.setter
     def dm(self, value):
+
+        utils.check_type("dm", value, str, desire=False)
+
+
         self._dm = self._set_value_units(value, unit=u.pc * u.cm**-3,
                                          non_negative=True)
 

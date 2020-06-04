@@ -3,7 +3,7 @@ from __future__ import print_function, absolute_import, division
 import matplotlib.pyplot as plt
 import numpy as np
 
-from fruitbat import cosmologies, methods, table
+from fruitbat import cosmologies, methods, table, utils
 
 
 def set_rc_params(usetex=False):
@@ -34,7 +34,7 @@ def set_rc_params(usetex=False):
     return rc_params
 
 
-def redshift_confidence_interval(frb, sigma=1, method="Batten2020"):
+def redshift_confidence_interval(frb, sigma=1, method="Batten2020", usetex=True):
     """
     Plots the redshift confidence interval for an FRB.
 
@@ -52,7 +52,12 @@ def redshift_confidence_interval(frb, sigma=1, method="Batten2020"):
 
     Returns
     -------
+
     """
+    plt.rcParams.update(plot.set_rc_params(usetex=usetex))
+
+    z, pdf, dz = frb.calc_redshift_pdf(method=method)
+
     pass
 
 
@@ -89,7 +94,8 @@ def method_comparison(filename=None, extension="png", usetex=False,
         fig = plt.figure(figsize=(8, 8), constrained_layout=True)
         ax = fig.add_subplot(111)
 
-    method_list = methods.available_methods()
+    method_list = methods.builtin_method_functions()
+    method_list.pop("Batten2020")
     dm_vals = np.linspace(0, 3000, 1000)
 
     colours = ["#1b9e77", "#d95f02", "#7570b3"]
@@ -102,11 +108,12 @@ def method_comparison(filename=None, extension="png", usetex=False,
         else:
             cosmology = 'Planck18'
 
-        table_name = "".join(["_".join([method, cosmology]), ".npz"])
-        lookup_table = table.load(table_name)
+        table_name = "{}.hdf5".format(method)
+        table_name = utils.get_path_to_file_from_here(table_name, subdirs=["data"])
+
 
         for i, dm in enumerate(dm_vals):
-            z_vals[i] = table.get_z_from_table(dm, lookup_table)
+            z_vals[i] = table.get_z_from_table(dm, table_name, cosmology)
 
         ax.plot(dm_vals, z_vals, colours[j], label=label[j], **kwargs)
 
@@ -181,10 +188,10 @@ def cosmology_comparison(filename="", extension="png", usetex=False,
         else:
             method = 'Inoue2004'
 
-        table_name = "".join(["_".join([method, cosmo]), ".npz"])
-        lookup_table = table.load(table_name)
+        table_name = "{}.hdf5".format(method)
+        table_name = utils.get_path_to_file_from_here(table_name, subdirs=["data"])
         for i, dm in enumerate(dm_vals):
-            z_vals[i] = table.get_z_from_table(dm, lookup_table)
+            z_vals[i] = table.get_z_from_table(dm, table_name, cosmo)
 
         ax.plot(dm_vals, z_vals, colours[j], label=label[j], **kwargs)
         if add_axin:

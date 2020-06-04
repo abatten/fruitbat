@@ -71,7 +71,7 @@ def create_analysis_catalogue(filename="fruitbat_analysis_catalogue",
 
         # Calculate FRB properties
         frb.calc_dm_galaxy()
-        frb.calc_redshift()
+        frb.calc_redshift(method="Inoue2004")
         energy = frb.calc_energy()
         luminosity = frb.calc_luminosity()
 
