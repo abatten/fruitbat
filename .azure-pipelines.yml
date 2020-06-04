@@ -16,9 +16,6 @@ trigger:
 #  vmImage: 'ubuntu-latest'
 strategy:
   matrix:
-    ubuntu-p27:
-      imageName: 'ubuntu-latest'
-      python.version: '2.7'
     ubuntu-p35:
       imageName: 'ubuntu-latest'
       python.version: '3.5'
@@ -31,12 +28,31 @@ strategy:
     ubuntu-p38:
       imageName: 'ubuntu-latest'
       python.version: '3.8'
+    macOS-p35:
+      imageName: 'macOS-latest'
+      python.version: '3.5'
+    macOS-p36:
+      imageName: 'macOS-latest'
+      python.version: '3.6'
     macOS-p37:
       imageName: 'macOS-latest'
       python.version: '3.7'
+    macOS-p39:
+      imageName: 'macOS-latest'
+      python.version: '3.8'
+    windows-p35:
+      imageName: 'windows-latest'
+      python.version: '3.5'
+    windows-p36:
+      imageName: 'windows-latest'
+      python.version: '3.6'
     windows-p37:
       imageName: 'windows-latest'
       python.version: '3.7'
+    windows-p38:
+      imageName: 'windows-latest'
+      python.version: '3.8'
+
 
 pool:
   vmImage: $(imageName)
