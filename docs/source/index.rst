@@ -2,13 +2,13 @@
 
 Fruitbat Documentation
 ----------------------
-``Fruitbat`` is an open source Python package designed to assist the estimation of redshifts, 
+*FRUITBAT* is an open source Python package designed to assist the estimation of redshifts, 
 energies and the galactic dispersion measure contributions of fast radio bursts.
 
-``Fruitbat`` generates and utilises 'look-up' tables of existing dispersion 
+*FRUITBAT* generates and utilises 'look-up' tables of existing dispersion 
 measure-redshift relations found in the literature (`Ioka 2003`_, `Inoue 2004`_, 
 `Zhang 2018`_) in conjunction with parameters from both the WMAP and Planck 
-missions. ``Fruitbat`` also utilises the YMW16 galactic dispersion measure model
+missions. *FRUITBAT* also utilises the YMW16 galactic dispersion measure model
 to estimate the dispersion measure contribution due to the Milky Way. However it
 is also possible to use the NE2001 model if the python port has been installed
 (See the `NE2001 installation instructions`_).
@@ -17,7 +17,7 @@ As a user you can independantly choose the dispersion measure-reshift relation
 and the cosmological parameters, or define your own relation, create new cosmologies and
 generate custom look-up tables for *FRUITBAT*.
 
-``Fruitbat`` is installable via ``pip`` (see `Getting Started`_) or the source code is made avaliable here_.
+*FRUITBAT* is installable via ``pip`` (see `Getting Started`_) or the source code is made avaliable here_.
 
 If you use **Fruitbat** in your research, please add the acknowledgement statement
 "Some of the results of this paper have been derived using the *FRUITBAT* package"
