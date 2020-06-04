@@ -431,5 +431,7 @@ class TestPlots:
 def test_cleanup():
     # Remove the files at end of test
     test_files = glob("*pytest_output*")
+    test_files += glob("./data/*pytest_output*")
+
     for file in test_files:
         os.remove(file)
