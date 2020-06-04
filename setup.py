@@ -36,19 +36,20 @@ setup(
     long_description=long_description,
     install_requires=requirements,
     classifiers=[
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
+#        "Programming Language :: Python :: 2",
+#        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8"
         "License :: OSI Approved :: BSD License",
         "Operating System :: MacOS",
         "Operating System :: Unix",
         ],
     package_dir={"fruitbat": "fruitbat"},
     packages=find_packages(),
-    package_data={'fruitbat': ['*.npz', '*.npy', '*.csv']},
+    package_data={'fruitbat': ['*.npz', '*.npy', '*.csv', "*.hdf5", ".*.h5"]},
     include_package_data=True,
     keywords=("FRB redshift astronomy astrophysics fast radio burst"),
 )

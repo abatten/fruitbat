@@ -4,11 +4,15 @@ import numpy as np
 import astropy.constants as const
 import astropy.units as u
 import scipy.integrate as integrate
+import h5py
+
+from fruitbat import utils
 
 
-__all__ = ["ioka2003", "inoue2004", "zhang2018", 
-           "builtin_method_functions", "add_method", 
-           "available_methods", "reset_methods", "method_functions"]
+__all__ = ["ioka2003", "inoue2004", "zhang2018",
+           "builtin_method_functions", "add_method",
+           "available_methods", "reset_methods", "method_functions",
+           "methods_hydrodynamic", "methods_analytic"]
 
 
 def _f_integrand(z, cosmo):
@@ -49,8 +53,8 @@ def _f_integrand(z, cosmo):
 
 def ioka2003(z, cosmo, zmin=0):
     """
-    Calculate the dispersion measure at a redshift ``z`` given a
-    cosmology using the Ioka (2003) relation.
+    Calculates the mean dispersion measure from redshift zero to redshift ``z``
+    given a cosmology using the Ioka (2003) relation.
 
     Parameters
     ----------
@@ -58,7 +62,7 @@ def ioka2003(z, cosmo, zmin=0):
         The input redshift.
 
     cosmo: An instance of :obj:`astropy.cosmology`
-        The cosmology to assume when when calculating the dispersion
+        The cosmology to assume when calculating the dispersion
         measure at redshift ``z``.
 
     zmin: float or int, optional
@@ -69,6 +73,7 @@ def ioka2003(z, cosmo, zmin=0):
     -------
     dm : float
         The dispersion measure at the redshift ``z``.
+
     """
     # Calculate Ioka 2003 DM coefficient
     coeff_top = 3 * const.c * cosmo.H0 * cosmo.Ob0
@@ -84,8 +89,8 @@ def ioka2003(z, cosmo, zmin=0):
 
 def inoue2004(z, cosmo, zmin=0):
     """
-    Calculate the dispersion measure at a redshift ``z`` given a
-    cosmology using the Inoue (2004) relation.
+    Calculates the mean dispersion measure from redshift zero to redshift ``z``
+    given a cosmology using the Inoue (2004) relation.
 
     Parameters
     ----------
@@ -93,7 +98,7 @@ def inoue2004(z, cosmo, zmin=0):
         The input redshift.
 
     cosmo: An instance of :obj:`astropy.cosmology`
-        The cosmology to assume when when calculating the dispersion
+        The cosmology to assume when calculating the dispersion
         measure at redshift ``z``.
 
     zmin: float or int, optional
@@ -104,6 +109,7 @@ def inoue2004(z, cosmo, zmin=0):
     -------
     dm : float
         The dispersion measure at the redshift ``z``.
+
     """
 
     # Coefficient from Inoue 2004
@@ -119,8 +125,8 @@ def inoue2004(z, cosmo, zmin=0):
 
 def zhang2018(z, cosmo, zmin=0, **kwargs):
     """
-    Calculates the dispersion measure at a redshift given a cosmology
-    using the Zhang (2018) relation.
+    Calculates the mean dispersion measure from redshift zero to redshift ``z``
+    given a cosmology using the Zhang (2018) relation.
 
     Parameters
     ----------
@@ -128,7 +134,7 @@ def zhang2018(z, cosmo, zmin=0, **kwargs):
         The input redshift.
 
     cosmo: An instance of :obj:`astropy.cosmology`
-        The cosmology to assume when when calculating the dispersion
+        The cosmology to assume when calculating the dispersion
         measure at redshift ``z``.
 
     zmin: float or int, optional
@@ -178,6 +184,30 @@ def zhang2018(z, cosmo, zmin=0, **kwargs):
     return dm.value
 
 
+def batten2020(dm):
+    """
+    """
+
+    filename = utils.get_path_to_file_from_here("Batten2020_EAGLE.hdf5", subdirs=["data"])
+
+    with h5py.File(filename, "r") as b20_data:
+
+        DMzHist = b20_data["DMz_hist"][:]
+
+        # Convert bins to linear, since they are in log
+        DMBins = 10**b20_data["DM_Bin_Edges"][:]
+
+        max_bin_idx = np.where(dm <= DMBins)[0][0]
+
+        pdf = DMzHist[max_bin_idx]
+
+        redshifts = b20_data["Redshifts"][:-1]
+        redshift_bin_widths = b20_data["Redshift_Bin_Widths"][:]
+
+
+
+
+
 def builtin_method_functions():
     """
     Returns a dictionary of the builtin methods with keywords and
@@ -187,12 +217,14 @@ def builtin_method_functions():
     -------
     methods: dict
         Contains the keywords and function for each method.
+
     """
 
     methods = {
         "Ioka2003": ioka2003,
         "Inoue2004": inoue2004,
-        "Zhang2018": zhang2018
+        "Zhang2018": zhang2018,
+        "Batten2020": batten2020,
     }
     return methods
 
@@ -216,6 +248,7 @@ def add_method(name, func):
 
     Return
     ------
+    None
 
     Example
     -------
@@ -223,6 +256,7 @@ def add_method(name, func):
             dm = 1200 * z
             return dm
     >>> fruitbat.add_method("simple_dm", simple_dm)
+
     """
 
     method = {name: func}
@@ -232,6 +266,7 @@ def add_method(name, func):
 def available_methods():
     """
     Returns the list containing all the keywords for valid methods.
+
     """
     return list(_available.keys())
 
@@ -239,6 +274,7 @@ def available_methods():
 def reset_methods():
     """
     Resets the list of available methods to the default builtin methods.
+
     """
 
     # Delete all keys that aren't in the list of builtin method functions
@@ -255,3 +291,22 @@ def method_functions():
     corresponding dispersion measure functions.
     """
     return _available
+
+
+def methods_analytic():
+    analytic = [
+        "Ioka2003",
+        "Inoue2004",
+        "Zhang2018",
+    ]
+
+    return analytic
+
+
+def methods_hydrodynamic():
+
+    hydro = [
+        "Batten2020",
+    ]
+
+    return hydro

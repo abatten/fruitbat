@@ -1,0 +1,26 @@
+If you use FRUITBAT in work or research that is published (in a journal 
+or as a dependancy to another package) we recommend and encourage you to
+cite the FRUITBAT paper.
+
+You can add the acknoledgement statement: “Some of the results of this paper 
+have been derived using the FRUITBAT python package.”
+
+BibTeX entry for the citation is:
+
+@ARTICLE{2019JOSS....4.1399B,
+       author = {{Batten}, Adam},
+        title = "{Fruitbat: A Python Package for Estimating Redshifts of Fast Radio Bursts}",
+      journal = {The Journal of Open Source Software},
+     keywords = {Astrophysics - Instrumentation and Methods for Astrophysics, Astrophysics - High Energy Astrophysical Phenomena},
+         year = "2019",
+        month = "May",
+       volume = {4},
+       number = {37},
+        pages = {1399},
+          doi = {10.21105/joss.01399},
+archivePrefix = {arXiv},
+       eprint = {1905.04294},
+ primaryClass = {astro-ph.IM},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2019JOSS....4.1399B},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}

@@ -5,3 +5,4 @@ matplotlib>=2.2.4
 pandas>=0.22.0
 pyymw16>=2.0.6
 e13tools>=0.5.3
+h5py>=2.10.0

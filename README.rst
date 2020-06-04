@@ -1,4 +1,4 @@
-|PyPI| |Python| |License| |Travis| |Docs| |CodeCov| |JOSS|
+|PyPI| |Python| |License| |Travis| |Docs| |CodeCov| |JOSS| |ASCL|
 
 |Logo|
 
@@ -89,8 +89,9 @@ will specify which cosmology to assume.
 
 It is also possible to specify the coordinates of the burst and use the 
 `calc_dm_galaxy`_ function to calculate the DM contribution from the Milky Way
-using the YMW16 model. Performing `calc_dm_galaxy`_ will automatically
-calculate the excess dispersion measure for the redshift calculation.
+using the YMW16 or NE2001 galactic electron distribution model. Performing 
+`calc_dm_galaxy`_ will automatically calculate the excess dispersion measure 
+for the redshift calculation.
 
 ::
 
@@ -118,8 +119,9 @@ hesitate to open a `Github Issue`_.
 Referencing Fruitbat
 --------------------
 
-If you use *FRUITBAT* in your research, we would like it if you could
-reference `our paper`_.
+If you use *FRUITBAT* in your research, we would like it if you could add an 
+acknowledgement statement “Some of the results of this paper have been derived
+using the *FRUITBAT* package” and reference `our paper`_.
 
 .. _our paper: https://ui.adsabs.harvard.edu/abs/2019JOSS....4.1399B/abstract
 
@@ -176,3 +178,6 @@ reference `our paper`_.
     :target: http://joss.theoj.org/papers/634bb69f2445c7457bea5dbc0b83e650
     :alt: JOSS Review Status
 
+.. |ASCL| image:: https://img.shields.io/badge/ascl-1911.010-blue.svg?colorB=262255"
+    :target: http://ascl.net/1911.010
+    :alt: ascl:1911.010

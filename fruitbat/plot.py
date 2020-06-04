@@ -3,21 +3,62 @@ from __future__ import print_function, absolute_import, division
 import matplotlib.pyplot as plt
 import numpy as np
 
-from fruitbat import cosmologies, methods, table
+from fruitbat import cosmologies, methods, table, utils
 
 
 def set_rc_params(usetex=False):
     """
     Set the rcParams that will be used in all the plots.
     """
-    plt.rcParams["text.usetex"] = usetex
-    plt.rcParams["axes.labelsize"] = 20
-    plt.rcParams["axes.labelpad"] = 3.0
-    plt.rcParams["xtick.minor.visible"] = True
-    plt.rcParams["ytick.minor.visible"] = True
-    plt.rcParams["xtick.labelsize"] = 16
-    plt.rcParams["ytick.labelsize"] = 16
-    plt.rcParams["legend.fontsize"] = 16
+
+    rc_params = {
+        #"axes.prop_cycle": cycler('color',
+        #    ['#1b9e77','#d95f02','#7570b3',
+        #     '#e7298a','#66a61e','#e6ab02',
+        #     '#a6761d','#666666']),
+        "axes.labelsize": 18,
+        "figure.dpi": 150,
+        "legend.fontsize": 12,
+        "legend.frameon": False,
+        "text.usetex": usetex,
+        "xtick.direction": 'in',
+        "xtick.labelsize": 14,
+        "xtick.minor.visible": True,
+        "xtick.top": True,
+        "ytick.direction": 'in',
+        "ytick.labelsize": 14,
+        "ytick.minor.visible": True,
+        "ytick.right": True,
+    }
+
+    return rc_params
+
+
+def redshift_confidence_interval(frb, sigma=1, method="Batten2020", usetex=True):
+    """
+    Plots the redshift confidence interval for an FRB.
+
+    Parameters
+    ----------
+    frb : :obj:`fruitbat.Frb`
+
+    sigma: [1, 2, 3, 4, 5], optional
+        The width of the confidence interval in units of sigma.
+        Default: 1
+
+    method: str, optional
+
+        Default: "Batten2020"
+
+    Returns
+    -------
+
+    """
+    plt.rcParams.update(plot.set_rc_params(usetex=usetex))
+
+    z, pdf, dz = frb.calc_redshift_pdf(method=method)
+
+    pass
 
 
 def method_comparison(filename=None, extension="png", usetex=False,
@@ -36,7 +77,7 @@ def method_comparison(filename=None, extension="png", usetex=False,
         Default: "png"
 
     usetex: bool, optional
-        Use LaTeX for for fonts. 
+        Use LaTeX for for fonts.
 
     passed_ax: or None, optional
 
@@ -45,7 +86,7 @@ def method_comparison(filename=None, extension="png", usetex=False,
     A figure displaying how estimated redshift changes as a function of
     dispersion measure for each of the different cosmologies.
     """
-    set_rc_params(usetex)
+    plt.rcParams.update(set_rc_params(usetex))
 
     if passed_ax:
         ax = passed_ax
@@ -53,7 +94,8 @@ def method_comparison(filename=None, extension="png", usetex=False,
         fig = plt.figure(figsize=(8, 8), constrained_layout=True)
         ax = fig.add_subplot(111)
 
-    method_list = methods.available_methods()
+    method_list = methods.builtin_method_functions()
+    method_list.pop("Batten2020")
     dm_vals = np.linspace(0, 3000, 1000)
 
     colours = ["#1b9e77", "#d95f02", "#7570b3"]
@@ -66,11 +108,12 @@ def method_comparison(filename=None, extension="png", usetex=False,
         else:
             cosmology = 'Planck18'
 
-        table_name = "".join(["_".join([method, cosmology]), ".npz"])
-        lookup_table = table.load(table_name)
+        table_name = "{}.hdf5".format(method)
+        table_name = utils.get_path_to_file_from_here(table_name, subdirs=["data"])
+
 
         for i, dm in enumerate(dm_vals):
-            z_vals[i] = table.get_z_from_table(dm, lookup_table)
+            z_vals[i] = table.get_z_from_table(dm, table_name, cosmology)
 
         ax.plot(dm_vals, z_vals, colours[j], label=label[j], **kwargs)
 
@@ -145,17 +188,17 @@ def cosmology_comparison(filename="", extension="png", usetex=False,
         else:
             method = 'Inoue2004'
 
-        table_name = "".join(["_".join([method, cosmo]), ".npz"])
-        lookup_table = table.load(table_name)        
+        table_name = "{}.hdf5".format(method)
+        table_name = utils.get_path_to_file_from_here(table_name, subdirs=["data"])
         for i, dm in enumerate(dm_vals):
-            z_vals[i] = table.get_z_from_table(dm, lookup_table)
+            z_vals[i] = table.get_z_from_table(dm, table_name, cosmo)
 
         ax.plot(dm_vals, z_vals, colours[j], label=label[j], **kwargs)
         if add_axin:
             axin.plot(dm_vals, z_vals, colours[j], **kwargs)
 
     ax.set_xlabel(r"$\rm{DM\ \left[pc \ cm^{-3}\right]}$")
-    
+
     if not passed_ax:
         ax.set_ylabel(r"$\rm{Redshift}$")
 
