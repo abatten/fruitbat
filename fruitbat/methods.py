@@ -1,5 +1,3 @@
-from __future__ import print_function, division, absolute_import
-
 import numpy as np
 import astropy.constants as const
 import astropy.units as u
@@ -184,11 +182,32 @@ def zhang2018(z, cosmo, zmin=0, **kwargs):
     return dm.value
 
 
-def batten2020(dm):
+def batten2020(z, return_pdf=False):
     """
+    Calculates the mean dispersion measure from redshift zero to redshift ``z``
+    using the Batten (2020) relation.
+
+    Parameters
+    ----------
+    z: float or int
+        The input redshift.
+
+    return_pdf:
+        If ``True``, returns the entire DM PDF and DM ranges instead of the mean DM value.
+        Default: False
+
+    Returns
+    -------
+    mean_dm: float
+
+    dm_array: :obj:`np.ndarray`, optional
+        The array of
+
+    dm_pdf: :obj:`np.ndarray`, optional
+        The DM pdf
     """
 
-    filename = utils.get_path_to_file_from_here("Batten2020_EAGLE.hdf5", subdirs=["data"])
+    filename = utils.get_path_to_file_from_here("Batten2020.hdf5", subdirs=["data"])
 
     with h5py.File(filename, "r") as b20_data:
 
@@ -205,6 +224,11 @@ def batten2020(dm):
         redshift_bin_widths = b20_data["Redshift_Bin_Widths"][:]
 
 
+    if return_pdf:
+        dm = (dm, dm_array, pdf)
+    else:
+        dm = dm
+    return dm
 
 
 
@@ -294,6 +318,10 @@ def method_functions():
 
 
 def methods_analytic():
+    """
+    Returns a list containing the valid method keys that use
+    analytic estimates.
+    """
     analytic = [
         "Ioka2003",
         "Inoue2004",
@@ -304,6 +332,11 @@ def methods_analytic():
 
 
 def methods_hydrodynamic():
+    """
+    Returns a list containing the valid method keys that have used
+    hydrodynamic simulations.
+
+    """
 
     hydro = [
         "Batten2020",

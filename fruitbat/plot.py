@@ -52,10 +52,10 @@ def set_rc_params(usetex=False):
 
 
 
-def redshift_confidence_interval(frb, method="Batten2020", sigma=1,
-                                 usetex=True, filename=None, outputdir=None):
+def redshift_pdf(frb, method="Batten2020", sigma=1, usetex=True,
+                 filename=None, outputdir=None):
     """
-    Plots the redshift confidence interval for an FRB.
+    Plots the redshift pdf and confidence interval for an FRB.
 
     Parameters
     ----------
@@ -81,7 +81,7 @@ def redshift_confidence_interval(frb, method="Batten2020", sigma=1,
     -------
     fig: , optional
 
-    ax: , optiona;
+    ax: , optional
 
     """
     # Update rcParams for consistent plotting style

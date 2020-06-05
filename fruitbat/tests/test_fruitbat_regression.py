@@ -1,23 +1,22 @@
-import os
-from glob import glob
+"""
+test_fruitbat_regression.py
 
+This test suite if for testing previously known bugs.
+"""
 import numpy as np
 
-import pytest
-import pytest_mpl
-
-from astropy.coordinates import SkyCoord
-from astropy import units as u
-import pyymw16 as ymw16
-
-from fruitbat import Frb, utils, cosmologies, methods, table, plot, catalogue
+from fruitbat import Frb, methods, table
 
 
-# THis bug was found when creating a custon method,
-# using calc_redshift wouldn't return any value.
+
 def test_create_custom_method():
+    """
+    This bug was found when creating a custon method,
+    using calc_redshift wouldn't return any value.
+    """
 
     def simple_dm(z):
+        """ A simple DM-z scaling relation"""
         dm = 1200 * z
         return dm
 
