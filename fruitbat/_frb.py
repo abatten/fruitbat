@@ -1,21 +1,19 @@
 """
 Frb class and method functions.
 """
-from __future__ import print_function, absolute_import, division
-
 import numpy as np
 import astropy.coordinates as coord
 from astropy.coordinates import SkyCoord
 from astropy.time import Time
 import astropy.units as u
+import h5py
 
-from e13tools import docstring_substitute
+from e13tools import docstring_substitute, docstring_copy
 import pygedm
 
-from fruitbat import cosmologies, methods, table
+from fruitbat import cosmologies, methods, table, utils, plot
 
 __all__ = ["Frb"]
-
 
 class Frb(object):
     """
@@ -190,6 +188,7 @@ class Frb(object):
         self.dm_igm = None
         self.cosmology = None
         self.method = None
+        self.dm_galaxy_model = None
 
         # Calculate fluence if peak_flux and width are given
         if ((self.fluence is None) and
@@ -231,7 +230,7 @@ class Frb(object):
 
     @docstring_substitute(meth=methods.available_methods(),
                           cosmo=cosmologies.available_cosmologies())
-    def calc_redshift(self, method='Inoue2004', cosmology="Planck18",
+    def calc_redshift(self, method='Batten2020', cosmology="Planck18",
                       subtract_host=False, lookup_table=None):
         """
         Calculate the redshift of the FRB from its :attr:`dm`,
@@ -274,14 +273,19 @@ class Frb(object):
 
         .. _cosmology: https://fruitbat.readthedocs.io/en/latest/user_guide/method_and_cosmology.html#cosmology
         .. _methods: https://fruitbat.readthedocs.io/en/latest/user_guide/method_and_cosmology.html#methods
+
         """
-        if not isinstance(subtract_host, bool):
-            raise ValueError("subtract_host must be of type bool.")
+        utils.check_type("subtract_host", subtract_host, bool)
 
         if subtract_host:
             input_dm = self.dm_excess - self.dm_host_est
+            print(input_dm)
         else:
             input_dm = self.dm_excess
+
+        # If the user provides a table use that table for estimation.
+        if lookup_table is not None:
+            raise NotImplementedError("Not made yet!")
 
         if method not in methods.available_methods():
             err_msg = ("Method '{}' is not a valid method. "
@@ -289,31 +293,190 @@ class Frb(object):
                         methods.available_methods()))
             raise ValueError(err_msg)
 
-        if cosmology not in cosmologies.available_cosmologies():
-            err_msg = ("Cosmology '{}' is not a valid cosmology. Valid "
-                       "cosmologies are: {}".format(cosmology,
-                        cosmologies.available_cosmologies()))
-            raise ValueError(err_msg)
+        if method in methods.methods_hydrodynamic():
+            zvals, pdf, dz = self.calc_redshift_pdf(method=method)
+            z_median = utils.calc_median_from_pdf(zvals, pdf)
+            self.z = z_median
+            self.method = method
+            if method == "Batten2020":
+                self.cosmology = "EAGLE"
 
-        # If the user provides a table use that table for estimation.
-        if lookup_table is not None:
-            lookup_table = table.load(lookup_table)
+        elif method in methods.methods_analytic():
+            if cosmology in cosmologies.available_cosmologies():
+                #if method in methods.builtin_method_functions().keys():
+                table_name = table.get_table_path(method)
+                self.z = table.get_z_from_table(input_dm, table_name, cosmology)
+                self.cosmology = cosmology
+                self.method = method
+
+
+            else:
+                err_msg = ("Cosmology '{}' is not a valid cosmology. Valid "
+                           "cosmologies are: {}".format(cosmology,
+                            cosmologies.available_cosmologies()))
+                raise ValueError(err_msg)
+
+
 
         else:
-            if method in methods.builtin_method_functions().keys():
-                #table_name = "".join(["_".join([method, cosmology]), ".npz"])
-                table_name = "".join([method, ".hdf5"])
-            else:
-                table_name = "".join(["custom_", method, ".npz"])
+            table_name = utils.get_path_to_file_from_here("{}.hdf5".format(method), subdirs=["data"])
+            self.z = table.get_z_from_table(input_dm, table_name)
+            self.cosmology = cosmology
+            self.method = method
 
-            lookup_table = "data/" + table_name#table.load(table_name)
 
-        self.z = table.get_z_from_table(input_dm, lookup_table)
-        lookup_table.close()
 
-        self.cosmology = cosmology
-        self.method = method
+
+        #elif method in methods.available_methods():
+        #    table_name = utils.get_path_to_file_from_here("{}.hdf5".format(method), subdirs=["data"])
+        #   self.z = table.get_z_from_table(input_dm, table_name, cosmology)
+
+
+
+
+
+
         return self.z
+
+    #@docstring_substitute(meth=methods.available_methods(),
+    #                      cosmo=cosmologies.available_cosmologies())
+    def calc_redshift_pdf(self, method="Batten2020", cosmology="Planck18", prior="uniform", subtract_host=False,
+                          lookup_table=None):
+        """
+        Calc
+        """
+        if method == "Batten2020":
+            filename = utils.get_path_to_file_from_here("Batten2020.hdf5", subdirs=["data"])
+
+
+        elif method in methods.methods_analytic():
+            filename = "{}.hdf5".format(method)
+            filename = utils.get_path_to_file_from_here(filename, subdirs=["data"])
+            raise NotImplementedError("This has not been implemented yet!")
+
+        else:
+            raise NotImplementedError("THis has not been implemented yet!")
+
+
+        with h5py.File(filename, "r") as data:
+
+            DMzHist = data["DMz_hist"][:]
+            redshift_bin_widths = data["Redshift_Bin_Widths"][:]
+            redshifts = data["Redshifts_Bin_Edges"][1:]
+            DMBins = data["DM_Bin_Edges"][:]
+
+            max_bin_idx = np.where(self.dm_excess.value <= DMBins)[0][0]
+            prev_bin_idx = max_bin_idx - 1
+
+            hist_higher_dm = DMzHist[max_bin_idx]
+            hist_lower_dm = DMzHist[prev_bin_idx]
+
+            pdf2 = utils.normalise_to_pdf(hist_higher_dm, bin_widths=redshift_bin_widths)
+            pdf1 = utils.normalise_to_pdf(hist_lower_dm, bin_widths=redshift_bin_widths)
+
+
+            DMlower, DMhigher = DMBins[prev_bin_idx], DMBins[max_bin_idx]
+            lin_interp_pdf = utils.linear_interpolate_pdfs(self.dm_excess.value,
+                (DMlower, DMhigher), (pdf1, pdf2))
+
+            prior = utils.redshift_prior(redshifts, prior=prior)
+
+            z_pdf = lin_interp_pdf * prior
+            z_bins = redshifts
+            dz = redshift_bin_widths
+
+
+
+        self.z_bins = z_bins
+        self.z_pdf = z_pdf
+        self.dz = dz
+
+        return z_bins, z_pdf, dz
+
+
+    @docstring_copy(plot.redshift_pdf)
+    def plot_redshift_pdf(self, *args, **kwargs):
+        return plot.redshift_pdf(self, *args, **kwargs)
+
+
+    @docstring_substitute(meth=methods.available_methods(),
+                          cosmo=cosmologies.available_cosmologies())
+    def calc_redshift_conf_int(self, method="Batten2020", sigma=1, scatter_percentage=0, **calc_redshift_kwargs):
+    #method='Batten2020', cosmology="Planck18", sigma=1,
+    #                           scatter_percentage=0, subtract_host=False, lookup_table=None):
+        """
+        Calculates the mean redshift and the confidence interval of
+        an FRB from its :attr:`dm`, :attr:`dm_excess` or
+        :attr:`dm_excess` - :attr:`dm_host_est`.
+
+        Parameters
+        ----------
+        method : str, optional
+            The dispersion meausre -redshift relation to use when
+            calculating the redshift. Avaliable methods:  %(meth)s.
+            Default: 'Batten2020'
+
+        cosmology : str, optional
+            The cosmology to assume when calculating the redshift.
+            This value is overided if using a hydrodynamic method.
+            Avaliable cosmologies: %(cosmo)s. Default: 'Planck18'
+
+        sigma : int (1, 2, 3, 4, 5), optional
+            The width of the confidence interval in units of standard
+            deviation. `sigma=1` is the 68\% confidence interval.
+
+        scatter_percentage : float, optional
+            The amount of line of
+            Default: 0
+
+        subtract_host : bool, optional
+            Subtract :attr:`dm_host_est` from the :attr:`dm_excess`
+            before calculating the redshift. This is is used to account
+            for the dispersion measure that arises from the FRB host
+            galaxy. Default: False
+
+        lookup_table : str or None, optional
+            The path to the lookup table file. If ``lookup_table=None``
+            a table will attempted to be loaded from the data directory
+            based on the method name. Default: *None*
+
+        Returns
+        -------
+        float
+            The extimated redshift of the FRB.
+
+        float
+            The redshift confidence interval the FRB.
+
+        Notes
+        -----
+        The methods_ section in the documentation has a description for
+        each of the builtin methods.
+
+        The cosmology_ section in the documentation has a list of the
+        cosmological parameters for each cosmology
+
+        .. _cosmology: https://fruitbat.readthedocs.io/en/latest/user_guide/method_and_cosmology.html#cosmology
+        .. _methods: https://fruitbat.readthedocs.io/en/latest/user_guide/method_and_cosmology.html#methods
+
+        """
+        redshift = self.calc_redshift(**calc_redshift_kwargs)
+
+
+        if method in methods.methods_hydrodynamic():
+            if method == "Batten2020":
+                zvals, pdf, dz = self.calc_redshift_pdf(method="Batten2020")
+
+                conf_lower_lim, conf_upper_lim = utils.sigma_to_pdf_percentiles(sigma=sigma)
+
+                conf_int_lower = utils.calc_z_from_pdf_percentile(zvals, pdf, percentile=conf_lower_lim)
+                conf_int_upper = utils.calc_z_from_pdf_percentile(zvals, pdf, percentile=conf_upper_lim)
+
+        self.z_conf_int_lower = conf_int_lower
+        self.z_conf_int_upper = conf_int_upper
+
+        return self.z, (self.z_conf_int_lower, self.z_conf_int_upper)
+
 
     def calc_skycoords(self, frame=None):
         """
@@ -408,9 +571,9 @@ class Frb(object):
         NE2001_options = ["ne2001", "NE2001"]
 
         if model in YMW16_options:
-            model = 'ymw16'
+            model = 'YMW16'
         elif model in NE2001_options:
-            model = 'ne2001'
+            model = 'NE2001'
         else:
             raise ValueError("'{}' is not a valid galactic DM model".format(model))
 
@@ -434,66 +597,7 @@ class Frb(object):
             dist=25000,
             method=model)
 
-
-
-
-#        if model in YMW16_options:
-#            # Since the YMW16 model only gives you a dispersion measure out to a
-#            # distance within the galaxy, to get the entire DM contribution of the
-#            # galaxy we need to specify the furthest distance in the YMW16 model.
-#            max_galaxy_dist = 25000  # units: pc
-#
-#            # Check to make sure some of the keyword are not None
-#            coord_list = [self.skycoords, self.raj, self.decj, self.gl, self.gb]
-#            if all(val is None for val in coord_list):
-#                raise ValueError("""Can not calculate dm_galaxy since coordinates
-#                                 for FRB burst were not provided. Please provide
-#                                 (raj, decj) or (gl, gb) coordinates.""")
-#
-#            # Calculate skycoords position if it
-#            elif (self.skycoords is None and
-#                    (self.raj is not None and self.decj is not None) or
-#                    (self.gl is not None and self.gb is not None)):
-#
-#                self._skycoords = self.calc_skycoords()
-#
-#            dm_galaxy, tau_sc = ymw16.dist_to_dm(self._skycoords.galactic.l,
-#                                                 self._skycoords.galactic.b,
-#                                                 max_galaxy_dist)
-#
-#        elif model in NE2001_options:
-#            try:
-#                from ne2001 import density
-#            except ModuleNotFoundError:
-#                msg = (
-#                """
-#                By default only the YMW16 Milky Way electron density model
-#                is installed with Fruitbat. However Fruitbat due support using
-#                the NE2001 model via a python port from JXP and Ben Baror.
-#
-#                To install the ne2001 model compatible with Fruitbat download
-#                and install it from github:
-#
-#                >>> git clone https://github.com/FRBs/ne2001
-#                >>> cd ne2001
-#                >>> pip install .
-#
-#                Once you have installed it you should be able to use Fruitbat
-#                in exactly the same way by passing 'ne2001' instead of 'ymw16'.
-#                """)
-#                raise ModuleNotFoundError(msg)
-#
-#            # This is the same max distanc e that we used for the YMW16 model
-#            # However the NE2001 model specifies distance in kpc not pc.
-#            max_galaxy_dist = 25  # units kpc
-#
-#            # NE2001 models needs gl and gb in floats
-#            gl = float(self._skycoords.galactic.l.value)
-#            gb = float(self._skycoords.galactic.b.value)
-#
-#            ne = density.ElectronDensity()
-#            dm_galaxy = ne.DM(gl, gb, max_galaxy_dist)
-
+        self.dm_galaxy_model = model
         self.dm_galaxy = dm_galaxy.value
         self.tau_sc = tau_sc.value
         self.calc_dm_excess()
@@ -501,6 +605,7 @@ class Frb(object):
             return self.dm_galaxy, self.tau_sc
         else:
             return self.dm_galaxy
+
 
     def calc_dm_igm(self):
         """
@@ -732,7 +837,7 @@ class Frb(object):
                        "energy.")
             raise ValueError(err_msg)
         else:
-            F = self.fluence
+            fluence = self.fluence
 
         if use_bandwidth:
             if self.obs_bandwidth is None:
@@ -741,8 +846,8 @@ class Frb(object):
                            "calculating energy.")
                 raise ValueError(err_msg)
             else:
-                B = self.obs_bandwidth
-            energy = F * B * 4 * np.pi * D**2 * (1 + self.z)**-1
+                bandwidth = self.obs_bandwidth
+            energy = fluence * bandwidth * 4 * np.pi * D**2 * (1 + self.z)**-1
 
         else:
             if self.obs_freq_central is None:
@@ -752,7 +857,7 @@ class Frb(object):
                 raise ValueError(err_msg)
             else:
                 nu = self.obs_freq_central
-            energy = F * nu * 4 * np.pi * D**2 * (1 + self.z)**-1
+            energy = fluence * nu * 4 * np.pi * D**2 * (1 + self.z)**-1
 
         return energy.to("erg")
 
@@ -824,6 +929,8 @@ class Frb(object):
     def name(self, value):
         if isinstance(value, str):
             self._name = value
+        elif value is None:
+            self._name = None
         else:
             self._name = str(value)
 
@@ -838,6 +945,10 @@ class Frb(object):
 
     @dm.setter
     def dm(self, value):
+
+        utils.check_type("dm", value, str, desire=False)
+
+
         self._dm = self._set_value_units(value, unit=u.pc * u.cm**-3,
                                          non_negative=True)
 
@@ -869,8 +980,8 @@ class Frb(object):
 
     @dm_excess.setter
     def dm_excess(self, value):
-            self._dm_excess = self._set_value_units(value, u.pc * u.cm**-3,
-                                                    non_negative=True)
+        self._dm_excess = self._set_value_units(value, u.pc * u.cm**-3,
+                                                non_negative=True)
 
 
     @property
@@ -928,7 +1039,34 @@ class Frb(object):
 
     @z.setter
     def z(self, value):
-        self._z = self._set_value_units(value)
+        self._z = self._set_value_units(value, non_negative=True)
+
+
+    @property
+    def z_conf_int_lower(self):
+        """
+        :obj:`astropy.units.Quantity` or None:
+            The lower bound of the redshift confidence interval.
+        """
+        return self._z_conf_int_lower
+
+    @z_conf_int_lower.setter
+    def z_conf_int_lower(self, value):
+        self._z_conf_int_lower = self._set_value_units(value, non_negative=True)
+
+
+    @property
+    def z_conf_int_upper(self):
+        """
+        :obj:`astropy.units.Quantity` or None:
+            The upper bound of the redshift confidence interval.
+        """
+        return self._z_conf_int_upper
+
+    @z_conf_int_upper.setter
+    def z_conf_int_upper(self, value):
+        self._z_conf_int_upper = self._set_value_units(value, non_negative=True)
+
 
     @property
     def z_host(self):
@@ -1174,3 +1312,19 @@ class Frb(object):
             self._method = value
         else:
             self._method = str(value)
+
+
+    @property
+    def dm_galaxy_model(self):
+        """
+        str or None:
+            The method used to calculate redshift.
+        """
+        return self._dm_galaxy_model
+
+    @dm_galaxy_model.setter
+    def dm_galaxy_model(self, value):
+        if isinstance(value, str):
+            self._dm_galaxy_model = value
+        else:
+            self._dm_galaxy_model = str(value)
