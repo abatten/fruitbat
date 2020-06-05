@@ -1,5 +1,8 @@
-from __future__ import division, print_function, absolute_import
+"""
+table
+=====
 
+"""
 import os
 import numpy as np
 import scipy.interpolate as interpolate
@@ -9,7 +12,7 @@ from fruitbat import utils
 from fruitbat.methods import available_methods, method_functions
 
 
-__all__ = ["create", "load", "get_z_from_table"]
+__all__ = ["create", "get_z_from_table", "get_table_path"]
 
 
 def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
@@ -204,6 +207,19 @@ def create(method, output_dir='data', filename=None, zmin=0, zmax=20,
 
 
 def get_table_path(filename, datadir="data"):
+    """
+
+    Parameters
+    ----------
+    filename:
+
+    datadir:
+
+    Returns
+    -------
+    path: string
+        The path to the data file
+    """
 
     if filename in available_methods():
         filename += ".hdf5"

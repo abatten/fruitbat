@@ -1,9 +1,24 @@
-from __future__ import print_function, absolute_import, division
+import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy import interpolate
 
 from fruitbat import cosmologies, methods, table, utils
+
+def _fruitbat_colors():
+    """
+    The official list of fruitbat plotting colours.
+    """
+    color_dict = {
+        "black": "#000000",
+        "orange": "#FF6800",
+        "red": "#C10020",
+        "blue": "#007FFF",
+    }
+    return color_dict
+
+_color_dict = _fruitbat_colors()
 
 
 def set_rc_params(usetex=False):
@@ -34,31 +49,125 @@ def set_rc_params(usetex=False):
     return rc_params
 
 
-def redshift_confidence_interval(frb, sigma=1, method="Batten2020", usetex=True):
+
+
+
+def redshift_confidence_interval(frb, method="Batten2020", sigma=1,
+                                 usetex=True, filename=None, outputdir=None):
     """
     Plots the redshift confidence interval for an FRB.
 
     Parameters
     ----------
     frb : :obj:`fruitbat.Frb`
-
-    sigma: [1, 2, 3, 4, 5], optional
-        The width of the confidence interval in units of sigma.
-        Default: 1
+        An instance of the :obj:`fruitbat.Frb` class.
 
     method: str, optional
 
         Default: "Batten2020"
 
+    sigma: [1, 2, 3, 4, 5], optional
+        The width of the confidence interval in units of sigma.
+        Default: 1
+
+    usetex: bool, optional
+        Use LaTeX font when creating the figure. Set this to false to
+        disable Latex fonts.
+        Default: True
+
+    filename: str or None, optional
+
     Returns
     -------
+    fig: , optional
+
+    ax: , optiona;
 
     """
-    plt.rcParams.update(plot.set_rc_params(usetex=usetex))
+    # Update rcParams for consistent plotting style
+    plt.rcParams.update(set_rc_params(usetex=usetex))
 
-    z, pdf, dz = frb.calc_redshift_pdf(method=method)
+    # Calculate the z pdf for the FRB
+    zvals, pdf, dz = frb.calc_redshift_pdf(method=method)
 
-    pass
+    redshift, conf_int = frb.calc_redshift_conf_int(method=method, sigma=sigma)
+    conf_int_lower, conf_int_upper = conf_int
+
+
+    fig, ax = plt.subplots(ncols=1, nrows=1, constrained_layout=True)
+
+    # Plot the redshift pdf
+    ax.plot(zvals, pdf, linewidth=2, color=_color_dict["black"])
+
+    # Plot vertical dotted line for the redshift median
+    ax.axvline(redshift, linestyle="--", color=_color_dict["blue"],
+               linewidth=2)
+
+    conf_int_range = np.linspace(conf_int_lower, conf_int_upper, 100)
+    interpolated_z_pdf = interpolate.interp1d(zvals, pdf)
+
+    # Colour in between the confidence interval
+    ax.fill_between(conf_int_range, 0, interpolated_z_pdf(conf_int_range),
+                    color=_color_dict["orange"], alpha=0.5)
+
+    ax.set_xlim(0, zvals[-1])
+    ax.set_ylim(0, 1.05 * np.max(pdf))
+
+    ax.set_xlabel(r"$\mathrm{Redshift}$")
+    ax.set_ylabel(r"$P(z | \mathrm{DM}) P(z)$")
+
+    # Set the position of the plot text
+    text_ypos_top = 0.90
+    text_ypos_padding = 0.06  # The space between each of the lines of text
+    if redshift < 1.5:
+        text_xpos = 0.60   # Low redshift -> text on right
+    else:
+        text_xpos = 0.05   # High redshift -> text on left
+
+    text_items = {
+        "name"     : (None if frb.name is None
+                      else r"$\mathrm{{%s}}$" % frb.name),
+
+        "dm"       : (r"$\mathrm{{DM}} = {}\ \mathrm{{pc\ "
+                      r"cm^{{-3}}}}$".format(frb.dm.value)),
+
+        "dm_galaxy": (r"$\mathrm{{DM_{{MW}}}} = {:.1f}\ "
+                      r"\mathrm{{pc\ cm^{{-3}}}}$".format(frb.dm_galaxy.value)),
+
+        "dm_model" : (r"$\mathrm{{Galactic\ DM\ Model = %s}}$"
+                      % frb.dm_galaxy_model),
+
+        "dm_excess": (r"$\mathrm{{DM_{{Excess}}}} = {:.1f}\ \mathrm{{pc\ "
+                      r"cm^{{-3}}}}$".format(frb.dm_excess.value)),
+
+        "redshift" : (r"$z = {:.3f}^{{+{:.3f}}}_{{-{:.3f}}}$".format(redshift,
+                      redshift - conf_int_lower, conf_int_upper - redshift)),
+    }
+
+    # Some of the text_items may be None, we cant to count the number of
+    # non-None items. So I have set up to lune_number to count them.
+    # If I don't do this the text is placed in the wrong place when
+    # the name is None.
+    line_number = 0
+    for item in text_items:
+        if text_items[item] is not None:
+            ax.text(text_xpos,
+                    text_ypos_top - text_ypos_padding * line_number, text_items[item],
+                    horizontalalignment='left',
+                    verticalalignment='center',
+                    transform=ax.transAxes,
+                    fontsize=11)
+            line_number += 1
+
+    if filename is not None:
+        if outputdir is not None:
+            os.path.join(outputdir, filename)
+        plt.savefig("{}.png".format(filename))
+        plt.close()
+
+    elif filename is None:
+        return fig, ax
+
 
 
 def method_comparison(filename=None, extension="png", usetex=False,
@@ -86,7 +195,8 @@ def method_comparison(filename=None, extension="png", usetex=False,
     A figure displaying how estimated redshift changes as a function of
     dispersion measure for each of the different cosmologies.
     """
-    plt.rcParams.update(set_rc_params(usetex))
+    # Update rcParams for consistent plotting style
+    plt.rcParams.update(set_rc_params(usetex=usetex))
 
     if passed_ax:
         ax = passed_ax
@@ -153,7 +263,8 @@ def cosmology_comparison(filename="", extension="png", usetex=False,
     A figure displaying how estimated redshift changes as a function of
     dispersion measure for each of the different cosmologies.
     """
-    set_rc_params(usetex)
+    # Update rcParams for consistent plotting style
+    plt.rcParams.update(set_rc_params(usetex=usetex))
 
     if passed_ax:
         ax = passed_ax

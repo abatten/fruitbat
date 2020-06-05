@@ -1,7 +1,6 @@
 """
 The collection of utility functions for Fruitbat.
 """
-from __future__ import print_function, absolute_import, division
 import os
 import numpy as np
 from scipy import interpolate
@@ -44,7 +43,7 @@ def check_type(value_name, value, dtype, desire=True):
             msg_add_in = "not have"
 
         msg = ("The value of {0} should {3} type: {1}. "
-                "Instead type({0}) = {2}".format(value_name, dtype, type(value), msg_add_in))
+               "Instead type({0}) = {2}".format(value_name, dtype, type(value), msg_add_in))
 
         raise ValueError(msg)
 
@@ -143,6 +142,7 @@ def calc_variance_from_pdf(x, pdf, dx=None):
 
     dx: optional
         Default: None
+
     """
 
     if dx is None:
@@ -152,6 +152,7 @@ def calc_variance_from_pdf(x, pdf, dx=None):
     mean = calc_mean_from_pdf(x, pdf, dx)
 
     return np.sum(pdf * dx * (x - mean)**2)
+
 
 def calc_std_from_pdf(x, pdf, dx=None):
     """
@@ -182,16 +183,13 @@ def calc_z_from_pdf_percentile(x, pdf, percentile):
 
     interpolated_cumsum = interpolate.interp1d(normed_cumsum, x)
 
-
-
-    return(interpolated_cumsum(percentile))
+    return interpolated_cumsum(percentile)
 
 
 
 
 def calc_median_from_pdf(x, pdf):
     """
-    Calc
     """
 
     return calc_z_from_pdf_percentile(x, pdf, percentile=0.5)
