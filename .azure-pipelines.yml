@@ -64,7 +64,7 @@ steps:
   displayName: Install gFortran on Linux
 
 - bash: |
-    brew install gfortran
+    brew cask install gfortran
   condition: eq(variables['Agent.OS'], 'Darwin')
   displayName: Install gFortran on MacOS
 
