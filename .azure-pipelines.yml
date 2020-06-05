@@ -12,8 +12,8 @@ trigger:
     include:
     - v*
 
-jobs:
-- job: Linux/Ubuntu
+#pool:
+#  vmImage: 'ubuntu-latest'
 strategy:
   matrix:
     ubuntu-p35:
@@ -28,85 +28,12 @@ strategy:
     ubuntu-p38:
       imageName: 'ubuntu-latest'
       python.version: '3.8'
-
-pool:
-  vmImage: $(imageName)
-
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
-
- - script: |
-    apt-get install gfortran
-
-  displayName: 'make gfortran available on Lunix/Ubuntu vm'
-
-- script: |
-    python -m pip install --upgrade pip setuptools
-    pip install -r requirements_dev.txt
-
-  displayName: 'Install dependencies'
-
-- script: |
-    pip install pytest pytest-azurepipelines
-    pytest
-
-  displayName: 'pytest'
-
-
-#pool:
-#  vmImage: 'ubuntu-latest'
-
-
-
-
-jobs:
-- job: macOS
-strategy:
-  matrix:
     macOS-p37:
       imageName: 'macOS-latest'
       python.version: '3.7'
     macOS-p38:
       imageName: 'macOS-latest'
       python.version: '3.8'
-
-pool:
-  vmImage: $(imageName)
-
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
-
- - script: |
-    brew install gcc
-
-  displayName: 'make gfortran available on mac os vm'
-
-- script: |
-    python -m pip install --upgrade pip setuptools
-    pip install -r requirements_dev.txt
-
-  displayName: 'Install dependencies'
-
-- script: |
-    pip install pytest pytest-azurepipelines
-    pytest
-
-  displayName: 'pytest'
-
-
-
-
-
-jobs:
-- job: Windows
-strategy:
-  matrix:
     windows-p35:
       imageName: 'windows-latest'
       python.version: '3.5'
@@ -120,8 +47,10 @@ strategy:
       imageName: 'windows-latest'
       python.version: '3.8'
 
+
 pool:
   vmImage: $(imageName)
+
 
 steps:
 - task: UsePythonVersion@0
@@ -129,13 +58,11 @@ steps:
     versionSpec: '$(python.version)'
   displayName: 'Use Python $(python.version)'
 
- - script: |
-    brew install gcc
-
-  displayName: 'make gfortran available on mac os vm'
-
 - script: |
+    brew install gfortran
+
     python -m pip install --upgrade pip setuptools
+
     pip install -r requirements_dev.txt
 
   displayName: 'Install dependencies'
