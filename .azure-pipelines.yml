@@ -58,9 +58,17 @@ steps:
     versionSpec: '$(python.version)'
   displayName: 'Use Python $(python.version)'
 
-- script: |
-    brew install gfortran
+- bash: |
+    sudo apt-get install gfortran
+  condition: eq(variables['Agent.OS'], 'Linux')
+  displayName: Install gFortran on Linux
 
+- bash: |
+    brew install gfortran
+  condition: eq(variables['Agent.OS'], 'Darwin')
+  displayName: Install gFortran on MacOS
+
+- script: |
     python -m pip install --upgrade pip setuptools
 
     pip install -r requirements_dev.txt

@@ -10,7 +10,7 @@ import pytest_mpl
 import astropy
 from astropy.coordinates import SkyCoord
 from astropy import units as u
-import pyymw16 as ymw16
+import pygedm
 
 import fruitbat
 from fruitbat import Frb, utils, cosmologies, methods, table, plot, catalogue
@@ -179,12 +179,21 @@ class TestFrbClass:
             self.frb_dm_host_est.calc_redshift(subtract_host="yes")
 
     # Test calc_dm_galaxy calculates dm_galaxy correctly for given coordinates.
-    def test_frb_calc_dm_galaxy(self):
-        dm_galaxy = self.frb_raj_decj.calc_dm_galaxy()
-        dm_pymw16, t_sc_pymw16 = ymw16.dist_to_dm(
+    def test_frb_calc_dm_galaxy_ymw16(self):
+        dm_galaxy = self.frb_raj_decj.calc_dm_galaxy("YMW16")
+        dm_pymw16, t_sc_pymw16 = pygedm.dist_to_dm(
             self.frb_raj_decj.skycoords.galactic.l,
-            self.frb_raj_decj.skycoords.galactic.b, 25000)
+            self.frb_raj_decj.skycoords.galactic.b, 25000, "NE2001")
         assert np.isclose(dm_galaxy.value, dm_pymw16.value)
+
+
+    # Test calc_dm_galaxy calculates dm_galaxy correctly for given coordinates.
+    def test_frb_calc_dm_galaxy_ne2001(self):
+        dm_galaxy = self.frb_raj_decj.calc_dm_galaxy("NE2001")
+        dm_ne2001, t_sc_ne2001 = pygedm.dist_to_dm(
+            self.frb_raj_decj.skycoords.galactic.l,
+            self.frb_raj_decj.skycoords.galactic.b, 25000, "NE2001")
+        assert np.isclose(dm_galaxy.value, dm_ne2001.value)
 
     # Test calc_dm_galaxy raises a ValueError when no coordinates are given
     def test_frb_cal_dm_galaxy_no_coords(self):
