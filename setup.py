@@ -1,5 +1,7 @@
 from setuptools import setup, find_packages
 from codecs import open
+import os
+import re
 
 with open("README.rst", "r") as f:
     long_description = f.read()
@@ -7,10 +9,21 @@ with open("README.rst", "r") as f:
 with open("requirements.txt", "r") as f:
     requirements = f.read().splitlines()
 
+def get_version():
+    here = os.path.abspath(os.path.dirname(__file__))
+    version_file = os.path.join(here, 'fruitbat', '__version__.py')
+
+    with open(version_file, "r") as vf:
+        lines = vf.read()
+        version = re.search(r"^_*version_* = ['\"]([^'\"]*)['\"]", lines, re.M).group(1)
+        return version
+
+
+fruitbat_version = get_version()
 
 setup(
     name='fruitbat',
-    version='0.2.0',
+    version=fruitbat_version,
     author='Adam Batten',
     author_email='adamjbatten@gmail.com',
     url='https://github.com/abatten/fruitbat',
@@ -23,8 +36,8 @@ setup(
     long_description=long_description,
     install_requires=requirements,
     classifiers=[
-        "Programming Language :: Python :: 2"
-        "Programming Language :: Python :: 2.7"
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
@@ -35,7 +48,7 @@ setup(
         ],
     package_dir={"fruitbat": "fruitbat"},
     packages=find_packages(),
-    package_data={'fruitbat': ['*.npy']},
+    package_data={'fruitbat': ['*.npz', '*.npy', '*.csv']},
     include_package_data=True,
     keywords=("FRB redshift astronomy astrophysics fast radio burst"),
 )
