@@ -14,4 +14,6 @@ exclude docs
 recursive-exclude docs *
 exclude *.yml
 recursive-exclude paper *
-recursive-excluse logos *
+recursive-exclude logos *
+
+
