@@ -12,12 +12,45 @@ jobs:
     strategy:
       matrix:
         architecture: [x86, x64]
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        compiler: gfortran-8
+        os: [ubuntu-latest]
+        compiler: gfortran-10
         python-version: [3.6, 3.7, 3.8, 3.9]
         exclude:
           - os: ubuntu-latest
             architecture: x86
+      fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }} ${{ matrix.architecture }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture:  ${{ matrix.architecture }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install gfortran
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -r requirements_dev.txt
+    - name: Test package
+      run: |
+        pytest
+    - name: Upload coverage
+      run: |
+        curl -s https://codecov.io/bash | bash
+
+jobs:
+  build:
+    name: ${{ matrix.os }} ${{ matrix.architecture }}, Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        architecture: [x86, x64]
+        os: [macos-latest]
+        compiler: gfortran-10
+        python-version: [3.6, 3.7, 3.8, 3.9]
+        exclude:
           - os: macos-latest
             architecture: x86
       fail-fast: false
@@ -31,6 +64,7 @@ jobs:
         architecture:  ${{ matrix.architecture }}
     - name: Install dependencies
       run: |
+        brew install --cask gfortran
         python -m pip install --upgrade pip setuptools wheel
         pip install -r requirements_dev.txt
     - name: Test package
