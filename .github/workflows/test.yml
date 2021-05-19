@@ -39,7 +39,7 @@ jobs:
       run: |
         curl -s https://codecov.io/bash | bash
 
-jobs:
+jobs2:
   build:
     name: ${{ matrix.os }} ${{ matrix.architecture }}, Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
