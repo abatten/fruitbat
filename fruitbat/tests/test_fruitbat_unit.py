@@ -183,7 +183,7 @@ class TestFrbClass:
         dm_galaxy = self.frb_raj_decj.calc_dm_galaxy("YMW16")
         dm_pymw16, t_sc_pymw16 = pygedm.dist_to_dm(
             self.frb_raj_decj.skycoords.galactic.l,
-            self.frb_raj_decj.skycoords.galactic.b, 25000, "NE2001")
+            self.frb_raj_decj.skycoords.galactic.b, 25000, method="YMW16")
         assert np.isclose(dm_galaxy.value, dm_pymw16.value)
 
 
@@ -192,7 +192,7 @@ class TestFrbClass:
         dm_galaxy = self.frb_raj_decj.calc_dm_galaxy("NE2001")
         dm_ne2001, t_sc_ne2001 = pygedm.dist_to_dm(
             self.frb_raj_decj.skycoords.galactic.l,
-            self.frb_raj_decj.skycoords.galactic.b, 25000, "NE2001")
+            self.frb_raj_decj.skycoords.galactic.b, 25000, method="NE2001")
         assert np.isclose(dm_galaxy.value, dm_ne2001.value)
 
     # Test calc_dm_galaxy raises a ValueError when no coordinates are given

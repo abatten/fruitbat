@@ -189,6 +189,8 @@ class Frb(object):
         self.cosmology = None
         self.method = None
         self.dm_galaxy_model = None
+        self.z_conf_int_lower = None
+        self.z_conf_int_upper = None
 
         # Calculate fluence if peak_flux and width are given
         if ((self.fluence is None) and
@@ -230,7 +232,7 @@ class Frb(object):
 
     @docstring_substitute(meth=methods.available_methods(),
                           cosmo=cosmologies.available_cosmologies())
-    def calc_redshift(self, method='Batten2020', cosmology="Planck18",
+    def calc_redshift(self, method='Batten2021', cosmology="Planck18",
                       subtract_host=False, lookup_table=None):
         """
         Calculate the redshift of the FRB from its :attr:`dm`,
@@ -324,38 +326,26 @@ class Frb(object):
             self.cosmology = cosmology
             self.method = method
 
-
-
-
-        #elif method in methods.available_methods():
-        #    table_name = utils.get_path_to_file_from_here("{}.hdf5".format(method), subdirs=["data"])
-        #   self.z = table.get_z_from_table(input_dm, table_name, cosmology)
-
-
-
-
-
-
         return self.z
 
     #@docstring_substitute(meth=methods.available_methods(),
     #                      cosmo=cosmologies.available_cosmologies())
-    def calc_redshift_pdf(self, method="Batten2020", cosmology="Planck18", prior="uniform", subtract_host=False,
+    def calc_redshift_pdf(self, method="Batten2021", cosmology="Planck18", prior="uniform", subtract_host=False,
                           lookup_table=None):
         """
         Calc
         """
-        if method == "Batten2020":
-            filename = utils.get_path_to_file_from_here("Batten2020.hdf5", subdirs=["data"])
+        if method == "Batten2021":
+            filename = utils.get_path_to_file_from_here("Batten2021.hdf5", subdirs=["data"])
 
 
         elif method in methods.methods_analytic():
             filename = "{}.hdf5".format(method)
             filename = utils.get_path_to_file_from_here(filename, subdirs=["data"])
-            raise NotImplementedError("This has not been implemented yet!")
+            raise NotImplementedError("Getting PDFs from analytic moddels has not been implemented yet!")
 
         else:
-            raise NotImplementedError("THis has not been implemented yet!")
+            raise NotImplementedError("This has not been implemented yet!")
 
 
         with h5py.File(filename, "r") as data:
@@ -401,7 +391,7 @@ class Frb(object):
 
     @docstring_substitute(meth=methods.available_methods(),
                           cosmo=cosmologies.available_cosmologies())
-    def calc_redshift_conf_int(self, method="Batten2020", sigma=1, scatter_percentage=0, **calc_redshift_kwargs):
+    def calc_redshift_conf_int(self, method="Batten2021", sigma=1, scatter_percentage=0, **calc_redshift_kwargs):
     #method='Batten2020', cosmology="Planck18", sigma=1,
     #                           scatter_percentage=0, subtract_host=False, lookup_table=None):
         """
@@ -412,7 +402,7 @@ class Frb(object):
         Parameters
         ----------
         method : str, optional
-            The dispersion meausre -redshift relation to use when
+            The dispersion meausre-redshift relation to use when
             calculating the redshift. Avaliable methods:  %(meth)s.
             Default: 'Batten2020'
 
@@ -464,8 +454,8 @@ class Frb(object):
 
 
         if method in methods.methods_hydrodynamic():
-            if method == "Batten2020":
-                zvals, pdf, dz = self.calc_redshift_pdf(method="Batten2020")
+            if method == "Batten2021":
+                zvals, pdf, dz = self.calc_redshift_pdf(method="Batten2021")
 
                 conf_lower_lim, conf_upper_lim = utils.sigma_to_pdf_percentiles(sigma=sigma)
 
@@ -594,7 +584,7 @@ class Frb(object):
         dm_galaxy, tau_sc = pygedm.dist_to_dm(
             gl=self._skycoords.galactic.l,
             gb=self._skycoords.galactic.b,
-            dist=25000,
+            dist=25000.0,
             method=model)
 
         self.dm_galaxy_model = model

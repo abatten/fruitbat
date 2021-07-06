@@ -182,10 +182,10 @@ def zhang2018(z, cosmo, zmin=0, **kwargs):
     return dm.value
 
 
-def batten2020(z, return_pdf=False):
+def batten2021(z, return_pdf=False):
     """
-    Calculates the mean dispersion measure from redshift zero to redshift ``z``
-    using the Batten (2020) relation.
+    Calculates the mean dispersion measure from redshift zero to
+    redshift ``z`` using the Batten et al. (2021) relation.
 
     Parameters
     ----------
@@ -193,39 +193,40 @@ def batten2020(z, return_pdf=False):
         The input redshift.
 
     return_pdf:
-        If ``True``, returns the entire DM PDF and DM ranges instead of the mean DM value.
-        Default: False
+        If ``True``, returns the entire DM PDF and DM ranges instead of
+        the mean DM value. Default: False
 
     Returns
     -------
     mean_dm: float
 
     dm_array: :obj:`np.ndarray`, optional
-        The array of
+        The array of DM values.
 
     dm_pdf: :obj:`np.ndarray`, optional
-        The DM pdf
+        The DM PDF at redshift `z`.
     """
 
-    filename = utils.get_path_to_file_from_here("Batten2020.hdf5", subdirs=["data"])
+    filename = utils.get_path_to_file_from_here("Batten2021.hdf5", subdirs=["data"])
 
-    with h5py.File(filename, "r") as b20_data:
+    with h5py.File(filename, "r") as b21_data:
+        DMzHist = b21_data["DMz_hist"][:]
 
-        DMzHist = b20_data["DMz_hist"][:]
+        redshift_bins = b21_data["Redshifts"][:-1]
+        redshift_bin_widths = b21_data["Redshift_Bin_Widths"][:]
 
         # Convert bins to linear, since they are in log
-        DMBins = 10**b20_data["DM_Bin_Edges"][:]
+        DM_bins = 10**b21_data["DM_Bin_Edges"][:]
 
-        max_bin_idx = np.where(dm <= DMBins)[0][0]
 
+        max_bin_idx = np.where(z <= DM_bins)[0][0]
         pdf = DMzHist[max_bin_idx]
 
-        redshifts = b20_data["Redshifts"][:-1]
-        redshift_bin_widths = b20_data["Redshift_Bin_Widths"][:]
 
+        dm = utils.calc_mean_from_pdf(redshifts, pdf, dx=redshift_bin_widths)
 
     if return_pdf:
-        dm = (dm, dm_array, pdf)
+        dm = (dm, DMBins, pdf)
     else:
         dm = dm
     return dm
@@ -248,7 +249,7 @@ def builtin_method_functions():
         "Ioka2003": ioka2003,
         "Inoue2004": inoue2004,
         "Zhang2018": zhang2018,
-        "Batten2020": batten2020,
+        "Batten2021": batten2021,
     }
     return methods
 
@@ -339,7 +340,7 @@ def methods_hydrodynamic():
     """
 
     hydro = [
-        "Batten2020",
+        "Batten2021",
     ]
 
     return hydro

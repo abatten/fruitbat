@@ -52,7 +52,7 @@ def set_rc_params(usetex=False):
 
 
 
-def redshift_pdf(frb, method="Batten2020", sigma=1, usetex=True,
+def redshift_pdf(frb, method="Batten2021", sigma=1, usetex=True,
                  filename=None, outputdir=None):
     """
     Plots the redshift pdf and confidence interval for an FRB.
@@ -323,7 +323,7 @@ def cosmology_comparison(filename="", extension="png", usetex=False,
 
         ax.indicate_inset_zoom(axin)
 
-    if filename is not "":
+    if filename != "":
         plt.savefig(".".join([filename, extension]))
 
     if passed_ax:
