@@ -607,11 +607,12 @@ class Frb(object):
                 gb=self._skycoords.galactic.b,
                 method='yt2020'
             )
+
         else:
             self.galaxy_halo = 0 * u.pc * u.cm**(-3)
 
         self.dm_galaxy_model = model
-        self.dm_galaxy = dm_galaxy.value + self.galaxy_halo
+        self.dm_galaxy = dm_galaxy.value + self.galaxy_halo.value
         self.tau_sc = tau_sc.value
         self.calc_dm_excess()
 
