@@ -191,6 +191,7 @@ class Frb(object):
         self.dm_galaxy_model = None
         self.z_conf_int_lower = None
         self.z_conf_int_upper = None
+        self.tau_sc = None
 
         # Calculate fluence if peak_flux and width are given
         if ((self.fluence is None) and
@@ -551,11 +552,24 @@ class Frb(object):
             https://fruitbat.readthedocs.io/en/latest/user_guide/ne2001_installation.html
             Default: 'ymw16'
 
+        include_halo : bool, optional
+            Include the DM of the galactic halo which isn't included
+            in NE2001 or YMW16. This used the YT2020 halo model. Default: False
+
+        return_tau_sc : bool, optional
+            Return the scattering timescale in addition to the DM.
+            Default: False
+
         Returns
         -------
-        :obj:`astropy.units.Quantity`
+        dm_galaxy: :obj:`astropy.units.Quantity`
             The dispersion measure contribution from the Milky Way of
             the FRB.
+
+        tau_sc: :obj:`astropy.units.Quantity`, optional
+            The scattering timescale at 1 GHz (s). Only returns if
+            :attr:`return_tau_sc` is `True`.
+
         """
         YMW16_options = ["ymw16", "YMW16"]
         NE2001_options = ["ne2001", "NE2001"]
@@ -587,10 +601,20 @@ class Frb(object):
             dist=25000.0,
             method=model)
 
+        if include_halo:
+            self.galaxy_halo = pygedm.calculate_halo_dm(
+                gl=self._skycoords.galactic.l,
+                gb=self._skycoords.galactic.b,
+                method='yt2020'
+            )
+        else:
+            self.galaxy_halo = 0 * u.pc * u.cm**(-3)
+
         self.dm_galaxy_model = model
-        self.dm_galaxy = dm_galaxy.value
+        self.dm_galaxy = dm_galaxy.value + self.galaxy_halo
         self.tau_sc = tau_sc.value
         self.calc_dm_excess()
+
         if return_tau_sc:
             return self.dm_galaxy, self.tau_sc
         else:
