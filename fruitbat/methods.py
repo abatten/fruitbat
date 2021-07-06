@@ -212,14 +212,14 @@ def batten2021(z, return_pdf=False):
     with h5py.File(filename, "r") as b21_data:
         DMzHist = b21_data["DMz_hist"][:]
 
-        redshift_bins = b21_data["Redshifts"][:-1]
+        redshifts = b21_data["Redshifts"][:-1]
         redshift_bin_widths = b21_data["Redshift_Bin_Widths"][:]
 
         # Convert bins to linear, since they are in log
-        DM_bins = 10**b21_data["DM_Bin_Edges"][:]
+        DMBins = 10**b21_data["DM_Bin_Edges"][:]
 
 
-        max_bin_idx = np.where(z <= DM_bins)[0][0]
+        max_bin_idx = np.where(z <= DMBins)[0][0]
         pdf = DMzHist[max_bin_idx]
 
 
