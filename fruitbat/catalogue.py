@@ -5,7 +5,7 @@ from e13tools import docstring_substitute
 
 from fruitbat import Frb, methods, cosmologies
 
-__all__ = ["create_analysis_catalogue", "create_methods_catalogue", 
+__all__ = ["create_analysis_catalogue", "create_methods_catalogue",
            "read_frb_row"]
 
 
@@ -45,10 +45,11 @@ def create_analysis_catalogue(filename="fruitbat_analysis_catalogue",
     Generates
     ---------
     A csv file with the output of the of the analysis.
+
     """
     if dataset == 'default':
 
-        dataset = os.path.join(os.path.dirname(__file__), 'data', 
+        dataset = os.path.join(os.path.dirname(__file__), 'data',
                                'frbcat_database_20190408.csv')
 
     df = pd.read_csv(dataset)
@@ -70,17 +71,29 @@ def create_analysis_catalogue(filename="fruitbat_analysis_catalogue",
 
         # Calculate FRB properties
         frb.calc_dm_galaxy()
-        frb.calc_redshift()
+        frb.calc_redshift(method="Inoue2004")
         energy = frb.calc_energy()
         luminosity = frb.calc_luminosity()
 
-        df_out.iloc[item] = [frb.name, data["telescope"], frb.raj,
-                             frb.decj, frb.gl, frb.gb, frb.dm.value,
-                             frb.width.value, frb.obs_bandwidth.value,
-                             frb.obs_freq_central.value, frb.peak_flux.value,
-                             frb.snr, frb.dm_galaxy.value, frb.z.value,
-                             frb.fluence.value, energy.value,
-                             luminosity.value, method, cosmology]
+        df_out.iloc[item] = [frb.name,
+                             data["telescope"],
+                             frb.raj,
+                             frb.decj,
+                             frb.gl,
+                             frb.gb,
+                             frb.dm.value,
+                             frb.width.value,
+                             frb.obs_bandwidth.value,
+                             frb.obs_freq_central.value,
+                             frb.peak_flux.value,
+                             frb.snr,
+                             frb.dm_galaxy.value,
+                             frb.z.value,
+                             frb.fluence.value,
+                             energy.value,
+                             luminosity.value,
+                             method,
+                             cosmology]
 
         output_name = "".join([filename, ".csv"])
         df_out.to_csv(output_name)
@@ -113,6 +126,7 @@ def create_methods_catalogue(filename="fruitbat_methods_catalogue",
     Generates
     ---------
     A csv file with the output of the of the analysis.
+
     """
     if dataset == 'default':
         dataset = os.path.join(os.path.dirname(__file__), 'data',
@@ -134,9 +148,9 @@ def create_methods_catalogue(filename="fruitbat_methods_catalogue",
         # Calculate FRB properties
         frb.calc_dm_galaxy()
 
-        z_ioka = frb.calc_redshift(method="Ioka2003")
-        z_inoue = frb.calc_redshift(method="Inoue2004")
-        z_zhang = frb.calc_redshift(method="Zhang2018")
+        z_ioka = frb.calc_redshift(method="Ioka2003", cosmology=cosmology)
+        z_inoue = frb.calc_redshift(method="Inoue2004", cosmology=cosmology)
+        z_zhang = frb.calc_redshift(method="Zhang2018", cosmology=cosmology)
 
         df_out.iloc[item] = [frb.name, data["telescope"], frb.raj,
                              frb.decj, frb.gl, frb.gb, frb.dm.value,
@@ -149,7 +163,7 @@ def create_methods_catalogue(filename="fruitbat_methods_catalogue",
 
 def read_frb_row(row):
     """
-    Reads the row of a :obj:`~pandas.DataFrame` and retrieves the 
+    Reads the row of a :obj:`~pandas.DataFrame` and retrieves the
     data in the correct format.
 
     Parameters
@@ -160,6 +174,7 @@ def read_frb_row(row):
     Returns
     -------
     A dictionary containing the FRB paramemters
+
     """
     drow = {"name": row['frb_name'],
             "utc": row['utc'],
