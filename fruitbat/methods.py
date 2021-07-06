@@ -7,7 +7,7 @@ import h5py
 from fruitbat import utils
 
 
-__all__ = ["ioka2003", "inoue2004", "zhang2018",
+__all__ = ["ioka2003", "inoue2004", "zhang2018", "batten2021"
            "builtin_method_functions", "add_method",
            "available_methods", "reset_methods", "method_functions",
            "methods_hydrodynamic", "methods_analytic"]

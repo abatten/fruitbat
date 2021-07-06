@@ -5,7 +5,11 @@ import os
 import numpy as np
 from scipy import interpolate
 
-__all__ = ["check_keys_in_dict"]
+__all__ = ["check_keys_in_dict", "check_type", "calc_mean_from_pdf", 
+    "calc_median_from_pdf", "calc_std_from_pdf", "calc_variance_from_pdf", 
+    "calc_z_from_pdf_percentile", "normalise_to_pdf", "redshift_prior", 
+    "sigma_to_pdf_percentiles", ]
+
 
 def check_type(value_name, value, dtype, desire=True):
     """
@@ -50,16 +54,13 @@ def check_type(value_name, value, dtype, desire=True):
     else:
         pass
 
-
-
-
 def check_keys_in_dict(dictionary, keys):
     """
     Checks that a list of keys exist in a dictionary.
 
     Parameters
     ----------
-    dictionary: dict
+    dictionary : dict
         The input dictionary.
 
     keys: list of strings
@@ -84,10 +85,10 @@ def get_path_to_file_from_here(filename, subdirs=None):
 
     Parameters
     ----------
-    filename: str
+    filename : str
         The name of the file
 
-    subdirs: list of strs, optional
+    subdirs : list of strs, optional
         A list of strings containing any subdirectory names.
         Default: None
 
@@ -116,11 +117,20 @@ def calc_mean_from_pdf(x, pdf, dx=None):
 
     Parameters
     ----------
-    x:
+    x : np.ndarray
+        The x values.
 
-    pdf:
+    pdf : np.ndarray
+        The value of the PDF at x.
 
-    dx:
+    dx : np.ndarray or None, optional
+        The spacing between the x bins. 
+        If `None`, then the bins are assumed to be linearly spaced.
+
+    Returns
+    -------
+    mean : float
+        The mean of the PDF.
 
     """
     if dx is None:
@@ -136,12 +146,20 @@ def calc_variance_from_pdf(x, pdf, dx=None):
 
     Parameters
     ----------
-    x:
+    x : np.ndarray
+        The x values.
 
-    pdf:
+    pdf : np.ndarray
+        The value of the PDF at x.
 
-    dx: optional
-        Default: None
+    dx : np.ndarray or None, optional
+        The spacing between the x bins. 
+        If `None`, then the bins are assumed to be linearly spaced.
+
+    Returns
+    -------
+    variance : float
+        The variance of the PDF.
 
     """
 
@@ -161,12 +179,21 @@ def calc_std_from_pdf(x, pdf, dx=None):
 
     Parameters
     ----------
-    x
+    x : np.ndarray
+        The x values.
 
-    pdf
+    pdf : np.ndarray
+        The value of the PDF at x.
 
-    dx: optional
-        Default: None
+    dx : np.ndarray or None, optional
+        The spacing between the x bins. 
+        If `None`, then the bins are assumed to be linearly spaced.
+
+    Returns
+    -------
+    std : float
+        The standard deviation of the PDF.
+
     """
     if dx is None:
         # If no dx is provided assume they are linearly spaced
@@ -177,12 +204,28 @@ def calc_std_from_pdf(x, pdf, dx=None):
 
 def calc_z_from_pdf_percentile(x, pdf, percentile):
     """
+
+
+    Parameters
+    ----------
+    x : np.ndarray
+        The x values of the PDF.
+
+    pdf : np.ndarray
+        The value of the PDF at x.
+
+    percentile : float
+        The percentile of the PDF.
+
+    Returns
+    -------
+    redshift : float
+        The redshift at the given percentile.
+
     """
     cumsum = np.cumsum(pdf)
     normed_cumsum = cumsum / cumsum[-1]
-
     interpolated_cumsum = interpolate.interp1d(normed_cumsum, x)
-
     return interpolated_cumsum(percentile)
 
 
@@ -190,11 +233,23 @@ def calc_z_from_pdf_percentile(x, pdf, percentile):
 
 def calc_median_from_pdf(x, pdf):
     """
+    Calculates the median of a PDF.
+
+    Parameters
+    ----------
+    x : np.ndarray
+        The x values.
+
+    pdf : np.ndarray
+        The value of the PDF at x.
+
+    Returns
+    -------
+    median: float
+        The median of the PDF.
+
     """
-
     return calc_z_from_pdf_percentile(x, pdf, percentile=0.5)
-
-
 
 
 def normalise_to_pdf(hist, bin_widths):
@@ -210,6 +265,17 @@ def normalise_to_pdf(hist, bin_widths):
 
 def linear_interpolate_pdfs(sample, xvals, pdfs):
     """
+
+    Parameters
+    ----------
+    sample
+
+    xvals: 
+
+    Returns
+    -------
+    PDF: np.ndarray
+        The PDF at sample.
     """
     x1, x2 = xvals
     pdf1, pdf2 = pdfs
@@ -223,19 +289,26 @@ def linear_interpolate_pdfs(sample, xvals, pdfs):
 
 def sigma_to_pdf_percentiles(sigma):
     """
-
+    Looks up the percentile range of Gaussian for a given
+    standard deviation.
 
     Parameters
     ----------
     sigma: [1, 2, 3, 4, 5]
-
+        The standard deviation to calculate a percentile.
 
     Returns
     -------
-    float
-        Lower
-    float
-        Higher
+    Lower: float
+        The lower percentile
+    Higher: float
+        The higher percentile
+
+    Example
+    -------
+    >>> sigma_to_pdf_percentiles(1)
+    (0.158655254, 0.841344746)
+
     """
 
     std = int(sigma)
@@ -260,8 +333,6 @@ def sigma_to_pdf_percentiles(sigma):
 def redshift_prior(zbins, prior="uniform"):
     """
     """
-
-
     available_priors = [
         "uniform",
         "volume",
@@ -278,6 +349,5 @@ def redshift_prior(zbins, prior="uniform"):
     elif prior == "volume":
         msg = "The volume dependent prior has not been implimented yet"
         raise NotImplementedError(msg)
-
 
     return Pz
