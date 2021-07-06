@@ -64,7 +64,7 @@ def redshift_pdf(frb, method="Batten2021", sigma=1, usetex=True,
 
     method: str, optional
 
-        Default: "Batten2020"
+        Default: "Batten2021"
 
     sigma: [1, 2, 3, 4, 5], optional
         The width of the confidence interval in units of sigma.
@@ -205,7 +205,7 @@ def method_comparison(filename=None, extension="png", usetex=False,
         ax = fig.add_subplot(111)
 
     method_list = methods.builtin_method_functions()
-    method_list.pop("Batten2020")
+    method_list.pop("Batten2021")
     dm_vals = np.linspace(0, 3000, 1000)
 
     colours = ["#1b9e77", "#d95f02", "#7570b3"]
