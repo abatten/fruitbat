@@ -436,7 +436,15 @@ class TestPlots:
         if not os.path.exists(os.path.join(cwd, "pytest_output_cosmo.png")):
             raise OSError
 
+    def test_redshift_pdf_plot(self):
+        frb = Frb(510, gl=34,gb=15)
+        with pytest_mpl.plugin.switch_backend('Agg'):
+            plot.redshift_pdf(frb, filename="pytest_output_pdf", usetex=False)
+        cwd = os.getcwd()
+        if not os.path.exists(os.path.join(cwd, "pytest_output_cosmo.png")):
+            raise OSError  
 
+            
 def test_cleanup():
     # Remove the files at end of test
     test_files = glob("*pytest_output*")
