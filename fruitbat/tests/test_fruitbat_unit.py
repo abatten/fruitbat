@@ -1,15 +1,48 @@
 import os
+from glob import glob
+from textwrap import dedent
 
 import numpy as np
-from glob import glob
+
 import pytest
 import pytest_mpl
 
+import astropy
 from astropy.coordinates import SkyCoord
 from astropy import units as u
-import pyymw16 as ymw16
+import pygedm
 
+import fruitbat
 from fruitbat import Frb, utils, cosmologies, methods, table, plot, catalogue
+
+
+def test_get_bibtex_is_correct():
+
+    ads_bibtex = dedent(
+    r"""
+        @ARTICLE{2019JOSS....4.1399B,
+               author = {{Batten}, Adam},
+                title = "{Fruitbat: A Python Package for Estimating Redshifts of Fast Radio Bursts}",
+              journal = {The Journal of Open Source Software},
+             keywords = {Astrophysics - Instrumentation and Methods for Astrophysics, Astrophysics - High Energy Astrophysical Phenomena},
+                 year = "2019",
+                month = "May",
+               volume = {4},
+               number = {37},
+                pages = {1399},
+                  doi = {10.21105/joss.01399},
+        archivePrefix = {arXiv},
+               eprint = {1905.04294},
+         primaryClass = {astro-ph.IM},
+               adsurl = {https://ui.adsabs.harvard.edu/abs/2019JOSS....4.1399B},
+              adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+        }
+    """
+    )
+    assert fruitbat.get_bibtex() == ads_bibtex.strip()
+
+def test_cite_is_get_bibtex():
+    assert fruitbat.__cite__() == fruitbat.get_bibtex()
 
 
 class TestFrbClass:
@@ -27,6 +60,28 @@ class TestFrbClass:
     frb_utc = Frb(dm=1000, utc="1999-01-01T00:00:00.000")
     frb_with_units = Frb(dm=1000, obs_bandwidth=400*u.MHz)
     frb_fluence = Frb(dm=1000, fluence=2)
+
+
+    def test_frb_dm_assignment_int(self):
+        test_frb = Frb(1000)
+        assert test_frb.dm == 1000.0 * u.pc * u.cm**-3
+
+    def test_frb_dm_assignment_float(self):
+        test_frb = Frb(1000.0)
+        assert test_frb.dm == 1000.0 * u.pc * u.cm**-3
+
+    def test_frb_dm_assignment_string(self):
+        with pytest.raises(ValueError):
+            test_frb = Frb("1000")
+
+    def test_frb_gl_gb_assignment_float(self):
+        test_frb = Frb(1000, gl=10, gb=20)
+        assert (test_frb.gl.value, test_frb.gb.value) == (10, 20)
+
+    def test_frb_gl_gb_assignment_string(self):
+        test_frb = Frb(1000, gl="10", gb="20")
+        assert (test_frb.gl.value, test_frb.gb.value) == (10, 20)
+
 
     # Test that methods returns the correct value for DM=1000 and planck2018
     def test_methods(self):
@@ -50,7 +105,7 @@ class TestFrbClass:
     def test_invalid_cosmology(self):
         invalid_cosmology = "cosmos_1964"
         with pytest.raises(ValueError):
-            self.frb.calc_redshift(cosmology=invalid_cosmology)
+            self.frb.calc_redshift(method="Ioka2003", cosmology=invalid_cosmology)
 
     # Test raises error on dispersion measure less than zero
     def test_frb_negative_dm(self):
@@ -114,8 +169,8 @@ class TestFrbClass:
 
     # Test calc_redshift with subract_host
     def test_frb_calc_redshift_subtract_host(self):
-        dm_1 = self.frb_dm_host_est.calc_redshift(subtract_host=True)
-        dm_2 = self.frb.calc_redshift()
+        dm_1 = self.frb_dm_host_est.calc_redshift(method="Ioka2003", subtract_host=True)
+        dm_2 = self.frb.calc_redshift(method="Ioka2003")
         assert np.isclose(dm_1, dm_2)
 
     # Test that calc_redshift will raise error if subtract_host is not a bool
@@ -124,12 +179,21 @@ class TestFrbClass:
             self.frb_dm_host_est.calc_redshift(subtract_host="yes")
 
     # Test calc_dm_galaxy calculates dm_galaxy correctly for given coordinates.
-    def test_frb_calc_dm_galaxy(self):
-        dm_galaxy = self.frb_raj_decj.calc_dm_galaxy()
-        dm_pymw16, t_sc_pymw16 = ymw16.dist_to_dm(
+    def test_frb_calc_dm_galaxy_ymw16(self):
+        dm_galaxy = self.frb_raj_decj.calc_dm_galaxy("YMW16")
+        dm_pymw16, t_sc_pymw16 = pygedm.dist_to_dm(
             self.frb_raj_decj.skycoords.galactic.l,
-            self.frb_raj_decj.skycoords.galactic.b, 25000)
+            self.frb_raj_decj.skycoords.galactic.b, 25000, method="YMW16")
         assert np.isclose(dm_galaxy.value, dm_pymw16.value)
+
+
+    # Test calc_dm_galaxy calculates dm_galaxy correctly for given coordinates.
+#    def test_frb_calc_dm_galaxy_ne2001(self):
+#        dm_galaxy = self.frb_raj_decj.calc_dm_galaxy("NE2001")
+#        dm_ne2001, t_sc_ne2001 = pygedm.dist_to_dm(
+#            self.frb_raj_decj.skycoords.galactic.l,
+#            self.frb_raj_decj.skycoords.galactic.b, 25000, method="NE2001")
+#        assert np.isclose(dm_galaxy.value, dm_ne2001.value)
 
     # Test calc_dm_galaxy raises a ValueError when no coordinates are given
     def test_frb_cal_dm_galaxy_no_coords(self):
@@ -143,47 +207,47 @@ class TestFrbClass:
 
     # Test calc_energy calculates the energy of an FRB
     def test_frb_calc_energy_bandwidth(self):
-        self.frb_energy.calc_redshift()
+        self.frb_energy.calc_redshift(method="Inoue2004")
         energy = self.frb_energy.calc_energy(use_bandwidth=True)
         assert np.isclose(energy.value, 2.13256754066293e+40)
 
     def test_frb_calc_energy_frequency(self):
-        self.frb_energy_freq.calc_redshift()
+        self.frb_energy_freq.calc_redshift(method="Inoue2004")
         energy = self.frb_energy_freq.calc_energy()
         assert np.isclose(energy.value, 2.13256754066293e+37)
 
     def test_frb_calc_energy_no_fluence(self):
         with pytest.raises(ValueError):
-            self.frb.calc_redshift()
+            self.frb.calc_redshift(method="Inoue2004")
             self.frb.calc_energy(use_bandwidth=True)
 
     def test_frb_calc_energy_no_bandwidth(self):
         with pytest.raises(ValueError):
-            self.frb_fluence.calc_redshift()
+            self.frb_fluence.calc_redshift(method="Inoue2004")
             self.frb_fluence.calc_energy(use_bandwidth=True)
 
     def test_frb_calc_energy_no_frequency(self):
         with pytest.raises(ValueError):
-            self.frb_energy.calc_redshift()
+            self.frb_energy.calc_redshift(method="Inoue2004")
             self.frb_energy.calc_energy()
 
     def test_frb_calc_luminosity_bandwidth(self):
-        self.frb_energy.calc_redshift()
+        self.frb_energy.calc_redshift(method="Inoue2004")
         lum = self.frb_energy.calc_luminosity(use_bandwidth=True)
         assert np.isclose(lum.value, 4.229828665e+43)
 
     def test_frb_calc_luminosity_frequency(self):
-        self.frb_energy_freq.calc_redshift()
+        self.frb_energy_freq.calc_redshift(method="Inoue2004")
         lum = self.frb_energy_freq.calc_luminosity()
         assert np.isclose(lum.value, 4.2298286655e+40)
 
     def test_frb_calc_luminosity_no_frequency(self):
         with pytest.raises(ValueError):
-            self.frb_energy.calc_redshift()
+            self.frb_energy.calc_redshift(method="Inoue2004")
             self.frb_energy.calc_luminosity()
 
     def test_frb_calc_comoving_distance(self):
-        self.frb.calc_redshift()
+        self.frb.calc_redshift(method="Inoue2004")
         dist = self.frb.calc_comoving_distance()
         assert np.isclose(dist.value, 3351.51321266)
 
@@ -202,23 +266,29 @@ class TestFrbClass:
             print(attr)
 
 
-def test_create_cosmology():
-
+def test_create_FlatLambdaCDM_cosmology():
     # Test FlatLambdaCDM
     FlatLambdaCDM_params = {'H0': 67, 'Om0': 0.3, 'flat': True}
-    cosmologies.create_cosmology(FlatLambdaCDM_params)
+    flcdm = cosmologies.create_cosmology(FlatLambdaCDM_params)
+    assert type(flcdm) == astropy.cosmology.core.FlatLambdaCDM
 
+def test_create_FlatwCDM_cosmology():
     # Test FlatwCDM
     FlatwCDM_params = {'H0': 67, 'Om0': 0.3, 'flat': True, 'w0': 0.9}
-    cosmologies.create_cosmology(FlatwCDM_params)
+    fwcdm = cosmologies.create_cosmology(FlatwCDM_params)
+    assert type(fwcdm) == astropy.cosmology.core.FlatwCDM
 
+def test_create_LambdaCDM_cosmology():
     # Test LambdaCDM
     LambdaCDM_params = {'H0': 67, 'Om0': 0.3, 'Ode0': 0.8, 'flat': False}
-    cosmologies.create_cosmology(LambdaCDM_params)
+    lcdm = cosmologies.create_cosmology(LambdaCDM_params)
+    assert type(lcdm) == astropy.cosmology.core.LambdaCDM
 
+def test_create_wCDM_cosmology():
     # Test wCDM
     wCDM_params = {'H0': 67, 'Om0': 0.3, 'Ode0': 0.8, 'flat': False, 'w0': 0.9}
-    cosmologies.create_cosmology(wCDM_params)
+    wcdm = cosmologies.create_cosmology(wCDM_params)
+    assert type(wcdm) == astropy.cosmology.core.wCDM
 
 
 class Test_fz_integrand:
@@ -289,30 +359,36 @@ class TestCreateTables:
         method_list = methods.builtin_method_functions()
         cosmology_list = cosmologies.builtin_cosmology_functions()
 
-        # Create a lookup table for each method and cosmology
-        for method in method_list:
-            for key in cosmology_list:
+        # Create a lookup table for each analytic method and cosmology
+        for method_key in method_list:
+            if method_key in methods.methods_hydrodynamic():
+                continue
+            for cosmo_key in cosmology_list:
+                if cosmo_key == "EAGLE":  # Skip EAGLE since it is the same as Planck13
+                    continue
                 here = os.getcwd()
 
-                cosmo = cosmologies.builtin_cosmology_functions()[key]
-                filename = "_".join(["pytest_output", method, key])
-                table.create(method=method, filename=filename,
+                cosmo = cosmologies.builtin_cosmology_functions()[cosmo_key]
+                filename = "_".join(["pytest_output", method_key, cosmo_key])
+                table.create(method=method_key, filename=filename,
                              cosmo=cosmo, output_dir=here, zmin=0,
                              zmax=20, num_samples=10000)
 
                 # Compare new tables to existing tables for 4 dm values
-                pre_calc_fn = ".".join(["_".join([method, key]), "npz"])
-                new_calc_fn = "".join([filename, ".npz"])
+                pre_calc_table_name = "{}.hdf5".format(method_key)
 
-                pre_calc = table.load(pre_calc_fn)
-                new_calc = table.load(new_calc_fn, data_dir=here)
+                pre_calc_table = utils.get_path_to_file_from_here(pre_calc_table_name, subdirs=["data"])
+                new_calc_table = "pytest_output_{}_{}.hdf5".format(method_key, cosmo_key)
+
+                #pre_calc = table.load(pre_calc_fn)
+                #new_calc = table.load(new_calc_fn, data_dir=here)
 
                 test_dm_list = [0, 100, 1000, 2000]
 
                 for dm in test_dm_list:
-                    new_z = table.get_z_from_table(dm, new_calc)
-                    pre_z = table.get_z_from_table(dm, pre_calc)
-                    assert new_z == pre_z
+                    new_z = table.get_z_from_table(dm, new_calc_table, cosmo_key)
+                    pre_z = table.get_z_from_table(dm, pre_calc_table, cosmo_key)
+                    assert np.isclose(new_z, pre_z, rtol=1e-03)
 
     def test_create_table_zhang_figm_free_elec(self):
         cosmo = cosmologies.builtin_cosmology_functions()["Planck18"]
@@ -360,9 +436,19 @@ class TestPlots:
         if not os.path.exists(os.path.join(cwd, "pytest_output_cosmo.png")):
             raise OSError
 
+    def test_redshift_pdf_plot(self):
+        frb = Frb(510, gl=34,gb=15)
+        with pytest_mpl.plugin.switch_backend('Agg'):
+            plot.redshift_pdf(frb, filename="pytest_output_pdf", usetex=False)
+        cwd = os.getcwd()
+        if not os.path.exists(os.path.join(cwd, "pytest_output_cosmo.png")):
+            raise OSError  
 
+            
 def test_cleanup():
     # Remove the files at end of test
     test_files = glob("*pytest_output*")
+    test_files += glob("./data/*pytest_output*")
+
     for file in test_files:
         os.remove(file)
