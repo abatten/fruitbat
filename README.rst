@@ -4,8 +4,8 @@
 
 *FRUITBAT* is an open source python package used to estimate the redshift of 
 Fast Radio Bursts (FRB) from their dispersion measure. *FRUITBAT* combines 
-various dispersion measure (DM) and redshift relations with the YMW16 galactic 
-dispersion measure model into a single easy to use API. 
+various dispersion measure (DM)- redshift relations with the `pygedm`_ galactic 
+dispersion measure package into a single easy to use API. 
 
 Documentation
 -------------
@@ -29,14 +29,6 @@ If you are installing the latest development version of *FRUITBAT* then you
 will also need to install git-lfs. Instructions for installing git-lfs for
 your operating system can be found here_.
 
-Linux Users
-***********
-If you are installing *FRUITBAT* on a linux machine you may see this 'error':
-``ERROR: Failed building wheel for pyymw16``. This does not mean the installation
-failed. The C++ bindings were compiled using MacOS and needed to be recompiled
-for your machine. The installation process does this for you. You should still
-be able to run *FRUITBAT* normally.
-
 .. _PyPi: https://pypi.python.org/pypi/fruitbat 
 .. _here: https://help.github.com/en/articles/installing-git-large-file-storage
 
@@ -56,7 +48,9 @@ each requirement.
 
  - pandas: Reading csv files from FRBCAT
 
- - pyymw16: Python wrapper for YMW16 galactic dispersion measure model.
+ - pygedm: Python wrapper for YMW16 and NE2001 galactic dispersion measure models.
+
+ - h5py: Manipulating the HDF5 model files in the backend 
 
  - e13tools: Utility tools for writing docstrings.
 
@@ -74,32 +68,43 @@ To calculate the redshift of the FRB use the method
 ::
 
     >>> import fruitbat
-    >>> FRB121102 = fruitbat.Frb(557, dm_excess=369)
-    >>> FRB121102.calc_redshift()
+    >>> FRB20121102 = fruitbat.Frb(557, dm_excess=369)
+    >>> FRB20121102.calc_redshift()
     <Quantity 0.37581945>
     
 The `calc_redshift`_ function can also be passed a method and/or a cosmology.
 The method will specify which DM-redshift relation to assume and the cosmology
-will specify which cosmology to assume.
+will specify which cosmology to assume. The default relation is the Batten2021 relation.
 
 ::
 
-    >>> FRB121102.calc_redshift(method="Zhang2018", cosmology="Planck18")
+    >>> FRB20121102.calc_redshift(method="Zhang2018", cosmology="Planck18")
     <Quantity 0.42166019>
 
 It is also possible to specify the coordinates of the burst and use the 
 `calc_dm_galaxy`_ function to calculate the DM contribution from the Milky Way
 using the YMW16 or NE2001 galactic electron distribution model. Performing 
 `calc_dm_galaxy`_ will automatically calculate the excess dispersion measure 
-for the redshift calculation.
+for the redshift calculation. The coordinates of the FRB can be given in both
+celestial (`raj`/`decj`) and galactic (`gl`/`gb`) coordinates.
 
 ::
 
-    >>> FRB190222 = fruitbat.Frb(500, raj="12:34:43.5", decj="2:34:15.2")
-    >>> FRB190222.calc_dm_galaxy()
+    >>> FRB20190222 = fruitbat.Frb(500, raj="12:34:43.5", decj="2:34:15.2")
+    >>> FRB20190222.calc_dm_galaxy(model="YMW16")
     <Quantity 22.43696785 pc / cm3>
     >>> FRB190222.calc_redshift()
-    <Quantity 0.4808557>
+    <Quantity  0.49407603>
+
+::
+    >>> FRB20190222 = fruitbat.Frb(500, raj="12:34:43.5", decj="2:34:15.2")
+    >>> FRB20190222.calc_dm_galaxy(model="YMW16")
+    <Quantity 22.43696785 pc / cm3>
+    >>> FRB20190222.calc_redshift()
+    <Quantity  0.49407603>
+    >>> pdf_plot = FRB20190222.plot_redshift_pdf()
+    >>> plt.show()
+
 
 .. _Frb class: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Frb.html
 .. _calc_redshift: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Frb.html#fruitbat.Frb.calc_redshift
@@ -126,7 +131,6 @@ using the *FRUITBAT* package" and reference `our paper`_.
 .. _our paper: https://ui.adsabs.harvard.edu/abs/2019JOSS....4.1399B/abstract
 
 ::
-
     @ARTICLE{2019JOSS....4.1399B,
            author = {{Batten}, Adam},
             title = "{Fruitbat: A Python Package for Estimating Redshifts of Fast Radio Bursts}",
@@ -150,6 +154,9 @@ using the *FRUITBAT* package" and reference `our paper`_.
 
 .. |Logo| image:: logo/fruitbat_logo.svg
     :alt: Fruitbat Logo
+
+.. |PDFPlot| image: images/FRB20190222_redshift_pdf.plot.png
+    :alt: A plot with the redshift PDF of FRB 20190222 showing median and confidence intervals.
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/fruitbat.svg?label=PyPI
     :target: https://pypi.python.org/pypi/fruitbat
