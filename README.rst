@@ -96,6 +96,7 @@ celestial (`raj`/`decj`) and galactic (`gl`/`gb`) coordinates.
     >>> FRB190222.calc_redshift()
     <Quantity  0.49407603>
 
+
 ::
     >>> FRB20190222 = fruitbat.Frb(500, raj="12:34:43.5", decj="2:34:15.2")
     >>> FRB20190222.calc_dm_galaxy(model="YMW16")
@@ -105,6 +106,7 @@ celestial (`raj`/`decj`) and galactic (`gl`/`gb`) coordinates.
     >>> pdf_plot = FRB20190222.plot_redshift_pdf()
     >>> plt.show()
 
+|PDFPlot|
 
 .. _Frb class: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Frb.html
 .. _calc_redshift: https://fruitbat.readthedocs.io/en/latest/api/fruitbat.Frb.html#fruitbat.Frb.calc_redshift
@@ -155,7 +157,7 @@ using the *FRUITBAT* package" and reference `our paper`_.
 .. |Logo| image:: logo/fruitbat_logo.svg
     :alt: Fruitbat Logo
 
-.. |PDFPlot| image: images/FRB20190222_redshift_pdf.plot.png
+.. |PDFPlot| image:: images/FRB20190222_redshift_pdf.plot.png
     :alt: A plot with the redshift PDF of FRB 20190222 showing median and confidence intervals.
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/fruitbat.svg?label=PyPI
