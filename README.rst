@@ -138,6 +138,7 @@ using the *FRUITBAT* package" and reference `our paper`_.
 .. _our paper: https://ui.adsabs.harvard.edu/abs/2019JOSS....4.1399B/abstract
 
 ::
+
     @ARTICLE{2019JOSS....4.1399B,
            author = {{Batten}, Adam},
             title = "{Fruitbat: A Python Package for Estimating Redshifts of Fast Radio Bursts}",
