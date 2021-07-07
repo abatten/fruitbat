@@ -4,7 +4,7 @@
 
 *FRUITBAT* is an open source python package used to estimate the redshift of 
 Fast Radio Bursts (FRB) from their dispersion measure. *FRUITBAT* combines 
-various dispersion measure (DM)- redshift relations with the `pygedm`_ galactic 
+various dispersion measure (DM)- redshift relations with the PyGEDM_ galactic 
 dispersion measure package into a single easy to use API. 
 
 Documentation
@@ -31,7 +31,7 @@ your operating system can be found here_.
 
 .. _PyPi: https://pypi.python.org/pypi/fruitbat 
 .. _here: https://help.github.com/en/articles/installing-git-large-file-storage
-
+.. _PyGEDM: https://github.com/FRBs/pygedm
 
 Requirements
 ------------
@@ -53,6 +53,17 @@ each requirement.
  - h5py: Manipulating the HDF5 model files in the backend 
 
  - e13tools: Utility tools for writing docstrings.
+
+Additionally you may need to install `f2c` which is a requirement for using PyGEDM_. Pre-compiled wheels
+for PYGEDM_ are generated for Linux, which means you may skip the `f2c` install step. Alternatively you can
+install via `apt-get f2c` in Ubuntu, or `conda install -c conda-forge f2c` if you use `conda`.
+
+However if you are using MacOS you will need to install `f2c` and your best bet is via `conda`.
+
+::
+
+    conda install -c conda-forge f2c
+
 
 Usage
 -----
@@ -97,7 +108,7 @@ celestial (`raj`/`decj`) and galactic (`gl`/`gb`) coordinates.
     <Quantity  0.49407603>
 
 Additionaly, plotting an FRB's redshift probability density function (PDF) and
-confidence intervals is extremely simple using the `plot_redshift_pdf()`_ function.
+confidence intervals is extremely simple using the `plot_redshift_pdf`_ function.
 
 ::
 
