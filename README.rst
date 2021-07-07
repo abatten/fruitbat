@@ -96,8 +96,13 @@ celestial (`raj`/`decj`) and galactic (`gl`/`gb`) coordinates.
     >>> FRB190222.calc_redshift()
     <Quantity  0.49407603>
 
+Additionaly, plotting an FRB's redshift probability density function (PDF) and
+confidence intervals is extremely simple using the `plot_redshift_pdf()`_ function.
 
 ::
+
+    >>> import fruitbat
+    >>> import matplotlib.pyplot as plt
     >>> FRB20190222 = fruitbat.Frb(500, raj="12:34:43.5", decj="2:34:15.2")
     >>> FRB20190222.calc_dm_galaxy(model="YMW16")
     <Quantity 22.43696785 pc / cm3>
