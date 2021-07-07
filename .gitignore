@@ -3,6 +3,10 @@
 # Edit at https://www.gitignore.io/?templates=python
 .DS_Store
 ._.DS_Store
+
+*pytest_output*
+*/*pytest_output*
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
