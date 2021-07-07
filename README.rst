@@ -97,7 +97,7 @@ It is also possible to specify the coordinates of the burst and use the
 using the YMW16 or NE2001 galactic electron distribution model. Performing 
 `calc_dm_galaxy`_ will automatically calculate the excess dispersion measure 
 for the redshift calculation. The coordinates of the FRB can be given in both
-celestial (`raj`/`decj`) and galactic (`gl`/`gb`) coordinates.
+celestial (``raj``/``decj``) and galactic (``gl``/``gb``) coordinates.
 
 ::
 
