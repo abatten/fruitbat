@@ -54,11 +54,11 @@ each requirement.
 
  - e13tools: Utility tools for writing docstrings.
 
-Additionally you may need to install `f2c` which is a requirement for using PyGEDM_. Pre-compiled wheels
-for PYGEDM_ are generated for Linux, which means you may skip the `f2c` install step. Alternatively you can
-install via `apt-get f2c` in Ubuntu, or `conda install -c conda-forge f2c` if you use `conda`.
+Additionally you may need to install ``f2c`` which is a requirement for using PyGEDM_. Pre-compiled wheels
+for PYGEDM_ are generated for Linux, which means you may skip the ``f2c`` install step. Alternatively you can
+install via `apt-get f2c` in Ubuntu, or ``conda install -c conda-forge f2c`` if you use ``conda``.
 
-However if you are using MacOS you will need to install `f2c` and your best bet is via `conda`.
+However if you are using MacOS you will need to install ``f2c`` and your best bet is via ``conda``.
 
 ::
 
