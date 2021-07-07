@@ -162,7 +162,7 @@ using the *FRUITBAT* package" and reference `our paper`_.
 .. |Logo| image:: logo/fruitbat_logo.svg
     :alt: Fruitbat Logo
 
-.. |PDFPlot| image:: images/FRB20190222_redshift_pdf.plot.png
+.. |PDFPlot| image:: images/FRB20190222_redshift_pdf_plot.png
     :alt: A plot with the redshift PDF of FRB 20190222 showing median and confidence intervals.
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/fruitbat.svg?label=PyPI
