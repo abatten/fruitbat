@@ -79,7 +79,7 @@ and cite the JOSS paper.
 
 
 
-.. |Logo| image:: ../../logo/fruitbat_logo.svg 
+.. |Logo| image:: ../../images/logo/fruitbat_logo.svg 
     :target: https://github.com/abatten/fruitbat 
 
 .. _Ioka 2003: https://adsabs.harvard.edu/abs/2003ApJ...598L..79I

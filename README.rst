@@ -171,7 +171,7 @@ using the *FRUITBAT* package" and reference `our paper`_.
 
 
 
-.. |Logo| image:: logo/fruitbat_logo.svg
+.. |Logo| image:: images/logo/fruitbat_logo.svg
     :alt: Fruitbat Logo
 
 .. |PDFPlot| image:: images/FRB20190222_redshift_pdf_plot.png
